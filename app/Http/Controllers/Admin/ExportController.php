@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 class ExportController extends Controller
 {
     /**
-     * Download data absensi 1 bulan dalam format CSV/Excel.
+     * Download data absensi 1 bulan dalam format Spreadsheet (CSV/Excel siap olah).
      */
     public function exportCsv(Request $request): StreamedResponse
     {
@@ -35,8 +35,9 @@ class ExportController extends Controller
             ->orderBy('check_in_time', 'asc')
             ->get();
 
-        $monthName = Carbon::parse($selectedMonth . '-01')->translatedFormat('F_Y');
-        $fileName = "Laporan_Absensi_SIMAHUB_{$monthName}.csv";
+        $office = OfficeSetting::getSetting();
+        $monthLabel = Carbon::parse($selectedMonth . '-01')->translatedFormat('F Y');
+        $fileName = "Rekap_Presensi_SIMAHUB_" . str_replace(' ', '_', $monthLabel) . ".csv";
 
         $headers = [
             'Content-Type' => 'text/csv; charset=UTF-8',
@@ -46,27 +47,35 @@ class ExportController extends Controller
             'Expires' => '0',
         ];
 
-        return response()->stream(function () use ($attendances) {
+        return response()->stream(function () use ($attendances, $office, $monthLabel, $now) {
             $handle = fopen('php://output', 'w');
 
-            // Tambahkan UTF-8 BOM agar Excel membaca karakter dengan rapi
+            // Tambahkan UTF-8 BOM agar Excel/Spreadsheets otomatis membaca karakter dengan rapi
             fputs($handle, "\xEF\xBB\xBF");
 
-            // Header Kolom
+            // Header Dokumen Spreadsheet
+            fputcsv($handle, ['REKAPITULASI PRESENSI MAHASISWA MAGANG - SIMAHUB']);
+            fputcsv($handle, ['Instansi', $office->office_name]);
+            fputcsv($handle, ['Periode Bulan', $monthLabel]);
+            fputcsv($handle, ['Waktu Ekspor', $now->translatedFormat('d F Y, H:i') . ' WIB']);
+            fputcsv($handle, ['Total Data', $attendances->count() . ' catatan presensi']);
+            fputcsv($handle, []); // Baris kosong pemisah
+
+            // Header Kolom Tabel
             fputcsv($handle, [
                 'No',
                 'NIM',
                 'Nama Mahasiswa',
-                'Asal Kampus / Instansi',
+                'Perguruan Tinggi / Asal Instansi',
                 'Tanggal',
                 'Hari',
-                'Tipe Kehadiran',
+                'Metode Kerja',
                 'Jam Masuk (WIB)',
                 'Status Masuk',
                 'Jam Pulang (WIB)',
                 'Durasi Kerja',
-                'Jarak Masuk (Meter)',
-                'Catatan',
+                'Jarak Presensi (Meter)',
+                'Catatan / Keterangan',
             ]);
 
             $no = 1;
@@ -80,7 +89,7 @@ class ExportController extends Controller
                     $row->user ? $row->user->nim : '-',
                     $row->user ? $row->user->name : '-',
                     $row->user ? $row->user->institution : '-',
-                    $row->date->format('Y-m-d'),
+                    $row->date->format('d/m/Y'),
                     $dayName,
                     $typeText,
                     $row->check_in_time ? substr($row->check_in_time, 0, 5) : '-',

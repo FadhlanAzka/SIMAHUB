@@ -1,15 +1,15 @@
 @extends('layouts.app')
 
-@section('title', 'Riwayat Absensi Mahasiswa')
+@section('title', 'Riwayat Presensi Mahasiswa')
 
 @section('content')
 <div class="space-y-6">
 
     <!-- Header & Filter Bar -->
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs">
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-3xl border border-slate-200/80 shadow-xs">
         <div>
-            <h1 class="text-xl font-bold text-slate-900">Riwayat Presensi</h1>
-            <p class="text-xs text-slate-500 mt-0.5">Catatan seluruh kehadiran Anda selama pelaksanaan magang</p>
+            <h1 class="text-xl font-black text-slate-900 tracking-tight">Riwayat Presensi Mahasiswa</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Catatan seluruh kehadiran Anda selama pelaksanaan program magang</p>
         </div>
 
         <!-- Month Filter Form -->
@@ -18,9 +18,9 @@
                 <input type="month" 
                        name="month" 
                        value="{{ $selectedMonth }}" 
-                       class="text-xs font-semibold py-2 px-3 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-slate-800">
+                       class="text-xs font-bold py-2.5 px-3 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-slate-800">
             </div>
-            <button type="submit" class="py-2 px-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all shadow-xs cursor-pointer">
+            <button type="submit" class="py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all shadow-md shadow-blue-500/20 cursor-pointer">
                 Filter
             </button>
         </form>
@@ -28,36 +28,36 @@
 
     <!-- Monthly Statistics Widget -->
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
-            <span class="text-xs font-semibold text-slate-500">Total Hadir</span>
-            <div class="text-2xl font-extrabold text-blue-700 mt-1">{{ $stats['total_hadir'] }} <span class="text-xs font-normal text-slate-500">Hari</span></div>
+        <div class="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Hadir</span>
+            <div class="text-2xl font-black text-blue-600 mt-1">{{ $stats['total_hadir'] }} <span class="text-xs font-normal text-slate-500">Hari</span></div>
         </div>
-        <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
-            <span class="text-xs font-semibold text-slate-500">Tepat Waktu</span>
-            <div class="text-2xl font-extrabold text-emerald-700 mt-1">{{ $stats['tepat_waktu'] }} <span class="text-xs font-normal text-slate-500">Hari</span></div>
+        <div class="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Tepat Waktu</span>
+            <div class="text-2xl font-black text-emerald-600 mt-1">{{ $stats['tepat_waktu'] }} <span class="text-xs font-normal text-slate-500">Hari</span></div>
         </div>
-        <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
-            <span class="text-xs font-semibold text-slate-500">Terlambat</span>
-            <div class="text-2xl font-extrabold text-rose-700 mt-1">{{ $stats['terlambat'] }} <span class="text-xs font-normal text-slate-500">Hari</span></div>
+        <div class="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Terlambat</span>
+            <div class="text-2xl font-black text-rose-600 mt-1">{{ $stats['terlambat'] }} <span class="text-xs font-normal text-slate-500">Hari</span></div>
         </div>
-        <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
-            <span class="text-xs font-semibold text-slate-500">WFH (Jumat)</span>
-            <div class="text-2xl font-extrabold text-purple-700 mt-1">{{ $stats['wfh'] }} <span class="text-xs font-normal text-slate-500">Hari</span></div>
+        <div class="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">WFH (Jumat)</span>
+            <div class="text-2xl font-black text-purple-600 mt-1">{{ $stats['wfh'] }} <span class="text-xs font-normal text-slate-500">Hari</span></div>
         </div>
     </div>
 
     <!-- Attendance Table -->
-    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+    <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden">
         <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
             <h3 class="text-sm font-bold text-slate-900">
                 Data Kehadiran Periode {{ \Carbon\Carbon::parse($selectedMonth . '-01')->translatedFormat('F Y') }}
             </h3>
-            <span class="text-xs text-slate-500 font-medium">{{ $attendances->count() }} catatan ditemukan</span>
+            <span class="text-xs text-slate-500 font-medium">{{ $attendances->count() }} catatan</span>
         </div>
 
         <div class="overflow-x-auto">
             <table class="w-full text-left text-xs text-slate-600">
-                <thead class="bg-slate-50 text-slate-500 uppercase tracking-wider font-semibold border-b border-slate-100">
+                <thead class="bg-slate-50/80 text-slate-500 uppercase tracking-wider font-bold border-b border-slate-100 text-[11px]">
                     <tr>
                         <th class="px-6 py-3.5">Tanggal</th>
                         <th class="px-6 py-3.5">Hari</th>
@@ -75,7 +75,7 @@
                             <td class="px-6 py-4 font-bold text-slate-900 whitespace-nowrap">
                                 {{ $row->date->format('d/m/Y') }}
                             </td>
-                            <td class="px-6 py-4 font-medium text-slate-700 whitespace-nowrap">
+                            <td class="px-6 py-4 font-semibold text-slate-700 whitespace-nowrap">
                                 {{ \Carbon\Carbon::parse($row->date)->translatedFormat('l') }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
@@ -90,7 +90,7 @@
                             <td class="px-6 py-4 font-mono font-medium text-slate-800 whitespace-nowrap">
                                 {{ $row->check_out_time ? substr($row->check_out_time, 0, 5) . ' WIB' : '-' }}
                             </td>
-                            <td class="px-6 py-4 text-slate-600 whitespace-nowrap">
+                            <td class="px-6 py-4 text-slate-600 whitespace-nowrap font-medium">
                                 {{ $row->duration }}
                             </td>
                             <td class="px-6 py-4 text-slate-500 whitespace-nowrap">
@@ -107,7 +107,7 @@
                     @empty
                         <tr>
                             <td colspan="8" class="px-6 py-12 text-center text-slate-400">
-                                <i data-lucide="calendar-x" class="w-8 h-8 mx-auto text-slate-300 mb-2"></i>
+                                <i data-lucide="inbox" class="w-8 h-8 mx-auto text-slate-300 mb-2"></i>
                                 Tidak ada data presensi pada bulan yang dipilih.
                             </td>
                         </tr>

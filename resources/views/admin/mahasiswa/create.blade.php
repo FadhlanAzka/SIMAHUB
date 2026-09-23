@@ -9,15 +9,15 @@
     <div class="flex items-center justify-between">
         <a href="{{ route('admin.mahasiswa.index') }}" class="text-xs font-bold text-slate-500 hover:text-slate-800 inline-flex items-center gap-1.5 transition-colors">
             <i data-lucide="arrow-left" class="w-4 h-4"></i>
-            Kembali ke Daftar Mahasiswa
+            Kembali ke Data Mahasiswa
         </a>
     </div>
 
     <!-- Form Card -->
-    <div class="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200/80 shadow-xs">
+    <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-xs">
         <div class="pb-5 border-b border-slate-100 mb-6">
             <h1 class="text-lg font-bold text-slate-900">Tambah Mahasiswa Magang Baru</h1>
-            <p class="text-xs text-slate-500 mt-0.5">Daftarkan akun mahasiswa untuk mengakses sistem absensi SIMAHUB</p>
+            <p class="text-xs text-slate-500 mt-0.5">Daftarkan akun mahasiswa untuk mengakses sistem presensi SIMAHUB</p>
         </div>
 
         <form action="{{ route('admin.mahasiswa.store') }}" method="POST" class="space-y-5">
@@ -26,7 +26,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <!-- Nama Mahasiswa -->
                 <div class="sm:col-span-2">
-                    <label for="name" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2">
+                    <label for="name" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
                         Nama Lengkap Mahasiswa <span class="text-rose-500">*</span>
                     </label>
                     <input type="text" 
@@ -34,13 +34,13 @@
                            id="name" 
                            value="{{ old('name') }}" 
                            required 
-                           placeholder="Contoh: Muhammad Akbar"
+                           placeholder="Contoh: Moch. Akbar"
                            class="w-full text-xs font-medium py-2.5 px-3.5 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-slate-900 transition-all">
                 </div>
 
                 <!-- NIM / Nomor Induk -->
                 <div>
-                    <label for="nim" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2">
+                    <label for="nim" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
                         NIM / ID Magang <span class="text-rose-500">*</span>
                     </label>
                     <input type="text" 
@@ -48,13 +48,13 @@
                            id="nim" 
                            value="{{ old('nim') }}" 
                            required 
-                           placeholder="Contoh: 20122010"
+                           placeholder="Contoh: 12345678"
                            class="w-full text-xs font-medium py-2.5 px-3.5 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-slate-900 transition-all">
                 </div>
 
                 <!-- Email -->
                 <div>
-                    <label for="email" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2">
+                    <label for="email" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
                         Alamat Email <span class="text-rose-500">*</span>
                     </label>
                     <input type="email" 
@@ -68,7 +68,7 @@
 
                 <!-- Asal Kampus / Instansi -->
                 <div>
-                    <label for="institution" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2">
+                    <label for="institution" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
                         Asal Perguruan Tinggi <span class="text-rose-500">*</span>
                     </label>
                     <input type="text" 
@@ -82,7 +82,7 @@
 
                 <!-- No Telepon / WA -->
                 <div>
-                    <label for="phone" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2">
+                    <label for="phone" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
                         No. WhatsApp / HP
                     </label>
                     <input type="text" 
@@ -95,7 +95,7 @@
 
                 <!-- Password -->
                 <div class="sm:col-span-2">
-                    <label for="password" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2">
+                    <label for="password" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
                         Kata Sandi Awal <span class="text-rose-500">*</span>
                     </label>
                     <input type="password" 

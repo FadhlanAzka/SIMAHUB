@@ -5,46 +5,41 @@
 @section('content')
 <div class="sm:mx-auto sm:w-full sm:max-w-md">
     
-    <!-- Header Logo & Identity -->
+    <!-- Modern Brand Identity & Sleek Monogram Logo -->
     <div class="text-center">
-        <div class="inline-flex w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-700 to-blue-500 items-center justify-center text-white shadow-lg shadow-blue-500/25 mb-4">
-            <i data-lucide="calendar-check" class="w-7 h-7"></i>
+        <div class="inline-flex w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-700 via-blue-600 to-indigo-600 items-center justify-center text-white shadow-xl shadow-blue-500/25 mb-4 ring-4 ring-blue-100/60 transform hover:scale-105 transition-transform duration-300">
+            <svg class="w-8 h-8 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+            </svg>
         </div>
-        <h1 class="text-2xl font-extrabold tracking-tight text-slate-900">SIMAHUB</h1>
-        <p class="text-sm text-slate-500 mt-1 font-medium">Sistem Informasi Absensi MagangHub</p>
+        <h1 class="text-2xl font-black tracking-tight text-slate-900">SIMAHUB</h1>
+        <p class="text-xs text-slate-500 mt-1 font-semibold tracking-wide uppercase">Sistem Informasi Absensi MagangHub</p>
     </div>
 
     <!-- Login Card -->
-    <div class="mt-8 bg-white py-8 px-6 sm:px-10 shadow-xl shadow-slate-200/50 rounded-2xl border border-slate-200/80">
+    <div class="mt-7 bg-white py-8 px-6 sm:px-10 shadow-xl shadow-slate-200/60 rounded-3xl border border-slate-200/80 backdrop-blur-sm">
         
         <!-- Flash Alert -->
         @if(session('error'))
-            <div class="mb-5 rounded-xl bg-rose-50 border border-rose-200 p-3.5 text-rose-800 text-xs flex items-center gap-2.5">
+            <div class="mb-5 rounded-xl bg-rose-50 border border-rose-200/80 p-3.5 text-rose-800 text-xs flex items-center gap-2.5">
                 <i data-lucide="alert-circle" class="w-4 h-4 text-rose-600 shrink-0"></i>
-                <span>{{ session('error') }}</span>
-            </div>
-        @endif
-
-        @if(session('success'))
-            <div class="mb-5 rounded-xl bg-emerald-50 border border-emerald-200 p-3.5 text-emerald-800 text-xs flex items-center gap-2.5">
-                <i data-lucide="check-circle" class="w-4 h-4 text-emerald-600 shrink-0"></i>
-                <span>{{ session('success') }}</span>
+                <span class="font-medium">{{ session('error') }}</span>
             </div>
         @endif
 
         @if($errors->has('login'))
-            <div class="mb-5 rounded-xl bg-rose-50 border border-rose-200 p-3.5 text-rose-800 text-xs flex items-center gap-2.5">
+            <div class="mb-5 rounded-xl bg-rose-50 border border-rose-200/80 p-3.5 text-rose-800 text-xs flex items-center gap-2.5">
                 <i data-lucide="alert-circle" class="w-4 h-4 text-rose-600 shrink-0"></i>
-                <span>{{ $errors->first('login') }}</span>
+                <span class="font-medium">{{ $errors->first('login') }}</span>
             </div>
         @endif
 
-        <form action="{{ route('login.process') }}" method="POST" class="space-y-5">
+        <form action="{{ route('login.process') }}" method="POST" id="loginForm" class="space-y-5">
             @csrf
 
             <!-- Login Input (Email / NIM) -->
             <div>
-                <label for="login" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2">
+                <label for="login" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
                     Email atau NIM
                 </label>
                 <div class="relative rounded-xl shadow-xs">
@@ -64,7 +59,7 @@
 
             <!-- Password Input -->
             <div>
-                <label for="password" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2">
+                <label for="password" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
                     Kata Sandi
                 </label>
                 <div class="relative rounded-xl shadow-xs">
@@ -92,30 +87,27 @@
                     <input type="checkbox" 
                            name="remember" 
                            class="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 border-slate-300">
-                    <span>Ingat saya di perangkat ini</span>
+                    <span class="font-medium">Ingat saya di perangkat ini</span>
                 </label>
             </div>
 
-            <!-- Submit Button -->
+            <!-- Submit Button (Changed to 'Masuk') -->
             <div>
                 <button type="submit" 
-                        class="w-full flex justify-center items-center gap-2 py-2.5 px-4 border border-transparent rounded-xl shadow-md shadow-blue-500/20 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all cursor-pointer">
-                    <span>Masuk ke Sistem</span>
-                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        id="btnLogin"
+                        class="w-full flex justify-center items-center gap-2 py-3 px-4 border border-transparent rounded-xl shadow-lg shadow-blue-500/25 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 active:scale-[0.99] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all cursor-pointer">
+                    <span id="btnText">Masuk</span>
+                    <i data-lucide="arrow-right" id="btnIcon" class="w-4 h-4"></i>
                 </button>
             </div>
         </form>
-    </div>
-
-    <!-- Clean Footer -->
-    <div class="mt-8 text-center text-xs text-slate-400">
-        &copy; {{ date('Y') }} SIMAHUB. Hak Cipta Dilindungi.
     </div>
 
 </div>
 
 @push('scripts')
 <script>
+    // Toggle Password Visibility
     const toggleBtn = document.getElementById('togglePassword');
     const pwdInput = document.getElementById('password');
     const eyeIcon = document.getElementById('eyeIcon');
@@ -126,6 +118,37 @@
         eyeIcon.setAttribute('data-lucide', isPassword ? 'eye-off' : 'eye');
         lucide.createIcons();
     });
+
+    // Login Form Submit Animation
+    const form = document.getElementById('loginForm');
+    const btnLogin = document.getElementById('btnLogin');
+    const btnText = document.getElementById('btnText');
+    const btnIcon = document.getElementById('btnIcon');
+
+    form.addEventListener('submit', function () {
+        btnLogin.disabled = true;
+        btnLogin.classList.add('opacity-90', 'cursor-wait');
+        btnText.textContent = 'Memverifikasi...';
+        btnIcon.setAttribute('data-lucide', 'loader-2');
+        btnIcon.classList.add('animate-spin');
+        lucide.createIcons();
+    });
+
+    // Success Popup if redirected back or initialized
+    @if(session('success'))
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil!',
+            text: "{{ session('success') }}",
+            timer: 2000,
+            showConfirmButton: false,
+            customClass: {
+                popup: 'rounded-2xl shadow-2xl border border-slate-100',
+                title: 'text-lg font-bold text-slate-900',
+                htmlContainer: 'text-xs text-slate-600'
+            }
+        });
+    @endif
 </script>
 @endpush
 @endsection

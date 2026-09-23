@@ -36,8 +36,9 @@
         }
     </script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
-<body class="h-full font-sans antialiased text-slate-800 bg-gradient-to-b from-blue-50/70 via-slate-50 to-slate-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+<body class="h-full font-sans antialiased text-slate-800 bg-gradient-to-br from-blue-50/80 via-slate-50 to-indigo-50/40 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
     
     @yield('content')
 
