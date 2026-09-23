@@ -48,11 +48,11 @@ class AuthController extends Controller
             $user = Auth::user();
             if ($user->isAdmin()) {
                 return redirect()->intended(route('admin.dashboard'))
-                    ->with('success', 'Selamat datang kembali, ' . $user->name);
+                    ->with('login_success', 'Selamat datang kembali, ' . $user->name . '!');
             }
 
             return redirect()->intended(route('mahasiswa.dashboard'))
-                ->with('success', 'Selamat datang, ' . $user->name);
+                ->with('login_success', 'Selamat datang, ' . $user->name . '!');
         }
 
         return back()->withErrors([

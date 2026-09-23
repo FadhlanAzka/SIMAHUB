@@ -66,14 +66,16 @@
                                 <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
                             </svg>
                         </div>
-                        <div>
-                            <span class="text-xl font-extrabold tracking-tight text-slate-900 flex items-center gap-2">
-                                SIMAHUB
-                                <span class="text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200/60">
+                        <div class="flex flex-col justify-center">
+                            <div class="flex items-center gap-2">
+                                <span class="text-lg font-black tracking-tight text-slate-900 leading-none">SIMAHUB</span>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 border border-slate-200/80 tracking-wide uppercase">
                                     {{ auth()->user()->role === 'admin' ? 'Admin' : 'Magang' }}
                                 </span>
-                            </span>
-                            <p class="text-[11px] text-slate-500 font-medium -mt-1">Sistem Absensi MagangHub</p>
+                            </div>
+                            <p class="text-[11px] text-slate-400 font-medium mt-1 leading-none">
+                                {{ auth()->user()->role === 'admin' ? 'Panel Administrator' : 'Portal Mahasiswa Magang' }}
+                            </p>
                         </div>
                     </a>
                 </div>
@@ -222,6 +224,30 @@
     <script>
         lucide.createIcons();
     </script>
+
+    <!-- SweetAlert2 Login Success Pop-up Animation -->
+    @if(session('login_success'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Login Berhasil!',
+                    text: "{{ session('login_success') }}",
+                    timer: 2400,
+                    timerProgressBar: true,
+                    showConfirmButton: false,
+                    backdrop: `rgba(15, 23, 42, 0.45)`,
+                    customClass: {
+                        popup: 'rounded-3xl shadow-2xl border border-slate-100 p-6',
+                        title: 'text-lg font-black text-slate-900',
+                        htmlContainer: 'text-xs font-semibold text-slate-600 mt-1',
+                        timerProgressBar: 'bg-blue-600'
+                    }
+                });
+            });
+        </script>
+    @endif
+
     @stack('scripts')
 </body>
 </html>
