@@ -131,6 +131,9 @@
                         </td>
                         <td class="p-2 border-r border-slate-300 font-semibold text-slate-900 whitespace-nowrap">
                             {{ $row->user ? $row->user->name : '-' }}
+                            @if($row->user && $row->user->position)
+                                <span class="text-[10px] text-blue-700 font-bold block">{{ $row->user->position }}</span>
+                            @endif
                             <span class="text-[10px] text-slate-500 font-normal block">{{ $row->user ? $row->user->institution : '' }}</span>
                         </td>
                         <td class="p-2 border-r border-slate-300 font-bold text-[10px] whitespace-nowrap">

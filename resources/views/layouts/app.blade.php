@@ -121,8 +121,8 @@
                 <div class="flex items-center space-x-4">
                     <div class="hidden sm:block text-right">
                         <div class="text-xs font-bold text-slate-900 leading-tight">{{ auth()->user()->name }}</div>
-                        <div class="text-[11px] text-slate-500 font-medium">
-                            {{ auth()->user()->isAdmin() ? 'Administrator' : (auth()->user()->nim ?: auth()->user()->institution) }}
+                        <div class="text-[11px] text-blue-600 font-semibold">
+                            {{ auth()->user()->isAdmin() ? 'Administrator Instansi' : (auth()->user()->position ?: 'Mahasiswa Magang') }}
                         </div>
                     </div>
 

@@ -38,7 +38,8 @@
                     <tr>
                         <th class="px-6 py-3.5">NIM / ID</th>
                         <th class="px-6 py-3.5">Nama Lengkap</th>
-                        <th class="px-6 py-3.5">Asal Kampus / Instansi</th>
+                        <th class="px-6 py-3.5">Posisi Magang</th>
+                        <th class="px-6 py-3.5">Asal Kampus</th>
                         <th class="px-6 py-3.5">Email</th>
                         <th class="px-6 py-3.5">No. Telepon / WA</th>
                         <th class="px-6 py-3.5 text-center">Total Kehadiran</th>
@@ -53,6 +54,11 @@
                             </td>
                             <td class="px-6 py-4 font-semibold text-slate-900 whitespace-nowrap">
                                 {{ $mhs->name }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200/60">
+                                    {{ $mhs->position ?: '-' }}
+                                </span>
                             </td>
                             <td class="px-6 py-4 text-slate-600 whitespace-nowrap">
                                 {{ $mhs->institution ?: '-' }}

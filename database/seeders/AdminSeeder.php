@@ -20,6 +20,7 @@ class AdminSeeder extends Seeder
                 'name' => 'Admin',
                 'nim' => 'ADMIN',
                 'institution' => 'Instansi MagangHub',
+                'position' => 'Administrator Instansi',
                 'phone' => '081234567890',
                 'role' => 'admin',
                 'password' => Hash::make('admin123'),

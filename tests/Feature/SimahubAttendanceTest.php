@@ -88,6 +88,7 @@ class SimahubAttendanceTest extends TestCase
             'email' => 'siswates@magang.id',
             'nim' => 'TEST1234',
             'institution' => 'Universitas Indonesia',
+            'position' => 'Web Developer',
             'role' => 'mahasiswa',
             'password' => bcrypt('password123'),
         ]);
@@ -113,6 +114,7 @@ class SimahubAttendanceTest extends TestCase
             'email' => 'wfh@magang.id',
             'nim' => 'WFH001',
             'institution' => 'ITB',
+            'position' => 'Data Analyst',
             'role' => 'mahasiswa',
             'password' => bcrypt('password123'),
         ]);
@@ -148,6 +150,7 @@ class SimahubAttendanceTest extends TestCase
             'email' => 'jauh@magang.id',
             'nim' => 'JAUH001',
             'institution' => 'UGM',
+            'position' => 'UI UX Designer',
             'role' => 'mahasiswa',
             'password' => bcrypt('password123'),
         ]);
@@ -180,6 +183,7 @@ class SimahubAttendanceTest extends TestCase
             'email' => 'telat@magang.id',
             'nim' => 'TELAT001',
             'institution' => 'UI',
+            'position' => 'Technical Writer',
             'role' => 'mahasiswa',
             'password' => bcrypt('password123'),
         ]);
@@ -212,6 +216,7 @@ class SimahubAttendanceTest extends TestCase
             'email' => 'cepat@magang.id',
             'nim' => 'CEPAT001',
             'institution' => 'UNDIP',
+            'position' => 'Network Engineer',
             'role' => 'mahasiswa',
             'password' => bcrypt('password123'),
         ]);

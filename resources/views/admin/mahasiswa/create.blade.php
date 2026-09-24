@@ -52,6 +52,20 @@
                            class="w-full text-xs font-medium py-2.5 px-3.5 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-slate-900 transition-all">
                 </div>
 
+                <!-- Posisi / Divisi Magang -->
+                <div>
+                    <label for="position" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                        Posisi / Divisi Magang <span class="text-rose-500">*</span>
+                    </label>
+                    <input type="text" 
+                           name="position" 
+                           id="position" 
+                           value="{{ old('position') }}" 
+                           required 
+                           placeholder="Contoh: Frontend Developer / UI UX Designer"
+                           class="w-full text-xs font-medium py-2.5 px-3.5 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-slate-900 transition-all">
+                </div>
+
                 <!-- Email -->
                 <div>
                     <label for="email" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">

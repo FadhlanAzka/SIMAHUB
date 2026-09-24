@@ -16,7 +16,7 @@
             <div>
                 <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 text-blue-100 text-xs font-bold backdrop-blur-md mb-3 border border-white/10">
                     <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                    <span>Portal Mahasiswa MagangHub</span>
+                    <span>Posisi: {{ $user->position ?: 'Mahasiswa Magang' }}</span>
                 </div>
                 <h1 class="text-2xl sm:text-3xl font-black tracking-tight">
                     Halo, {{ $user->name }}

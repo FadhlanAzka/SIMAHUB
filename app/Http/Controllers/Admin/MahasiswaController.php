@@ -20,7 +20,8 @@ class MahasiswaController extends Controller
                     $q->where('name', 'like', "%{$search}%")
                       ->orWhere('nim', 'like', "%{$search}%")
                       ->orWhere('email', 'like', "%{$search}%")
-                      ->orWhere('institution', 'like', "%{$search}%");
+                      ->orWhere('institution', 'like', "%{$search}%")
+                      ->orWhere('position', 'like', "%{$search}%");
                 });
             })
             ->withCount('attendances')
@@ -43,6 +44,7 @@ class MahasiswaController extends Controller
             'nim' => ['required', 'string', 'max:50', 'unique:users,nim'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
             'institution' => ['required', 'string', 'max:255'],
+            'position' => ['required', 'string', 'max:100'],
             'phone' => ['nullable', 'string', 'max:20'],
             'password' => ['required', 'string', 'min:6'],
         ], [
@@ -52,6 +54,7 @@ class MahasiswaController extends Controller
             'email.required' => 'Email wajib diisi.',
             'email.unique' => 'Email tersebut sudah terdaftar.',
             'institution.required' => 'Asal perguruan tinggi / instansi wajib diisi.',
+            'position.required' => 'Posisi / divisi magang wajib diisi.',
             'password.required' => 'Kata sandi wajib diisi (minimal 6 karakter).',
             'password.min' => 'Kata sandi minimal 6 karakter.',
         ]);
@@ -85,6 +88,7 @@ class MahasiswaController extends Controller
             'nim' => ['required', 'string', 'max:50', Rule::unique('users')->ignore($mahasiswa->id)],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($mahasiswa->id)],
             'institution' => ['required', 'string', 'max:255'],
+            'position' => ['required', 'string', 'max:100'],
             'phone' => ['nullable', 'string', 'max:20'],
             'password' => ['nullable', 'string', 'min:6'],
         ], [
@@ -94,6 +98,7 @@ class MahasiswaController extends Controller
             'email.required' => 'Email wajib diisi.',
             'email.unique' => 'Email sudah digunakan.',
             'institution.required' => 'Asal perguruan tinggi wajib diisi.',
+            'position.required' => 'Posisi / divisi magang wajib diisi.',
         ]);
 
         if (!empty($validated['password'])) {
