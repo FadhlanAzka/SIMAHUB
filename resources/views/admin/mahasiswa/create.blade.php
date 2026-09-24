@@ -38,10 +38,10 @@
                            class="w-full text-xs font-medium py-2.5 px-3.5 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-slate-900 transition-all">
                 </div>
 
-                <!-- NIM / Nomor Induk -->
+                <!-- NIM-->
                 <div>
                     <label for="nim" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                        NIM / ID Magang <span class="text-rose-500">*</span>
+                        NIM / ID Magang<span class="text-rose-500">*</span>
                     </label>
                     <input type="text" 
                            name="nim" 
@@ -52,7 +52,7 @@
                            class="w-full text-xs font-medium py-2.5 px-3.5 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-slate-900 transition-all">
                 </div>
 
-                <!-- Posisi / Divisi Magang -->
+                <!-- Posisi Magang -->
                 <div>
                     <label for="position" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
                         Posisi / Divisi Magang <span class="text-rose-500">*</span>
@@ -110,7 +110,7 @@
                 <!-- Password -->
                 <div class="sm:col-span-2">
                     <label for="password" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                        Kata Sandi Awal <span class="text-rose-500">*</span>
+                        Kata Sandi <span class="text-rose-500">*</span>
                     </label>
                     <input type="password" 
                            name="password" 
