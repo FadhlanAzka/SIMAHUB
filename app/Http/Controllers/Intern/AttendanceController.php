@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Mahasiswa;
+namespace App\Http\Controllers\intern;
 
 use App\Http\Controllers\Controller;
 use App\Models\Attendance;
@@ -13,24 +13,28 @@ use Illuminate\Support\Facades\Auth;
 class AttendanceController extends Controller
 {
     /**
-     * Memproses Absen Masuk mahasiswa magang.
+     * Memproses Absen Masuk intern magang.
      */
     public function checkIn(Request $request)
     {
-        $request->validate([
-            'latitude' => ['required', 'numeric'],
-            'longitude' => ['required', 'numeric'],
-            'notes' => ['nullable', 'string', 'max:255'],
-        ], [
-            'latitude.required' => 'Koordinat GPS wajib diaktifkan pada peramban Anda.',
-            'longitude.required' => 'Koordinat GPS wajib diaktifkan pada peramban Anda.',
-        ]);
-
         $user = Auth::user();
         $now = Carbon::now();
         $today = $now->toDateString();
         $currentTime = $now->toTimeString(); // HH:MM:SS
         $dayOfWeek = $now->dayOfWeekIso; // 1 = Senin, 5 = Jumat, 6 = Sabtu, 7 = Minggu
+        
+        $office = OfficeSetting::getSetting();
+        $wfhDays = is_array($office->wfh_days) ? $office->wfh_days : (json_decode($office->wfh_days, true) ?? []);
+        $isWfhDay = in_array($dayOfWeek, $wfhDays);
+
+        $request->validate([
+            'latitude' => [$isWfhDay ? 'nullable' : 'required', 'numeric'],
+            'longitude' => [$isWfhDay ? 'nullable' : 'required', 'numeric'],
+            'notes' => ['nullable', 'string', 'max:255'],
+        ], [
+            'latitude.required' => 'Koordinat GPS wajib diaktifkan pada peramban Anda untuk WFO.',
+            'longitude.required' => 'Koordinat GPS wajib diaktifkan pada peramban Anda untuk WFO.',
+        ]);
 
         // 1. Validasi Hari Kerja (Senin - Jumat)
         if ($dayOfWeek >= 6) {
@@ -46,39 +50,45 @@ class AttendanceController extends Controller
             return back()->with('error', 'Anda sudah melakukan absen masuk hari ini pada pukul ' . substr($attendance->check_in_time, 0, 5) . ' WIB.');
         }
 
-        $office = OfficeSetting::getSetting();
-        $userLat = (float) $request->latitude;
-        $userLong = (float) $request->longitude;
+        $userLat = $request->latitude ? (float) $request->latitude : null;
+        $userLong = $request->longitude ? (float) $request->longitude : null;
+        $distance = null;
 
-        // Hitung jarak pengguna ke kantor instansi dalam meter
-        $distance = GeolocationService::calculateDistance(
-            $userLat,
-            $userLong,
-            (float) $office->latitude,
-            (float) $office->longitude
-        );
+        // Hitung jarak pengguna ke kantor instansi dalam meter (Jika ada koordinat)
+        if ($userLat && $userLong) {
+            $distance = GeolocationService::calculateDistance(
+                $userLat,
+                $userLong,
+                (float) $office->latitude,
+                (float) $office->longitude
+            );
+        }
 
         // 3. Kebijakan WFO vs WFH
-        // Jumat = WFH (Bebas dari rumah / bypass radius)
-        // Senin - Kamis = WFO (Wajib di lingkungan instansi / radius)
-        $isFriday = ($dayOfWeek === 5);
+        // WFH: Berdasarkan pengaturan WFH yang dipilih Admin (Bebas dari rumah / bypass radius)
+        // WFO: Selain hari WFH (Wajib di lingkungan instansi / radius)
+        $wfhDays = is_array($office->wfh_days) ? $office->wfh_days : (json_decode($office->wfh_days, true) ?? []);
+        $isWfhDay = in_array($dayOfWeek, $wfhDays);
 
-        if ($isFriday) {
+        if ($isWfhDay) {
             $type = 'WFH';
         } else {
             $type = 'WFO';
-            // Validasi Geofencing jika hari Senin - Kamis
+            // Validasi Geofencing jika hari WFO
             if ($distance > $office->radius_meters) {
                 return back()->with(
                     'error',
-                    "Absensi ditolak! Pada hari Senin s/d Kamis absensi wajib WFO di lingkungan instansi. Anda terdeteksi berada di luar area kantor ({$distance} meter dari kantor, batas toleransi: {$office->radius_meters} meter)."
+                    "Absensi ditolak! Pada hari kerja normal (WFO), absensi wajib di lingkungan instansi. Anda terdeteksi berada di luar area kantor ({$distance} meter dari kantor, batas toleransi: {$office->radius_meters} meter)."
                 );
             }
         }
 
-        // 4. Penentuan Status Masuk (Batas 07:30:00)
-        // Jika <= 07:30 -> Tepat Waktu; Jika > 07:30 -> Terlambat
-        $status = ($currentTime <= $office->work_start_time) ? 'tepat_waktu' : 'terlambat';
+        $workHours = is_array($office->work_hours) ? $office->work_hours : (json_decode($office->work_hours, true) ?? []);
+        $startLimit = $workHours[$dayOfWeek]['start'] ?? $office->work_start_time;
+
+        // 4. Penentuan Status Masuk
+        // Jika <= jam masuk -> Tepat Waktu; Jika > jam masuk -> Terlambat
+        $status = ($currentTime <= $startLimit) ? 'tepat_waktu' : 'terlambat';
 
         // 5. Simpan Transaksi Absensi
         Attendance::updateOrCreate(
@@ -104,7 +114,7 @@ class AttendanceController extends Controller
     }
 
     /**
-     * Memproses Absen Pulang mahasiswa magang.
+     * Memproses Absen Pulang intern magang.
      */
     public function checkOut(Request $request)
     {
@@ -137,12 +147,15 @@ class AttendanceController extends Controller
             return back()->with('error', 'Anda sudah melakukan absen pulang hari ini pada pukul ' . substr($attendance->check_out_time, 0, 5) . ' WIB.');
         }
 
-        // 3. Validasi Waktu Pulang (Minimal 16:00:00)
+        // 3. Validasi Waktu Pulang
         $office = OfficeSetting::getSetting();
-        if ($currentTime < $office->work_end_time) {
+        $workHours = is_array($office->work_hours) ? $office->work_hours : (json_decode($office->work_hours, true) ?? []);
+        $endLimit = $workHours[$dayOfWeek]['end'] ?? $office->work_end_time;
+
+        if ($currentTime < $endLimit) {
             return back()->with(
                 'error',
-                "Belum waktunya pulang! Absen pulang hanya dapat dilakukan mulai pukul " . substr($office->work_end_time, 0, 5) . " WIB (Waktu saat ini: " . substr($currentTime, 0, 5) . " WIB)."
+                "Belum waktunya pulang! Absen pulang hanya dapat dilakukan mulai pukul " . substr($endLimit, 0, 5) . " WIB (Waktu saat ini: " . substr($currentTime, 0, 5) . " WIB)."
             );
         }
 
@@ -171,7 +184,7 @@ class AttendanceController extends Controller
     }
 
     /**
-     * Menampilkan riwayat absensi mahasiswa magang.
+     * Menampilkan riwayat absensi intern magang.
      */
     public function history(Request $request)
     {
@@ -194,6 +207,6 @@ class AttendanceController extends Controller
             'wfh' => $attendances->where('type', 'WFH')->count(),
         ];
 
-        return view('mahasiswa.history', compact('user', 'attendances', 'selectedMonth', 'stats'));
+        return view('intern.history', compact('user', 'attendances', 'selectedMonth', 'stats'));
     }
 }

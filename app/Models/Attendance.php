@@ -74,7 +74,7 @@ class Attendance extends Model
     public function getTypeBadgeAttribute(): string
     {
         if ($this->type === 'WFH') {
-            return '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 font-semibold">WFH (Jumat)</span>';
+            return '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 font-semibold">WFH (Bebas Lokasi)</span>';
         }
 
         return '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 font-semibold">WFO (Kantor)</span>';

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Mahasiswa;
+namespace App\Http\Controllers\intern;
 
 use App\Http\Controllers\Controller;
 use App\Models\Attendance;
@@ -18,22 +18,23 @@ class DashboardController extends Controller
         $today = $now->toDateString();
         $dayOfWeek = $now->dayOfWeekIso; // 1 (Senin) s/d 7 (Minggu)
 
+        // Pengaturan kantor & jam kerja
+        $office = OfficeSetting::getSetting();
+        $wfhDays = is_array($office->wfh_days) ? $office->wfh_days : (json_decode($office->wfh_days, true) ?? []);
+
         $isWeekend = ($dayOfWeek >= 6); // Sabtu (6) atau Minggu (7)
-        $isFriday = ($dayOfWeek === 5); // Jumat (5)
+        $isWfhDay = in_array($dayOfWeek, $wfhDays);
         
         // Tipe kerja hari ini
         if ($isWeekend) {
             $workType = 'LIBUR';
-        } elseif ($isFriday) {
+        } elseif ($isWfhDay) {
             $workType = 'WFH';
         } else {
             $workType = 'WFO';
         }
 
-        // Pengaturan kantor & jam kerja
-        $office = OfficeSetting::getSetting();
-
-        // Absensi hari ini untuk mahasiswa yang sedang login
+        // Absensi hari ini untuk intern yang sedang login
         $todayAttendance = Attendance::where('user_id', $user->id)
             ->where('date', $today)
             ->first();
@@ -59,13 +60,13 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
-        return view('mahasiswa.dashboard', compact(
+        return view('intern.dashboard', compact(
             'user',
             'now',
             'today',
             'dayOfWeek',
             'isWeekend',
-            'isFriday',
+            'isWfhDay',
             'workType',
             'office',
             'todayAttendance',

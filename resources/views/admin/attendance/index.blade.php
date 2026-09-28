@@ -9,7 +9,7 @@
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-3xl border border-slate-200/80 shadow-xs">
         <div>
             <h1 class="text-xl font-black text-slate-900 tracking-tight">Rekapitulasi Data Absensi</h1>
-            <p class="text-xs text-slate-500 mt-0.5">Monitoring riwayat dan transaksi kehadiran seluruh mahasiswa magang</p>
+            <p class="text-xs text-slate-500 mt-0.5">Monitoring riwayat dan transaksi kehadiran seluruh intern magang</p>
         </div>
 
         <div class="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
@@ -49,12 +49,12 @@
                        class="w-full py-2.5 px-3 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-slate-800 font-medium">
             </div>
 
-            <!-- Mahasiswa Filter -->
+            <!-- intern Filter -->
             <div>
-                <label class="block font-bold text-slate-700 mb-1">Pilih Mahasiswa</label>
+                <label class="block font-bold text-slate-700 mb-1">Pilih intern</label>
                 <select name="user_id" class="w-full py-2.5 px-3 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-slate-800 font-medium">
-                    <option value="">-- Semua Mahasiswa --</option>
-                    @foreach($allMahasiswa as $m)
+                    <option value="">-- Semua intern --</option>
+                    @foreach($allintern as $m)
                         <option value="{{ $m->id }}" {{ $selectedUserId == $m->id ? 'selected' : '' }}>
                             {{ $m->name }} ({{ $m->nim }})
                         </option>
@@ -100,7 +100,7 @@
                     <tr>
                         <th class="px-6 py-3.5">Tanggal</th>
                         <th class="px-6 py-3.5">NIM</th>
-                        <th class="px-6 py-3.5">Nama Mahasiswa</th>
+                        <th class="px-6 py-3.5">Nama intern</th>
                         <th class="px-6 py-3.5">Asal Kampus</th>
                         <th class="px-6 py-3.5">Tipe</th>
                         <th class="px-6 py-3.5">Masuk</th>

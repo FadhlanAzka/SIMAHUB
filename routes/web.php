@@ -1,25 +1,24 @@
 <?php
 
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\Mahasiswa\AttendanceController as MahasiswaAttendanceController;
-use App\Http\Controllers\Mahasiswa\DashboardController as MahasiswaDashboardController;
+use App\Http\Controllers\intern\AttendanceController as internAttendanceController;
+use App\Http\Controllers\intern\DashboardController as internDashboardController;
 use App\Http\Controllers\Admin\AttendanceController as AdminAttendanceController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\ExportController;
-use App\Http\Controllers\Admin\MahasiswaController;
+use App\Http\Controllers\Admin\internController;
 use App\Http\Controllers\Admin\SettingController;
 use Illuminate\Support\Facades\Route;
 
-// Redirect halaman utama ke login / dashboard
+// Redirect root ke dashboard (otomatis ditangani auth middleware)
 Route::get('/', function () {
-    if (auth()->check()) {
-        if (auth()->user()->isAdmin()) {
-            return redirect()->route('admin.dashboard');
-        }
-        return redirect()->route('mahasiswa.dashboard');
-    }
-    return redirect()->route('login');
+    return redirect()->route('dashboard');
 });
+
+// Unified Dashboard Route
+Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])
+    ->middleware('auth')
+    ->name('dashboard');
 
 // Autentikasi
 Route::middleware('guest')->group(function () {
@@ -29,21 +28,19 @@ Route::middleware('guest')->group(function () {
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
-// Area Mahasiswa Magang (Role: mahasiswa)
-Route::middleware(['auth', 'role:mahasiswa'])->prefix('mahasiswa')->name('mahasiswa.')->group(function () {
-    Route::get('/dashboard', [MahasiswaDashboardController::class, 'index'])->name('dashboard');
-    Route::post('/attendance/check-in', [MahasiswaAttendanceController::class, 'checkIn'])->name('attendance.checkin');
-    Route::post('/attendance/check-out', [MahasiswaAttendanceController::class, 'checkOut'])->name('attendance.checkout');
-    Route::get('/history', [MahasiswaAttendanceController::class, 'history'])->name('history');
+// Area intern Magang (Role: intern)
+Route::middleware(['auth', 'role:intern'])->prefix('intern')->name('intern.')->group(function () {
+    Route::post('/attendance/check-in', [internAttendanceController::class, 'checkIn'])->name('attendance.checkin');
+    Route::post('/attendance/check-out', [internAttendanceController::class, 'checkOut'])->name('attendance.checkout');
+    Route::get('/history', [internAttendanceController::class, 'history'])->name('history');
 });
 
-// Area Administrator Instansi (Role: admin)
-Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+// Area Administrator Instansi (Role: admin, pengawas, mentor)
+Route::middleware(['auth', 'role:admin,pengawas,mentor'])->prefix('admin')->name('admin.')->group(function () {
     
-    // Manajemen Mahasiswa Magang
-    Route::resource('mahasiswa', MahasiswaController::class);
-    Route::post('mahasiswa/{mahasiswa}/reset-password', [MahasiswaController::class, 'resetPassword'])->name('mahasiswa.reset_password');
+    // Manajemen intern Magang
+    Route::resource('intern', internController::class);
+    Route::post('intern/{intern}/reset-password', [internController::class, 'resetPassword'])->name('intern.reset_password');
     
     // Monitoring & Rekap Absensi
     Route::get('/attendance', [AdminAttendanceController::class, 'index'])->name('attendance.index');

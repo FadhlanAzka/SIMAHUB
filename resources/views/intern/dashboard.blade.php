@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Dashboard Presensi Mahasiswa')
+@section('title', 'Dashboard Presensi intern')
 
 @section('content')
 <div class="space-y-6">
@@ -16,13 +16,13 @@
             <div>
                 <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 text-blue-100 text-xs font-bold backdrop-blur-md mb-3 border border-white/10">
                     <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                    <span>Posisi: {{ $user->position ?: 'Mahasiswa Magang' }}</span>
+                    <span>Posisi: {{ $user->position ?: 'intern Magang' }}</span>
                 </div>
                 <h1 class="text-2xl sm:text-3xl font-black tracking-tight">
                     Halo, {{ $user->name }}
                 </h1>
                 <p class="text-blue-100/90 text-xs sm:text-sm mt-1 max-w-xl font-medium">
-                    {{ $user->institution ?: 'Mahasiswa Magang' }} &bull; NIM: <span class="font-mono">{{ $user->nim ?: '-' }}</span>
+                    {{ $user->institution ?: 'intern Magang' }} &bull; NIM: <span class="font-mono">{{ $user->nim ?: '-' }}</span>
                 </p>
             </div>
 
@@ -72,12 +72,12 @@
                     <span class="text-blue-200/90 text-[11px] font-medium block">Ketentuan Hari Ini:</span>
                     @if($isWeekend)
                         <span class="font-black text-amber-300 text-sm">Libur Akhir Pekan</span>
-                    @elseif($isFriday)
+                    @elseif($isWfhDay)
                         <span class="font-black text-purple-200 text-sm">WFH (Bebas dari Rumah)</span>
                     @else
                         <span class="font-black text-emerald-300 text-sm">WFO (Radius {{ $office->radius_meters }}m)</span>
                     @endif
-                    <span class="text-[10px] text-blue-200/75 block">Senin-Kamis WFO &bull; Jumat WFH</span>
+                    <span class="text-[10px] text-blue-200/75 block">Kerja sesuai dengan jadwal yang telah diatur Admin</span>
                 </div>
             </div>
         </div>
@@ -171,7 +171,7 @@
                         </div>
 
                         @if(!$todayAttendance || !$todayAttendance->check_in_time)
-                            <form action="{{ route('mahasiswa.attendance.checkin') }}" method="POST" id="formCheckIn">
+                            <form action="{{ route('intern.attendance.checkin') }}" method="POST" id="formCheckIn">
                                 @csrf
                                 <input type="hidden" name="latitude" class="inputLat">
                                 <input type="hidden" name="longitude" class="inputLong">
@@ -222,7 +222,7 @@
                         </div>
 
                         @if($todayAttendance && $todayAttendance->check_in_time && !$todayAttendance->check_out_time)
-                            <form action="{{ route('mahasiswa.attendance.checkout') }}" method="POST" id="formCheckOut">
+                            <form action="{{ route('intern.attendance.checkout') }}" method="POST" id="formCheckOut">
                                 @csrf
                                 <input type="hidden" name="latitude" class="inputLat">
                                 <input type="hidden" name="longitude" class="inputLong">
@@ -276,12 +276,12 @@
                     </div>
                     <div class="p-3.5 rounded-2xl bg-purple-50/80 border border-purple-100">
                         <div class="text-2xl font-black text-purple-600">{{ $stats['wfh'] }}</div>
-                        <div class="text-[11px] font-bold text-purple-900 mt-0.5">WFH (Jumat)</div>
+                        <div class="text-[11px] font-bold text-purple-900 mt-0.5">WFH (Bebas Lokasi)</div>
                     </div>
                 </div>
 
                 <div class="mt-5 pt-4 border-t border-slate-100 text-center">
-                    <a href="{{ route('mahasiswa.history') }}" class="text-xs font-bold text-blue-600 hover:text-blue-700 inline-flex items-center gap-1">
+                    <a href="{{ route('intern.history') }}" class="text-xs font-bold text-blue-600 hover:text-blue-700 inline-flex items-center gap-1">
                         <span>Lihat Riwayat Lengkap</span>
                         <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
                     </a>
@@ -307,7 +307,7 @@
     <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden">
         <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
             <h3 class="text-sm font-bold text-slate-900">Riwayat Kehadiran Terakhir</h3>
-            <a href="{{ route('mahasiswa.history') }}" class="text-xs font-bold text-blue-600 hover:text-blue-700">
+            <a href="{{ route('intern.history') }}" class="text-xs font-bold text-blue-600 hover:text-blue-700">
                 Semua Riwayat &rarr;
             </a>
         </div>
@@ -379,7 +379,7 @@
     const OFFICE_LAT = {{ (float) $office->latitude }};
     const OFFICE_LON = {{ (float) $office->longitude }};
     const OFFICE_RADIUS = {{ (int) $office->radius_meters }};
-    const IS_FRIDAY = {{ $isFriday ? 'true' : 'false' }};
+    const IS_WFH_DAY = {{ $isWfhDay ? 'true' : 'false' }};
     const IS_WEEKEND = {{ $isWeekend ? 'true' : 'false' }};
     const WORK_END_TIME = "{{ substr($office->work_end_time, 0, 5) }}";
 
@@ -414,16 +414,8 @@
         const dist = calculateDistance(lat, lon, OFFICE_LAT, OFFICE_LON);
         gpsDist.textContent = `~${dist} meter dari kantor`;
 
-        if (IS_FRIDAY) {
-            // WFH Mode on Friday
-            gpsBox.className = "my-5 p-4 rounded-2xl border bg-purple-50/80 border-purple-200 text-xs";
-            gpsIconWrap.className = "p-2.5 rounded-xl bg-purple-100 text-purple-700 shrink-0";
-            gpsIcon.setAttribute('data-lucide', 'home');
-            gpsTitle.textContent = "Mode WFH Aktif (Hari Jumat)";
-            gpsDesc.textContent = `Lokasi GPS terdeteksi (${dist}m dari kantor). Hari Jumat Anda diperbolehkan presensi dari kediaman/rumah.`;
-            if (btnCheckIn) btnCheckIn.disabled = false;
-        } else if (!IS_WEEKEND) {
-            // WFO Mode Monday - Thursday
+        if (!IS_WEEKEND) {
+            // WFO Mode
             if (dist <= OFFICE_RADIUS) {
                 gpsBox.className = "my-5 p-4 rounded-2xl border bg-emerald-50/80 border-emerald-200 text-xs";
                 gpsIconWrap.className = "p-2.5 rounded-xl bg-emerald-100 text-emerald-700 shrink-0";
@@ -436,7 +428,7 @@
                 gpsIconWrap.className = "p-2.5 rounded-xl bg-rose-100 text-rose-700 shrink-0";
                 gpsIcon.setAttribute('data-lucide', 'map-pin-off');
                 gpsTitle.textContent = "Di Luar Area Kantor Instansi";
-                gpsDesc.textContent = `Jarak Anda (${dist}m) melebihi batas radius kantor (${OFFICE_RADIUS}m). Pada hari Senin-Kamis, presensi wajib di lingkungan kantor.`;
+                gpsDesc.textContent = `Jarak Anda (${dist}m) melebihi batas radius kantor (${OFFICE_RADIUS}m). Pada hari kerja WFO, presensi wajib di lingkungan kantor.`;
                 if (btnCheckIn) btnCheckIn.disabled = true;
             }
         }
@@ -444,6 +436,17 @@
     }
 
     function initGeolocation() {
+        if (IS_WFH_DAY) {
+            gpsBox.className = "my-5 p-4 rounded-2xl border bg-purple-50/80 border-purple-200 text-xs";
+            gpsIconWrap.className = "p-2.5 rounded-xl bg-purple-100 text-purple-700 shrink-0";
+            gpsIcon.setAttribute('data-lucide', 'home');
+            gpsTitle.textContent = "Mode WFH Aktif";
+            gpsDesc.textContent = `Hari ini adalah hari WFH. Anda diperbolehkan presensi dari rumah tanpa verifikasi lokasi GPS.`;
+            gpsDist.textContent = "-";
+            if (btnCheckIn) btnCheckIn.disabled = false;
+            lucide.createIcons();
+            return; // Skip GPS finding entirely!
+        }
         if (!navigator.geolocation) {
             gpsTitle.textContent = "Peramban Tidak Mendukung Geolocation";
             gpsDesc.textContent = "Gunakan browser modern seperti Google Chrome atau Microsoft Edge.";

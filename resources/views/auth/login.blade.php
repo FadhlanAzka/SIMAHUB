@@ -40,7 +40,7 @@
             <!-- Login Input (Email / NIM) -->
             <div>
                 <label for="login" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                    Email atau NIM
+                    Username
                 </label>
                 <div class="relative rounded-xl shadow-xs">
                     <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
@@ -52,7 +52,7 @@
                            value="{{ old('login') }}" 
                            required 
                            autofocus
-                           placeholder="Masukkan Email atau NIM Anda"
+                           placeholder="Masukkan Username Anda"
                            class="block w-full pl-10 pr-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm placeholder-slate-400 text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
                 </div>
             </div>

@@ -46,11 +46,11 @@ class AttendanceController extends Controller
             ->paginate(20)
             ->withQueryString();
 
-        $allMahasiswa = User::where('role', 'mahasiswa')->orderBy('name', 'asc')->get();
+        $allintern = User::where('role', 'intern')->orderBy('name', 'asc')->get();
 
         return view('admin.attendance.index', compact(
             'attendances',
-            'allMahasiswa',
+            'allintern',
             'selectedMonth',
             'selectedDate',
             'selectedUserId',

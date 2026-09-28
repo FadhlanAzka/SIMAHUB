@@ -89,7 +89,7 @@ class SimahubAttendanceTest extends TestCase
             'nim' => 'TEST1234',
             'institution' => 'Universitas Indonesia',
             'position' => 'Web Developer',
-            'role' => 'mahasiswa',
+            'role' => 'intern',
             'password' => bcrypt('password123'),
         ]);
 
@@ -98,7 +98,7 @@ class SimahubAttendanceTest extends TestCase
             'password' => 'password123',
         ]);
 
-        $response->assertRedirect('/mahasiswa/dashboard');
+        $response->assertRedirect('/intern/dashboard');
         $this->assertAuthenticatedAs($student);
 
         $student->delete();
@@ -110,19 +110,19 @@ class SimahubAttendanceTest extends TestCase
         Carbon::setTestNow(Carbon::create(2026, 9, 25, 7, 15, 0)); // 25 Sept 2026 is Friday
 
         $student = User::create([
-            'name' => 'Mahasiswa WFH',
+            'name' => 'intern WFH',
             'email' => 'wfh@magang.id',
             'nim' => 'WFH001',
             'institution' => 'ITB',
             'position' => 'Data Analyst',
-            'role' => 'mahasiswa',
+            'role' => 'intern',
             'password' => bcrypt('password123'),
         ]);
 
         $this->actingAs($student);
 
         // Location 50 km away from office (e.g. Bandung / remote)
-        $response = $this->post('/mahasiswa/attendance/check-in', [
+        $response = $this->post('/intern/attendance/check-in', [
             'latitude' => -6.917464,
             'longitude' => 107.619123,
         ]);
@@ -146,19 +146,19 @@ class SimahubAttendanceTest extends TestCase
         Carbon::setTestNow(Carbon::create(2026, 9, 24, 7, 15, 0)); // Thursday
 
         $student = User::create([
-            'name' => 'Mahasiswa Jauh',
+            'name' => 'intern Jauh',
             'email' => 'jauh@magang.id',
             'nim' => 'JAUH001',
             'institution' => 'UGM',
             'position' => 'UI UX Designer',
-            'role' => 'mahasiswa',
+            'role' => 'intern',
             'password' => bcrypt('password123'),
         ]);
 
         $this->actingAs($student);
 
         // Location 5 km away
-        $response = $this->post('/mahasiswa/attendance/check-in', [
+        $response = $this->post('/intern/attendance/check-in', [
             'latitude' => -6.200000,
             'longitude' => 106.850000,
         ]);
@@ -179,18 +179,18 @@ class SimahubAttendanceTest extends TestCase
         Carbon::setTestNow(Carbon::create(2026, 9, 25, 8, 0, 0));
 
         $student = User::create([
-            'name' => 'Mahasiswa Telat',
+            'name' => 'intern Telat',
             'email' => 'telat@magang.id',
             'nim' => 'TELAT001',
             'institution' => 'UI',
             'position' => 'Technical Writer',
-            'role' => 'mahasiswa',
+            'role' => 'intern',
             'password' => bcrypt('password123'),
         ]);
 
         $this->actingAs($student);
 
-        $response = $this->post('/mahasiswa/attendance/check-in', [
+        $response = $this->post('/intern/attendance/check-in', [
             'latitude' => -6.17539240,
             'longitude' => 106.82715280,
         ]);
@@ -212,19 +212,19 @@ class SimahubAttendanceTest extends TestCase
         Carbon::setTestNow(Carbon::create(2026, 9, 25, 7, 15, 0));
 
         $student = User::create([
-            'name' => 'Mahasiswa Pulang Cepat',
+            'name' => 'intern Pulang Cepat',
             'email' => 'cepat@magang.id',
             'nim' => 'CEPAT001',
             'institution' => 'UNDIP',
             'position' => 'Network Engineer',
-            'role' => 'mahasiswa',
+            'role' => 'intern',
             'password' => bcrypt('password123'),
         ]);
 
         $this->actingAs($student);
 
         // Check in first
-        $this->post('/mahasiswa/attendance/check-in', [
+        $this->post('/intern/attendance/check-in', [
             'latitude' => -6.17539240,
             'longitude' => 106.82715280,
         ]);
@@ -232,7 +232,7 @@ class SimahubAttendanceTest extends TestCase
         // Attempt checkout at 15:30 (before 16:00)
         Carbon::setTestNow(Carbon::create(2026, 9, 25, 15, 30, 0));
 
-        $checkoutResponse = $this->post('/mahasiswa/attendance/check-out', [
+        $checkoutResponse = $this->post('/intern/attendance/check-out', [
             'latitude' => -6.17539240,
             'longitude' => 106.82715280,
         ]);
@@ -242,7 +242,7 @@ class SimahubAttendanceTest extends TestCase
         // Attempt checkout at 16:05 (allowed!)
         Carbon::setTestNow(Carbon::create(2026, 9, 25, 16, 5, 0));
 
-        $validCheckoutResponse = $this->post('/mahasiswa/attendance/check-out', [
+        $validCheckoutResponse = $this->post('/intern/attendance/check-out', [
             'latitude' => -6.17539240,
             'longitude' => 106.82715280,
         ]);

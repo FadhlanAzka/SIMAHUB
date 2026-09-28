@@ -18,10 +18,11 @@ class DashboardController extends Controller
         $dayOfWeek = $now->dayOfWeekIso;
 
         $isWeekend = ($dayOfWeek >= 6);
-        $isFriday = ($dayOfWeek === 5);
-
-        $totalMahasiswa = User::where('role', 'mahasiswa')->count();
         $office = OfficeSetting::getSetting();
+        $wfhDays = is_array($office->wfh_days) ? $office->wfh_days : (json_decode($office->wfh_days, true) ?? []);
+        $isWfhDay = in_array($dayOfWeek, $wfhDays);
+
+        $totalintern = User::where('role', 'intern')->count();
 
         // Absensi hari ini
         $todayAttendances = Attendance::with('user')
@@ -33,7 +34,7 @@ class DashboardController extends Controller
         $terlambatCount = $todayAttendances->where('status', 'terlambat')->count();
         $wfhCount = $todayAttendances->where('type', 'WFH')->count();
         $wfoCount = $todayAttendances->where('type', 'WFO')->count();
-        $belumHadirCount = max(0, $totalMahasiswa - $hadirCount);
+        $belumHadirCount = max(0, $totalintern - $hadirCount);
 
         // Daftar absensi terbaru
         $recentAttendances = Attendance::with('user')
@@ -46,8 +47,8 @@ class DashboardController extends Controller
             'now',
             'today',
             'isWeekend',
-            'isFriday',
-            'totalMahasiswa',
+            'isWfhDay',
+            'totalintern',
             'hadirCount',
             'tepatWaktuCount',
             'terlambatCount',

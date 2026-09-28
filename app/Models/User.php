@@ -18,12 +18,10 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
-        'email',
-        'nim',
-        'institution',
+        'username',
+        'role',
         'position',
         'phone',
-        'role',
         'password',
     ];
 
@@ -55,9 +53,19 @@ class User extends Authenticatable
         return $this->role === 'admin';
     }
 
-    public function isMahasiswa(): bool
+    public function isIntern(): bool
     {
-        return $this->role === 'mahasiswa';
+        return $this->role === 'intern';
+    }
+
+    public function isPengawas(): bool
+    {
+        return $this->role === 'pengawas';
+    }
+
+    public function isMentor(): bool
+    {
+        return $this->role === 'mentor';
     }
 
     public function attendances(): HasMany

@@ -59,7 +59,7 @@
                 
                 <!-- Logo & Brand (Clean, no calendar checklist icon) -->
                 <div class="flex items-center space-x-3">
-                    <a href="{{ auth()->user()->isAdmin() ? route('admin.dashboard') : route('mahasiswa.dashboard') }}" class="flex items-center space-x-3 group">
+                    <a href="{{ route('dashboard') }}" class="flex items-center space-x-3 group">
                         <!-- Custom Modern SVG Monogram Logo -->
                         <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-700 via-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-blue-500/20 group-hover:scale-105 transition-transform">
                             <svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
@@ -74,7 +74,7 @@
                                 </span>
                             </div>
                             <p class="text-[11px] text-slate-400 font-medium mt-1 leading-none">
-                                {{ auth()->user()->role === 'admin' ? 'Panel Administrator' : 'Portal Mahasiswa Magang' }}
+                                {{ auth()->user()->role === 'admin' ? 'Panel Administrator' : 'Portal intern Magang' }}
                             </p>
                         </div>
                     </a>
@@ -82,35 +82,37 @@
 
                 <!-- Navigation Links (Desktop) -->
                 <nav class="hidden md:flex items-center space-x-1">
-                    @if(auth()->user()->isAdmin())
-                        <a href="{{ route('admin.dashboard') }}" 
-                           class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 {{ request()->routeIs('admin.dashboard') ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/20' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100' }}">
+                    @if(!auth()->user()->isIntern())
+                        <a href="{{ route('dashboard') }}" 
+                           class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 {{ request()->routeIs('dashboard') ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/20' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100' }}">
                             <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
                             Dashboard
                         </a>
-                        <a href="{{ route('admin.mahasiswa.index') }}" 
-                           class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 {{ request()->routeIs('admin.mahasiswa.*') ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/20' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100' }}">
+                        <a href="{{ route('admin.intern.index') }}" 
+                           class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 {{ request()->routeIs('admin.intern.*') ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/20' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100' }}">
                             <i data-lucide="users" class="w-4 h-4"></i>
-                            Data Mahasiswa
+                            Data intern
                         </a>
                         <a href="{{ route('admin.attendance.index') }}" 
                            class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 {{ request()->routeIs('admin.attendance.*') ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/20' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100' }}">
                             <i data-lucide="clipboard-list" class="w-4 h-4"></i>
                             Rekap Absensi
                         </a>
+                        @if(auth()->user()->role === 'admin')
                         <a href="{{ route('admin.settings.index') }}" 
                            class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 {{ request()->routeIs('admin.settings.*') ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/20' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100' }}">
                             <i data-lucide="map-pin" class="w-4 h-4"></i>
                             Lokasi & Jam
                         </a>
+                        @endif
                     @else
-                        <a href="{{ route('mahasiswa.dashboard') }}" 
-                           class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 {{ request()->routeIs('mahasiswa.dashboard') ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/20' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100' }}">
+                        <a href="{{ route('dashboard') }}" 
+                           class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 {{ request()->routeIs('dashboard') ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/20' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100' }}">
                             <i data-lucide="clock" class="w-4 h-4"></i>
                             Dashboard Presensi
                         </a>
-                        <a href="{{ route('mahasiswa.history') }}" 
-                           class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 {{ request()->routeIs('mahasiswa.history') ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/20' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100' }}">
+                        <a href="{{ route('intern.history') }}" 
+                           class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 {{ request()->routeIs('intern.history') ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/20' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100' }}">
                             <i data-lucide="history" class="w-4 h-4"></i>
                             Riwayat Absensi
                         </a>
@@ -122,7 +124,7 @@
                     <div class="hidden sm:block text-right">
                         <div class="text-xs font-bold text-slate-900 leading-tight">{{ auth()->user()->name }}</div>
                         <div class="text-[11px] text-blue-600 font-semibold">
-                            {{ auth()->user()->isAdmin() ? 'Administrator Instansi' : (auth()->user()->position ?: 'Mahasiswa Magang') }}
+                            {{ auth()->user()->isAdmin() ? 'Administrator Instansi' : (auth()->user()->position ?: 'intern Magang') }}
                         </div>
                     </div>
 
@@ -141,24 +143,26 @@
 
         <!-- Mobile Navigation Strip -->
         <div class="md:hidden border-t border-slate-200 bg-slate-50/90 px-4 py-2 flex items-center justify-around text-xs font-semibold">
-            @if(auth()->user()->isAdmin())
-                <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'text-blue-600 font-bold' : 'text-slate-600' }} py-1 flex items-center gap-1">
+            @if(!auth()->user()->isIntern())
+                <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'text-blue-600 font-bold' : 'text-slate-600' }} py-1 flex items-center gap-1">
                     <i data-lucide="layout-dashboard" class="w-3.5 h-3.5"></i> Dashboard
                 </a>
-                <a href="{{ route('admin.mahasiswa.index') }}" class="{{ request()->routeIs('admin.mahasiswa.*') ? 'text-blue-600 font-bold' : 'text-slate-600' }} py-1 flex items-center gap-1">
-                    <i data-lucide="users" class="w-3.5 h-3.5"></i> Mahasiswa
+                <a href="{{ route('admin.intern.index') }}" class="{{ request()->routeIs('admin.intern.*') ? 'text-blue-600 font-bold' : 'text-slate-600' }} py-1 flex items-center gap-1">
+                    <i data-lucide="users" class="w-3.5 h-3.5"></i> intern
                 </a>
                 <a href="{{ route('admin.attendance.index') }}" class="{{ request()->routeIs('admin.attendance.*') ? 'text-blue-600 font-bold' : 'text-slate-600' }} py-1 flex items-center gap-1">
                     <i data-lucide="clipboard-list" class="w-3.5 h-3.5"></i> Rekap
                 </a>
+                @if(auth()->user()->role === 'admin')
                 <a href="{{ route('admin.settings.index') }}" class="{{ request()->routeIs('admin.settings.*') ? 'text-blue-600 font-bold' : 'text-slate-600' }} py-1 flex items-center gap-1">
                     <i data-lucide="map-pin" class="w-3.5 h-3.5"></i> Lokasi
                 </a>
+                @endif
             @else
-                <a href="{{ route('mahasiswa.dashboard') }}" class="{{ request()->routeIs('mahasiswa.dashboard') ? 'text-blue-600 font-bold' : 'text-slate-600' }} py-1 flex items-center gap-1">
+                <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'text-blue-600 font-bold' : 'text-slate-600' }} py-1 flex items-center gap-1">
                     <i data-lucide="clock" class="w-3.5 h-3.5"></i> Dashboard
                 </a>
-                <a href="{{ route('mahasiswa.history') }}" class="{{ request()->routeIs('mahasiswa.history') ? 'text-blue-600 font-bold' : 'text-slate-600' }} py-1 flex items-center gap-1">
+                <a href="{{ route('intern.history') }}" class="{{ request()->routeIs('intern.history') ? 'text-blue-600 font-bold' : 'text-slate-600' }} py-1 flex items-center gap-1">
                     <i data-lucide="history" class="w-3.5 h-3.5"></i> Riwayat
                 </a>
             @endif

@@ -13,10 +13,7 @@ class AuthController extends Controller
     public function showLogin()
     {
         if (Auth::check()) {
-            if (Auth::user()->isAdmin()) {
-                return redirect()->route('admin.dashboard');
-            }
-            return redirect()->route('mahasiswa.dashboard');
+            return redirect()->route('dashboard');
         }
 
         return view('auth.login');
@@ -31,7 +28,7 @@ class AuthController extends Controller
             'login' => ['required', 'string'],
             'password' => ['required', 'string'],
         ], [
-            'login.required' => 'Email atau NIM wajib diisi.',
+            'login.required' => 'Username wajib diisi.',
             'password.required' => 'Kata sandi wajib diisi.',
         ]);
 
@@ -39,24 +36,16 @@ class AuthController extends Controller
         $password = $credentials['password'];
         $remember = $request->boolean('remember');
 
-        // Deteksi apakah input login adalah format email atau NIM
-        $fieldType = filter_var($loginInput, FILTER_VALIDATE_EMAIL) ? 'email' : 'nim';
-
-        if (Auth::attempt([$fieldType => $loginInput, 'password' => $password], $remember)) {
+        if (Auth::attempt(['username' => $loginInput, 'password' => $password], $remember)) {
             $request->session()->regenerate();
 
             $user = Auth::user();
-            if ($user->isAdmin()) {
-                return redirect()->intended(route('admin.dashboard'))
-                    ->with('login_success', 'Selamat datang kembali, ' . $user->name . '!');
-            }
-
-            return redirect()->intended(route('mahasiswa.dashboard'))
+            return redirect()->intended(route('dashboard'))
                 ->with('login_success', 'Selamat datang, ' . $user->name . '!');
         }
 
         return back()->withErrors([
-            'login' => 'Email/NIM atau kata sandi yang Anda masukkan salah.',
+            'login' => 'Username atau kata sandi yang Anda masukkan salah.',
         ])->onlyInput('login');
     }
 

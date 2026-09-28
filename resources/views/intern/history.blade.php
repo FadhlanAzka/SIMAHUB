@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Riwayat Presensi Mahasiswa')
+@section('title', 'Riwayat Presensi intern')
 
 @section('content')
 <div class="space-y-6">
@@ -8,12 +8,12 @@
     <!-- Header & Filter Bar -->
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-3xl border border-slate-200/80 shadow-xs">
         <div>
-            <h1 class="text-xl font-black text-slate-900 tracking-tight">Riwayat Presensi Mahasiswa</h1>
+            <h1 class="text-xl font-black text-slate-900 tracking-tight">Riwayat Presensi intern</h1>
             <p class="text-xs text-slate-500 mt-0.5">Catatan seluruh kehadiran Anda selama pelaksanaan program magang</p>
         </div>
 
         <!-- Month Filter Form -->
-        <form action="{{ route('mahasiswa.history') }}" method="GET" class="flex items-center gap-2 w-full sm:w-auto">
+        <form action="{{ route('intern.history') }}" method="GET" class="flex items-center gap-2 w-full sm:w-auto">
             <div class="relative flex-1 sm:flex-initial">
                 <input type="month" 
                        name="month" 
@@ -41,7 +41,7 @@
             <div class="text-2xl font-black text-rose-600 mt-1">{{ $stats['terlambat'] }} <span class="text-xs font-normal text-slate-500">Hari</span></div>
         </div>
         <div class="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs">
-            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">WFH (Jumat)</span>
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">WFH (Bebas Lokasi)</span>
             <div class="text-2xl font-black text-purple-600 mt-1">{{ $stats['wfh'] }} <span class="text-xs font-normal text-slate-500">Hari</span></div>
         </div>
     </div>
