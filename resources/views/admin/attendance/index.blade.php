@@ -56,7 +56,7 @@
                     <option value="">-- Semua intern --</option>
                     @foreach($allintern as $m)
                         <option value="{{ $m->id }}" {{ $selectedUserId == $m->id ? 'selected' : '' }}>
-                            {{ $m->name }} ({{ $m->nim }})
+                            {{ $m->name }}
                         </option>
                     @endforeach
                 </select>
@@ -99,14 +99,22 @@
                 <thead class="bg-slate-50/80 text-slate-500 uppercase tracking-wider font-bold border-b border-slate-100 text-[11px]">
                     <tr>
                         <th class="px-6 py-3.5">Tanggal</th>
-                        <th class="px-6 py-3.5">NIM</th>
                         <th class="px-6 py-3.5">Nama intern</th>
-                        <th class="px-6 py-3.5">Asal Kampus</th>
                         <th class="px-6 py-3.5">Tipe</th>
                         <th class="px-6 py-3.5">Masuk</th>
                         <th class="px-6 py-3.5">Status</th>
                         <th class="px-6 py-3.5">Pulang</th>
-                        <th class="px-6 py-3.5">Durasi</th>
+                        <th class="px-6 py-3.5 relative group" style="cursor: help;">
+                            <div class="flex items-center gap-1.5">
+                                Durasi
+                                <i data-lucide="info" class="w-3.5 h-3.5 text-slate-400"></i>
+                            </div>
+                            <!-- Custom Tooltip (Bottom) -->
+                            <div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-max max-w-[200px] whitespace-normal px-2.5 py-1.5 bg-slate-800 text-white text-[10px] leading-relaxed font-medium rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 shadow-lg pointer-events-none text-center">
+                                Total jam sudah dikurangi 1 jam waktu istirahat
+                                <div class="absolute bottom-full left-1/2 -translate-x-1/2 border-4 border-transparent border-b-slate-800"></div>
+                            </div>
+                        </th>
                         <th class="px-6 py-3.5">Jarak Masuk</th>
                     </tr>
                 </thead>
@@ -119,17 +127,11 @@
                                     {{ \Carbon\Carbon::parse($row->date)->translatedFormat('l') }}
                                 </span>
                             </td>
-                            <td class="px-6 py-4 font-mono font-bold text-slate-700 whitespace-nowrap">
-                                {{ $row->user ? $row->user->nim : '-' }}
-                            </td>
                             <td class="px-6 py-4 font-bold text-slate-900 whitespace-nowrap">
                                 {{ $row->user ? $row->user->name : '-' }}
                                 @if($row->user && $row->user->position)
                                     <span class="text-[10px] text-blue-600 font-semibold block">{{ $row->user->position }}</span>
                                 @endif
-                            </td>
-                            <td class="px-6 py-4 text-slate-600 whitespace-nowrap">
-                                {{ $row->user ? $row->user->institution : '-' }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 {!! $row->type_badge !!}
@@ -156,7 +158,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="10" class="px-6 py-12 text-center text-slate-400">
+                            <td colspan="8" class="px-6 py-12 text-center text-slate-400">
                                 <i data-lucide="inbox" class="w-8 h-8 mx-auto text-slate-300 mb-2"></i>
                                 Tidak ada data absensi yang sesuai dengan kriteria filter.
                             </td>

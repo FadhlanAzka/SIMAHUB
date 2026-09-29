@@ -115,9 +115,7 @@
             <table class="w-full text-left text-xs text-slate-600">
                 <thead class="bg-slate-50/80 text-slate-500 uppercase tracking-wider font-bold border-b border-slate-100 text-[11px]">
                     <tr>
-                        <th class="px-6 py-3.5">NIM</th>
                         <th class="px-6 py-3.5">Nama intern</th>
-                        <th class="px-6 py-3.5">Asal Kampus</th>
                         <th class="px-6 py-3.5">Tipe</th>
                         <th class="px-6 py-3.5">Jam Masuk</th>
                         <th class="px-6 py-3.5">Status</th>
@@ -128,17 +126,11 @@
                 <tbody class="divide-y divide-slate-100">
                     @forelse($todayAttendances as $row)
                         <tr class="hover:bg-slate-50/80 transition-colors">
-                            <td class="px-6 py-4 font-mono text-slate-700 font-bold">
-                                {{ $row->user ? $row->user->nim : '-' }}
-                            </td>
                             <td class="px-6 py-4 font-bold text-slate-900">
                                 {{ $row->user ? $row->user->name : '-' }}
                                 @if($row->user && $row->user->position)
                                     <span class="text-[10px] text-blue-600 font-semibold block">{{ $row->user->position }}</span>
                                 @endif
-                            </td>
-                            <td class="px-6 py-4 text-slate-600">
-                                {{ $row->user ? $row->user->institution : '-' }}
                             </td>
                             <td class="px-6 py-4">
                                 {!! $row->type_badge !!}
@@ -162,7 +154,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="px-6 py-12 text-center text-slate-400">
+                            <td colspan="6" class="px-6 py-12 text-center text-slate-400">
                                 <i data-lucide="inbox" class="w-8 h-8 mx-auto text-slate-300 mb-2"></i>
                                 Belum ada intern yang melakukan absensi hari ini.
                             </td>

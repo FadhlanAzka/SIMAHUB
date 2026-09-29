@@ -65,7 +65,17 @@
                         <th class="px-6 py-3.5">Absen Masuk</th>
                         <th class="px-6 py-3.5">Status Masuk</th>
                         <th class="px-6 py-3.5">Absen Pulang</th>
-                        <th class="px-6 py-3.5">Durasi Kerja</th>
+                        <th class="px-6 py-3.5 relative group" style="cursor: help;">
+                            <div class="flex items-center gap-1.5">
+                                Durasi Kerja
+                                <i data-lucide="info" class="w-3.5 h-3.5 text-slate-400"></i>
+                            </div>
+                            <!-- Custom Tooltip (Bottom) -->
+                            <div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-max max-w-[200px] whitespace-normal px-2.5 py-1.5 bg-slate-800 text-white text-[10px] leading-relaxed font-medium rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 shadow-lg pointer-events-none text-center">
+                                Total jam sudah dikurangi 1 jam waktu istirahat
+                                <div class="absolute bottom-full left-1/2 -translate-x-1/2 border-4 border-transparent border-b-slate-800"></div>
+                            </div>
+                        </th>
                         <th class="px-6 py-3.5">Lokasi GPS</th>
                     </tr>
                 </thead>

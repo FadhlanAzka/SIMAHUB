@@ -24,6 +24,15 @@ class UserSeeder extends Seeder
         );
 
         User::updateOrCreate(
+            ['username' => 'admin2'],
+            [
+                'name' => 'Ita Nurvita, S.E.',
+                'role' => 'admin',
+                'password' => Hash::make('password'),
+            ]
+        );
+
+        User::updateOrCreate(
             ['username' => 'pengawas'],
             [
                 'name' => 'Pengawas',
@@ -42,23 +51,49 @@ class UserSeeder extends Seeder
             ]
         );
 
-        // 4. Data intern (Berdasarkan Database Lama)
+        User::updateOrCreate(
+            ['username' => 'mentor1'],
+            [
+                'name' => 'Akhmad Susanto, S.E.',
+                'role' => 'mentor',
+                'password' => Hash::make('password'),
+            ]
+        );
+
+        User::updateOrCreate(
+            ['username' => 'mentor2'],
+            [
+                'name' => 'Lailatul Munawaroh, S.Pd, M.Pd.',
+                'role' => 'mentor',
+                'password' => Hash::make('password'),
+            ]
+        );
+
+        User::updateOrCreate(
+            ['username' => 'mentor3'],
+            [
+                'name' => 'Evi Fuji Fauziyah, M.Hum.',
+                'role' => 'mentor',
+                'password' => Hash::make('password'),
+            ]
+        );
+
         $interns = [
-            ['name' => 'Madani Sri Rahayu', 'username' => 'madani', 'phone' => '089501817401', 'position' => null],
-            ['name' => 'Salma Salsabila', 'username' => 'salma', 'phone' => '089523875080', 'position' => null],
+            ['name' => 'Madani Sri Rahayu', 'username' => 'madani', 'phone' => '089501817401', 'position' => 'Pranata Humas'],
             ['name' => 'Fadhlan Muhammad Azka', 'username' => 'padlan', 'phone' => '082216699635', 'position' => 'Pengolah Data dan Informasi (Informatika)'],
             ['name' => 'Moch. Akbar Ramdani', 'username' => 'akbar', 'phone' => '083877429651', 'position' => 'Pengolah Data dan Informasi (Informatika)'],
-            ['name' => 'Widia Lestari', 'username' => 'widia', 'phone' => '085523500319', 'position' => null],
-            ['name' => 'Nazwa Aulia Nahdiyin', 'username' => 'nazwa', 'phone' => '089518956743', 'position' => null],
-            ['name' => 'Triya Haliza Handayani', 'username' => 'triya', 'phone' => '089648090179', 'position' => null],
-            ['name' => 'Febrian Gibran Juliansyah', 'username' => 'febrian', 'phone' => '081563401712', 'position' => null],
-            ['name' => 'Sofia Yanifah', 'username' => 'sofia', 'phone' => '081214976705', 'position' => null],
-            ['name' => 'Maulida Fitriatusyifa', 'username' => 'maulida', 'phone' => '087821991399', 'position' => null],
-            ['name' => 'Alya Siti Aisyah', 'username' => 'alya', 'phone' => '081222744348', 'position' => null],
-            ['name' => 'Firman Fathurohman', 'username' => 'firman', 'phone' => '089505721919', 'position' => null],
-            ['name' => 'Ananda Putri Wandika', 'username' => 'ananda', 'phone' => '081223409004', 'position' => null],
-            ['name' => 'Sendhy Pratama', 'username' => 'sendhy', 'phone' => '083838352743', 'position' => null],
-            ['name' => 'Dede Permana', 'username' => 'dede', 'phone' => '081395482374', 'position' => null],
+            ['name' => 'Salma Salsabila', 'username' => 'salma', 'phone' => '089523875080', 'position' => 'Pengolah Data dan Informasi (Keuangan)'],
+            ['name' => 'Widia Lestari', 'username' => 'widia', 'phone' => '085523500319', 'position' => 'Pustakawan'],
+            ['name' => 'Nazwa Aulia Nahdiyin', 'username' => 'nazwa', 'phone' => '089518956743', 'position' => 'Pustakawan'],
+            ['name' => 'Febrian Gibran Juliansyah', 'username' => 'febrian', 'phone' => '081563401712', 'position' => 'Pustakawan'],
+            ['name' => 'Triya Haliza Handayani', 'username' => 'triya', 'phone' => '089648090179', 'position' => 'Pustakawan'],            
+            ['name' => 'Sofia Yanifah', 'username' => 'sofia', 'phone' => '081214976705', 'position' => 'Penelaah Teknis Kebijakan (Bahasa Indonesia)'],
+            ['name' => 'Maulida Fitriatusyifa', 'username' => 'maulida', 'phone' => '087821991399', 'position' => 'Penelaah Teknis Kebijakan (Bahasa Indonesia)'],
+            ['name' => 'Firman Fathurohman', 'username' => 'firman', 'phone' => '089505721919', 'position' => 'Penelaah Teknis Kebijakan Bahasa Sunda'],
+            ['name' => 'Alya Siti Aisyah', 'username' => 'alya', 'phone' => '081222744348', 'position' => 'Penelaah Teknis Kebijakan Bahasa Sunda'],            
+            ['name' => 'Dede Permana', 'username' => 'dede', 'phone' => '081395482374', 'position' => 'Penelaah Teknis Kebijakan Bahasa Sunda'],
+            ['name' => 'Sendhy Pratama', 'username' => 'sendhy', 'phone' => '083838352743', 'position' => 'Pengolah Data dan Informasi (Desain, Videografi, Editing)'],            
+            ['name' => 'Ananda Putri Wandika', 'username' => 'ananda', 'phone' => '081223409004', 'position' => 'Pengolah Data dan Informasi (Desain, Videografi, Editing)'],
         ];
 
         foreach ($interns as $intern) {

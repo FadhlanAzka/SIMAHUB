@@ -48,7 +48,10 @@ class Attendance extends Model
         $in = Carbon::parse($this->check_in_time);
         $out = Carbon::parse($this->check_out_time);
 
-        $hours = $in->diffInHours($out);
+        // Bulatkan ke bawah dan kurangi 1 jam (istirahat)
+        $hours = (int) floor($in->diffInHours($out));
+        $hours = max(0, $hours - 1); // Pastikan tidak kurang dari 0
+
         $minutes = $in->diffInMinutes($out) % 60;
 
         return "{$hours} jam {$minutes} mnt";
@@ -60,9 +63,34 @@ class Attendance extends Model
     public function getStatusBadgeAttribute(): string
     {
         if ($this->status === 'tepat_waktu') {
-            return '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">Tepat Waktu</span>';
+            return '<div class="inline-flex flex-col items-center"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">Tepat Waktu</span></div>';
         } elseif ($this->status === 'terlambat') {
-            return '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-rose-100 text-rose-800">Terlambat</span>';
+            $latenessText = '';
+            if ($this->check_in_time && $this->date) {
+                $office = \App\Models\OfficeSetting::getSetting();
+                $dayOfWeek = Carbon::parse($this->date)->dayOfWeekIso;
+                
+                $workHours = is_string($office->work_hours) ? json_decode($office->work_hours, true) : $office->work_hours;
+                $startLimitStr = $workHours[$dayOfWeek]['start'] ?? $office->work_start_time;
+                
+                $limit = Carbon::parse($startLimitStr);
+                $checkIn = Carbon::parse($this->check_in_time);
+                
+                if ($checkIn->gt($limit)) {
+                    $diffMins = $limit->diffInMinutes($checkIn);
+                    $hours = (int) floor($diffMins / 60);
+                    $mins = $diffMins % 60;
+                    
+                    if ($hours > 0) {
+                        $latenessText = "({$hours}j {$mins}m)";
+                    } else {
+                        $latenessText = "({$mins} mnt)";
+                    }
+                    $latenessText = "<span class=\"block text-[9.5px] text-rose-500 font-bold mt-1 leading-none tracking-tight\">{$latenessText}</span>";
+                }
+            }
+
+            return '<div class="inline-flex flex-col items-center justify-center"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-rose-100 text-rose-800">Terlambat</span>' . $latenessText . '</div>';
         }
 
         return '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-700">-</span>';

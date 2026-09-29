@@ -119,3 +119,17 @@ Once everything in `staging` has been tested and confirmed to work perfectly wit
 2. Have another developer review it.
 3. Merge it.
 4. **Never** write new code directly on the `main` branch.
+
+git checkout dev/padlan
+git pull origin staging -> make sure there is no local code update first
+
+# ...writes code...
+git add .
+git commit -m "Padlan finished the API endpoints"
+git push origin dev/padlan
+
+git checkout staging
+git pull origin staging
+
+# Merge Padlan's local branch AND Akbar's remote branch simultaneously
+git merge dev/padlan origin/dev/akbar

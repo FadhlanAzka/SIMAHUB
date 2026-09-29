@@ -70,11 +70,11 @@
                             <div class="flex items-center gap-2">
                                 <span class="text-lg font-black tracking-tight text-slate-900 leading-none">SIMAHUB</span>
                                 <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 border border-slate-200/80 tracking-wide uppercase">
-                                    {{ auth()->user()->role === 'admin' ? 'Admin' : 'Magang' }}
+                                    {{ auth()->user()->role === 'admin' ? 'Admin' : 'Intern' }}
                                 </span>
                             </div>
                             <p class="text-[11px] text-slate-400 font-medium mt-1 leading-none">
-                                {{ auth()->user()->role === 'admin' ? 'Panel Administrator' : 'Portal intern Magang' }}
+                                {{ auth()->user()->role === 'admin' ? 'Panel Administrator' : 'Sistem Presensi Maganghub' }}
                             </p>
                         </div>
                     </a>
@@ -115,6 +115,11 @@
                            class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 {{ request()->routeIs('intern.history') ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/20' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100' }}">
                             <i data-lucide="history" class="w-4 h-4"></i>
                             Riwayat Absensi
+                        </a>
+                        <a href="{{ route('intern.profile.edit') }}" 
+                           class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 {{ request()->routeIs('intern.profile.*') ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/20' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100' }}">
+                            <i data-lucide="user" class="w-4 h-4"></i>
+                            Profil Saya
                         </a>
                     @endif
                 </nav>
@@ -164,6 +169,9 @@
                 </a>
                 <a href="{{ route('intern.history') }}" class="{{ request()->routeIs('intern.history') ? 'text-blue-600 font-bold' : 'text-slate-600' }} py-1 flex items-center gap-1">
                     <i data-lucide="history" class="w-3.5 h-3.5"></i> Riwayat
+                </a>
+                <a href="{{ route('intern.profile.edit') }}" class="{{ request()->routeIs('intern.profile.*') ? 'text-blue-600 font-bold' : 'text-slate-600' }} py-1 flex items-center gap-1">
+                    <i data-lucide="user" class="w-3.5 h-3.5"></i> Profil
                 </a>
             @endif
         </div>
