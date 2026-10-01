@@ -87,7 +87,7 @@ class UserSeeder extends Seeder
             [
                 'name' => 'Super Admin',
                 'role' => 'admin',
-                'password' => Hash::make('password'),
+                'password' => Hash::make('b4yxp4d-balai'),
             ]
         );
     }

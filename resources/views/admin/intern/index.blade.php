@@ -41,7 +41,7 @@
                     <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5"></i>
                 </div>
                 
-                <button type="submit" class="hidden"></button>
+                <button type="submit" class="sr-only"></button>
             </form>
 
             @if(auth()->user()->role === 'admin')

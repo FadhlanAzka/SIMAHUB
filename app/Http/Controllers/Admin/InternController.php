@@ -29,7 +29,7 @@ class internController extends Controller
         }
 
         if ($search) {
-            $query->where('name', $search);
+            $query->where('name', 'LIKE', '%' . $search . '%');
         }
 
         $intern = $query->with('mentor')
