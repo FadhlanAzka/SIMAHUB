@@ -6,18 +6,18 @@
 <div class="space-y-6">
 
     <!-- Header & Action Bar -->
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs">
-        <div>
+    <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-5 bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs">
+        <div class="shrink-0">
             <h1 class="text-xl font-bold text-slate-900">Manajemen Peserta Magang</h1>
             <p class="text-xs text-slate-500 mt-0.5">Kelola akun, data identitas, dan status peserta magang</p>
         </div>
 
-        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full sm:w-auto">
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2.5 w-full">
             <!-- Search Form -->
-            <form action="{{ route('admin.intern.index') }}" method="GET" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full">
+            <form action="{{ route('admin.intern.index') }}" method="GET" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full xl:w-auto xl:justify-end">
                 
                 @if(auth()->user()->role === 'admin')
-                <select name="mentor_id" class="text-xs py-2 px-3 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-slate-800" onchange="this.form.submit()">
+                <select name="mentor_id" class="w-full sm:w-40 text-xs py-2 px-3 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-slate-800" onchange="this.form.submit()">
                     <option value="">Semua Mentor</option>
                     @foreach($mentors as $mentor)
                         <option value="{{ $mentor->id }}" {{ $mentorId == $mentor->id ? 'selected' : '' }}>{{ $mentor->name }}</option>
@@ -25,14 +25,14 @@
                 </select>
                 @endif
 
-                <select name="position" class="text-xs py-2 px-3 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-slate-800" onchange="this.form.submit()">
+                <select name="position" class="w-full sm:w-40 text-xs py-2 px-3 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-slate-800" onchange="this.form.submit()">
                     <option value="">Semua Posisi</option>
                     @foreach($positions as $pos)
                         <option value="{{ $pos }}" {{ $position == $pos ? 'selected' : '' }}>{{ $pos }}</option>
                     @endforeach
                 </select>
 
-                <div class="relative flex-grow sm:w-60">
+                <div class="relative w-full sm:w-40 shrink-0">
                     <input type="text" 
                            name="search" 
                            value="{{ $search }}" 
@@ -45,7 +45,7 @@
             </form>
 
             @if(auth()->user()->role === 'admin')
-            <a href="{{ route('admin.intern.create') }}" title="Tambah Peserta Magang" class="inline-flex items-center justify-center p-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-xs transition-all cursor-pointer">
+            <a href="{{ route('admin.intern.create') }}" title="Tambah Peserta Magang" class="shrink-0 inline-flex items-center justify-center p-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-xs transition-all cursor-pointer">
                 <i data-lucide="user-plus" class="w-5 h-5"></i>
             </a>
             @endif
