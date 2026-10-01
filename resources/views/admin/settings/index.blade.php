@@ -166,7 +166,7 @@
                     @endforeach
                 </div>
                 <span class="text-[11px] text-slate-500 mt-3 block">
-                    Absen masuk \(\le\) jam masuk berstatus <strong>Tepat Waktu</strong>. Peserta magang hanya dapat absen pulang jika waktu sudah mencapai jam pulang.
+                    Absen masuk <strong>sebelum atau tepat pada batas jam masuk</strong> berstatus <strong>Tepat Waktu</strong> (jika lewat dihitung <strong>Terlambat</strong>). Peserta magang hanya dapat absen pulang jika waktu sudah mencapai batas minimal jam pulang.
                 </span>
             </div>
 

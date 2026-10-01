@@ -75,7 +75,6 @@
                     @else
                         <span class="font-black text-emerald-300 text-sm">WFO (Radius {{ $office->radius_meters }}m)</span>
                     @endif
-                    <span class="text-[10px] text-blue-200/75 block">Sesuai sinkronisasi pengaturan Admin</span>
                 </div>
             </div>
         </div>
@@ -311,7 +310,6 @@
                         <i data-lucide="calendar-clock" class="w-4 h-4 text-blue-600"></i>
                         <span>Jadwal Kerja & WFH Mingguan</span>
                     </div>
-                    <span class="text-[10px] text-slate-400 font-medium">Sinkron Admin</span>
                 </div>
                 <div class="divide-y divide-slate-100 text-xs">
                     @foreach($weeklySchedule as $ws)

@@ -80,11 +80,6 @@ class ExportController extends Controller
             fputcsv($handle, ['Instansi', $office->office_name]);
             fputcsv($handle, ['Periode Bulan', $monthLabel]);
             fputcsv($handle, ['Waktu Ekspor', $now->translatedFormat('d F Y, H:i') . ' WIB']);
-            fputcsv($handle, ['Total Data', $attendances->count() . ' catatan']);
-            fputcsv($handle, ['Total Terlambat', $attendances->where('status', 'terlambat')->count() . ' kali']);
-            if ($userId && isset($userLateTotalsText[$userId])) {
-                fputcsv($handle, ['Total Terlambat Peserta Terpilih', $userLateTotalsText[$userId]]);
-            }
             fputcsv($handle, ['Ketentuan Jam Kerja', 'Senin - Kamis (07:30 - 16:00 WIB), Jumat (07:30 - 16:30 WIB)']);
             fputcsv($handle, []); // Baris kosong pemisah
 

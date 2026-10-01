@@ -338,6 +338,10 @@ class SimahubAttendanceTest extends TestCase
         $this->assertStringNotContainsString('NIM', $content);
         $this->assertStringNotContainsString('Perguruan Tinggi', $content);
 
+        // Verifikasi metadata Total Data dan Total Terlambat telah dihapus dari header CSV
+        $this->assertStringNotContainsString('Total Data', $content);
+        $this->assertStringNotContainsString("Total Terlambat,", $content);
+
         // Verifikasi kolom baru tersinkronisasi
         $this->assertStringContainsString('Username', $content);
         $this->assertStringContainsString('Posisi Magang', $content);
@@ -345,6 +349,19 @@ class SimahubAttendanceTest extends TestCase
         $this->assertStringContainsString('Durasi Terlambat', $content);
         $this->assertStringContainsString('Total Durasi Terlambat', $content);
         $this->assertStringContainsString('Jumat (07:30 - 16:30 WIB)', $content);
+
+        // Uji cetak PDF / print report
+        $printResponse = $this->get('/admin/export/print?month=2026-09');
+        $printResponse->assertStatus(200);
+        $printResponse->assertSee('LAPORAN REKAPITULASI PRESENSI PESERTA MAGANG');
+        $printResponse->assertDontSee('Wilayah Presensi: Radius');
+        $printResponse->assertSee('Jadwal Kerja: Senin - Kamis (07:30 - 16:00 WIB)');
+
+        // Uji admin settings tidak ada string \le
+        $settingsResponse = $this->get('/admin/settings');
+        $settingsResponse->assertStatus(200);
+        $settingsResponse->assertDontSee('\le');
+        $settingsResponse->assertSee('sebelum atau tepat pada batas jam masuk');
 
         $admin->delete();
     }
@@ -393,7 +410,9 @@ class SimahubAttendanceTest extends TestCase
         $response->assertSee('Jam Pulang (Hari Selasa):');
         $response->assertSee('17:00 WIB');
         $response->assertSee('WFH (Bebas dari Rumah)');
+        $response->assertDontSee('Sesuai sinkronisasi pengaturan Admin');
         $response->assertSee('Jadwal Kerja & WFH Mingguan', false);
+        $response->assertDontSee('Sinkron Admin');
         $response->assertSee('Total Durasi Terlambat');
 
         $student->delete();
