@@ -14,9 +14,15 @@
 
         <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
             <div>
-                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 text-blue-100 text-xs font-bold backdrop-blur-md mb-3 border border-white/10">
-                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                    <span>Posisi: {{ $user->position ?: 'intern Magang' }}</span>
+                <div class="flex flex-wrap items-center gap-2 mb-3">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 text-blue-100 text-xs font-bold backdrop-blur-md border border-white/10">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span>Posisi: {{ $user->position ?: 'intern Magang' }}</span>
+                    </div>
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 text-blue-100 text-xs font-bold backdrop-blur-md border border-white/10">
+                        <i data-lucide="user-check" class="w-3.5 h-3.5"></i>
+                        <span>Mentor: {{ $user->mentor ? $user->mentor->name : 'Belum ditentukan' }}</span>
+                    </div>
                 </div>
                 <h1 class="text-2xl sm:text-3xl font-black tracking-tight">
                     Halo, {{ $user->name }}

@@ -70,11 +70,11 @@
                             <div class="flex items-center gap-2">
                                 <span class="text-lg font-black tracking-tight text-slate-900 leading-none">SIMAHUB</span>
                                 <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 border border-slate-200/80 tracking-wide uppercase">
-                                    {{ auth()->user()->role === 'admin' ? 'Admin' : 'Intern' }}
+                                    {{ auth()->user()->role === 'admin' ? 'Admin' : (auth()->user()->role === 'mentor' ? 'Mentor' : 'Intern') }}
                                 </span>
                             </div>
                             <p class="text-[11px] text-slate-400 font-medium mt-1 leading-none">
-                                {{ auth()->user()->role === 'admin' ? 'Panel Administrator' : 'Sistem Presensi Maganghub' }}
+                                {{ auth()->user()->role === 'admin' ? 'Panel Administrator' : (auth()->user()->role === 'mentor' ? 'Panel Mentor' : 'Sistem Presensi Maganghub') }}
                             </p>
                         </div>
                     </a>
@@ -105,6 +105,11 @@
                             Lokasi & Jam
                         </a>
                         @endif
+                        <a href="{{ route('admin.profile.edit') }}" 
+                           class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 {{ request()->routeIs('admin.profile.*') ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/20' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100' }}">
+                            <i data-lucide="user" class="w-4 h-4"></i>
+                            Profil Saya
+                        </a>
                     @else
                         <a href="{{ route('dashboard') }}" 
                            class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 {{ request()->routeIs('dashboard') ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/20' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100' }}">
@@ -129,7 +134,7 @@
                     <div class="hidden sm:block text-right">
                         <div class="text-xs font-bold text-slate-900 leading-tight">{{ auth()->user()->name }}</div>
                         <div class="text-[11px] text-blue-600 font-semibold">
-                            {{ auth()->user()->isAdmin() ? 'Administrator Instansi' : (auth()->user()->position ?: 'intern Magang') }}
+                            {{ auth()->user()->role === 'admin' ? 'Administrator Instansi' : (auth()->user()->role === 'mentor' ? 'Mentor' : (auth()->user()->position ?: 'intern Magang')) }}
                         </div>
                     </div>
 
@@ -163,6 +168,9 @@
                     <i data-lucide="map-pin" class="w-3.5 h-3.5"></i> Lokasi
                 </a>
                 @endif
+                <a href="{{ route('admin.profile.edit') }}" class="{{ request()->routeIs('admin.profile.*') ? 'text-blue-600 font-bold' : 'text-slate-600' }} py-1 flex items-center gap-1">
+                    <i data-lucide="user" class="w-3.5 h-3.5"></i> Profil
+                </a>
             @else
                 <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'text-blue-600 font-bold' : 'text-slate-600' }} py-1 flex items-center gap-1">
                     <i data-lucide="clock" class="w-3.5 h-3.5"></i> Dashboard

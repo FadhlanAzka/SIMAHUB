@@ -74,8 +74,7 @@
                            class="block w-full pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm placeholder-slate-400 text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
                     <button type="button" 
                             id="togglePassword" 
-                            tabindex="-1"
-                            class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 focus:outline-none">
+                            class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 focus:outline-none focus:text-blue-600 rounded-xl transition-colors cursor-pointer">
                         <i data-lucide="eye" id="eyeIcon" class="w-4 h-4"></i>
                     </button>
                 </div>

@@ -23,8 +23,14 @@ class ProfileController extends Controller
                 'string',
                 'max:255',
                 \Illuminate\Validation\Rule::unique('users')->ignore($intern->id),
+                'not_regex:/admin|mentor/i',
             ],
-            'password' => 'nullable|string|min:6',
+            'password' => 'nullable|string|min:8',
+        ], [
+            'username.required' => 'Username tidak boleh kosong.',
+            'username.unique' => 'Username ini sudah digunakan oleh pengguna lain. Silakan pilih username yang berbeda.',
+            'username.not_regex' => 'Username Anda tidak diperbolehkan mengandung kata "admin" atau "mentor".',
+            'password.min' => 'Kata sandi baru minimal harus 8 karakter.',
         ]);
 
         $data = [

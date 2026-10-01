@@ -10,7 +10,7 @@
         <div>
             <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-800 text-xs font-bold border border-blue-100 mb-2">
                 <i data-lucide="shield-check" class="w-3.5 h-3.5 text-blue-600"></i>
-                Panel Administrator Instansi
+                Panel {{ auth()->user()->role === 'admin' ? 'Administrator Instansi' : 'Mentor' }}
             </div>
             <h1 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
                 Dashboard Monitoring Presensi
@@ -20,20 +20,14 @@
             </p>
         </div>
 
+        @if(auth()->user()->role === 'admin')
         <div class="flex flex-wrap items-center gap-2.5">
             <a href="{{ route('admin.intern.create') }}" class="inline-flex items-center gap-2 py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-md shadow-blue-500/20 transition-all cursor-pointer">
                 <i data-lucide="user-plus" class="w-4 h-4"></i>
                 <span>Tambah intern</span>
             </a>
-            <a href="{{ route('admin.export.csv', ['month' => date('Y-m')]) }}" class="inline-flex items-center gap-2 py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-md shadow-emerald-500/20 transition-all cursor-pointer">
-                <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
-                <span>Download Spreadsheet</span>
-            </a>
-            <a href="{{ route('admin.export.print', ['month' => date('Y-m')]) }}" target="_blank" class="inline-flex items-center gap-2 py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold shadow-md shadow-slate-800/10 transition-all cursor-pointer">
-                <i data-lucide="printer" class="w-4 h-4"></i>
-                <span>Cetak Laporan</span>
-            </a>
         </div>
+        @endif
     </div>
 
     <!-- Attendance Metrics Cards Grid -->

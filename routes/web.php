@@ -56,4 +56,8 @@ Route::middleware(['auth', 'role:admin,pengawas,mentor'])->prefix('admin')->name
     // Pengaturan Instansi & Geofencing
     Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
     Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');
+
+    // Profil Admin / Mentor
+    Route::get('/profile', [\App\Http\Controllers\Admin\ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [\App\Http\Controllers\Admin\ProfileController::class, 'update'])->name('profile.update');
 });

@@ -22,12 +22,20 @@ class DashboardController extends Controller
         $wfhDays = is_array($office->wfh_days) ? $office->wfh_days : (json_decode($office->wfh_days, true) ?? []);
         $isWfhDay = in_array($dayOfWeek, $wfhDays);
 
-        $totalintern = User::where('role', 'intern')->count();
+        $internQuery = User::where('role', 'intern');
+        if (auth()->user()->role === 'mentor') {
+            $internQuery->where('mentor_id', auth()->id());
+        }
+        $totalintern = $internQuery->count();
 
         // Absensi hari ini
-        $todayAttendances = Attendance::with('user')
-            ->where('date', $today)
-            ->get();
+        $attendanceQuery = Attendance::with('user')->where('date', $today);
+        if (auth()->user()->role === 'mentor') {
+            $attendanceQuery->whereHas('user', function ($q) {
+                $q->where('mentor_id', auth()->id());
+            });
+        }
+        $todayAttendances = $attendanceQuery->get();
 
         $hadirCount = $todayAttendances->whereNotNull('check_in_time')->count();
         $tepatWaktuCount = $todayAttendances->where('status', 'tepat_waktu')->count();
@@ -37,11 +45,16 @@ class DashboardController extends Controller
         $belumHadirCount = max(0, $totalintern - $hadirCount);
 
         // Daftar absensi terbaru
-        $recentAttendances = Attendance::with('user')
+        $recentQuery = Attendance::with('user')
             ->orderBy('date', 'desc')
             ->orderBy('check_in_time', 'desc')
-            ->limit(10)
-            ->get();
+            ->limit(10);
+        if (auth()->user()->role === 'mentor') {
+            $recentQuery->whereHas('user', function ($q) {
+                $q->where('mentor_id', auth()->id());
+            });
+        }
+        $recentAttendances = $recentQuery->get();
 
         return view('admin.dashboard', compact(
             'now',

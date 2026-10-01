@@ -74,6 +74,18 @@
                            class="w-full text-xs font-medium py-2.5 px-3.5 bg-slate-100 border border-slate-200 text-slate-500 rounded-xl focus:outline-none cursor-not-allowed">
                 </div>
 
+                <!-- Mentor (Readonly) -->
+                <div>
+                    <label for="mentor" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2">
+                        Mentor Pendamping <span class="text-slate-400 font-normal normal-case ml-1">(Ditetapkan Admin)</span>
+                    </label>
+                    <input type="text" 
+                           id="mentor" 
+                           value="{{ $intern->mentor ? $intern->mentor->name : 'Belum ditentukan' }}" 
+                           readonly
+                           class="w-full text-xs font-medium py-2.5 px-3.5 bg-slate-100 border border-slate-200 text-slate-500 rounded-xl focus:outline-none cursor-not-allowed">
+                </div>
+
                 <!-- Password (Optional) -->
                 <div class="sm:col-span-2 mt-2">
                     <label for="password" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2">

@@ -13,84 +13,46 @@
         </div>
 
         <div class="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
+            <!-- Filter Button -->
+            <button onclick="document.getElementById('filterModal').classList.remove('hidden')" class="inline-flex items-center gap-2 py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-md shadow-blue-500/20 transition-all cursor-pointer">
+                <i data-lucide="filter" class="w-4 h-4"></i>
+                <span>Filter Data</span>
+            </button>
+            @if(request()->anyFilled(['month', 'date', 'start_date', 'end_date', 'user_id', 'status', 'type']))
+                <a href="{{ route('admin.attendance.index') }}" class="inline-flex items-center gap-2 py-2.5 px-4 rounded-xl border border-rose-200 text-rose-600 hover:bg-rose-50 text-xs font-bold transition-all cursor-pointer">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                    <span>Reset</span>
+                </a>
+            @endif
+            
             <!-- Download Spreadsheet -->
             <a href="{{ route('admin.export.csv', request()->query()) }}" class="inline-flex items-center gap-2 py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-md shadow-emerald-500/20 transition-all cursor-pointer">
                 <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
-                <span>Download Spreadsheet</span>
+                <span>CSV</span>
             </a>
 
             <!-- Print PDF -->
             <a href="{{ route('admin.export.print', request()->query()) }}" target="_blank" class="inline-flex items-center gap-2 py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold shadow-md shadow-slate-800/10 transition-all cursor-pointer">
                 <i data-lucide="printer" class="w-4 h-4"></i>
-                <span>Cetak Laporan</span>
+                <span>Cetak</span>
             </a>
         </div>
-    </div>
-
-    <!-- Filter Card -->
-    <div class="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-xs">
-        <form action="{{ route('admin.attendance.index') }}" method="GET" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3.5 text-xs">
-            
-            <!-- Month Filter -->
-            <div>
-                <label class="block font-bold text-slate-700 mb-1">Periode Bulan</label>
-                <input type="month" 
-                       name="month" 
-                       value="{{ $selectedMonth }}" 
-                       class="w-full py-2.5 px-3 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-slate-800 font-medium">
-            </div>
-
-            <!-- Specific Date Filter -->
-            <div>
-                <label class="block font-bold text-slate-700 mb-1">Atau Tanggal Spesifik</label>
-                <input type="date" 
-                       name="date" 
-                       value="{{ $selectedDate }}" 
-                       class="w-full py-2.5 px-3 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-slate-800 font-medium">
-            </div>
-
-            <!-- intern Filter -->
-            <div>
-                <label class="block font-bold text-slate-700 mb-1">Pilih intern</label>
-                <select name="user_id" class="w-full py-2.5 px-3 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-slate-800 font-medium">
-                    <option value="">-- Semua intern --</option>
-                    @foreach($allintern as $m)
-                        <option value="{{ $m->id }}" {{ $selectedUserId == $m->id ? 'selected' : '' }}>
-                            {{ $m->name }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-
-            <!-- Status Filter -->
-            <div>
-                <label class="block font-bold text-slate-700 mb-1">Status Kehadiran</label>
-                <select name="status" class="w-full py-2.5 px-3 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-slate-800 font-medium">
-                    <option value="">-- Semua Status --</option>
-                    <option value="tepat_waktu" {{ $selectedStatus == 'tepat_waktu' ? 'selected' : '' }}>Tepat Waktu (&le; 07:30)</option>
-                    <option value="terlambat" {{ $selectedStatus == 'terlambat' ? 'selected' : '' }}>Terlambat (&gt; 07:30)</option>
-                </select>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="flex items-end gap-2">
-                <button type="submit" class="w-full py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold transition-all shadow-md shadow-blue-500/20 cursor-pointer flex items-center justify-center gap-1.5">
-                    <i data-lucide="filter" class="w-3.5 h-3.5"></i>
-                    <span>Terapkan</span>
-                </button>
-                <a href="{{ route('admin.attendance.index') }}" class="p-2.5 rounded-xl border border-slate-300 text-slate-600 hover:bg-slate-50 transition-colors" title="Reset Filter">
-                    <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
-                </a>
-            </div>
-
-        </form>
     </div>
 
     <!-- Attendance Table -->
     <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden">
         <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
             <h3 class="text-sm font-bold text-slate-900">
-                Data Presensi ({{ $attendances->total() }} catatan ditemukan)
+                @if($selectedDate)
+                    Data Presensi Tanggal {{ \Carbon\Carbon::parse($selectedDate)->translatedFormat('d F Y') }}
+                @elseif($startDate && $endDate)
+                    Data Presensi {{ \Carbon\Carbon::parse($startDate)->translatedFormat('d M Y') }} - {{ \Carbon\Carbon::parse($endDate)->translatedFormat('d M Y') }}
+                @elseif($selectedMonth)
+                    Data Presensi Periode {{ \Carbon\Carbon::parse($selectedMonth . '-01')->translatedFormat('F Y') }}
+                @else
+                    Semua Data Presensi
+                @endif
+                <span class="text-xs text-slate-500 font-medium ml-2">({{ $attendances->total() }} catatan ditemukan)</span>
             </h3>
         </div>
 
@@ -176,4 +138,121 @@
     </div>
 
 </div>
+
+<!-- Modal Filter -->
+<div id="filterModal" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onclick="document.getElementById('filterModal').classList.add('hidden')"></div>
+    
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden max-h-[90vh] flex flex-col">
+        <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50 shrink-0">
+            <h3 class="font-bold text-slate-900">Filter Rekapitulasi</h3>
+            <button onclick="document.getElementById('filterModal').classList.add('hidden')" class="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-xl transition-colors">
+                <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+        </div>
+        
+        <form action="{{ route('admin.attendance.index') }}" method="GET" class="p-6 space-y-4 overflow-y-auto" onsubmit="cleanEmptyInputs(this)">
+            
+            <!-- intern Filter -->
+            <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Pilih intern</label>
+                <select name="user_id" class="w-full text-xs font-medium py-2.5 px-3.5 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-slate-900 transition-all">
+                    <option value="">Semua intern</option>
+                    @foreach($allintern as $m)
+                        <option value="{{ $m->id }}" {{ $selectedUserId == $m->id ? 'selected' : '' }}>
+                            {{ $m->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            
+            <div class="border-t border-slate-100 my-2"></div>
+
+            <!-- Bulan Periode -->
+            <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                    Bulan Periode <span class="text-[10px] text-slate-400 font-normal normal-case ml-1">(Format: YYYY-MM)</span>
+                </label>
+                <input type="month" name="month" value="{{ $selectedMonth }}" placeholder="YYYY-MM"
+                       class="w-full text-xs font-medium py-2.5 px-3.5 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-slate-900 transition-all">
+            </div>
+            
+            <div class="relative flex py-1 items-center">
+                <div class="flex-grow border-t border-slate-200"></div>
+                <span class="shrink-0 mx-4 text-slate-400 text-[10px] font-bold">ATAU</span>
+                <div class="flex-grow border-t border-slate-200"></div>
+            </div>
+
+            <!-- Tanggal Spesifik -->
+            <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Tanggal Spesifik</label>
+                <input type="date" name="date" value="{{ $selectedDate }}" 
+                       class="w-full text-xs font-medium py-2.5 px-3.5 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-slate-900 transition-all">
+            </div>
+
+            <div class="relative flex py-1 items-center">
+                <div class="flex-grow border-t border-slate-200"></div>
+                <span class="shrink-0 mx-4 text-slate-400 text-[10px] font-bold">ATAU</span>
+                <div class="flex-grow border-t border-slate-200"></div>
+            </div>
+
+            <!-- Tanggal Range -->
+            <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Rentang Tanggal</label>
+                <div class="flex items-center gap-2">
+                    <input type="date" name="start_date" value="{{ $startDate }}" 
+                           class="w-full text-xs font-medium py-2.5 px-3.5 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-slate-900 transition-all">
+                    <span class="text-slate-400 font-bold">-</span>
+                    <input type="date" name="end_date" value="{{ $endDate }}" 
+                           class="w-full text-xs font-medium py-2.5 px-3.5 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-slate-900 transition-all">
+                </div>
+            </div>
+            
+            <div class="border-t border-slate-100 my-2"></div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <!-- Status Filter -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Status</label>
+                    <select name="status" class="w-full text-xs font-medium py-2.5 px-3.5 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-slate-900 transition-all">
+                        <option value="">Semua Status</option>
+                        <option value="tepat_waktu" {{ $selectedStatus == 'tepat_waktu' ? 'selected' : '' }}>Tepat Waktu</option>
+                        <option value="terlambat" {{ $selectedStatus == 'terlambat' ? 'selected' : '' }}>Terlambat</option>
+                    </select>
+                </div>
+                
+                <!-- WFO/WFH Filter -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Tipe</label>
+                    <select name="type" class="w-full text-xs font-medium py-2.5 px-3.5 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-slate-900 transition-all">
+                        <option value="">Semua Tipe</option>
+                        <option value="WFO" {{ $selectedType === 'WFO' ? 'selected' : '' }}>WFO (Kantor)</option>
+                        <option value="WFH" {{ $selectedType === 'WFH' ? 'selected' : '' }}>WFH (Rumah)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="pt-5 mt-2 border-t border-slate-100 flex items-center justify-end gap-3 shrink-0">
+                <button type="button" onclick="document.getElementById('filterModal').classList.add('hidden')" class="py-2.5 px-4 rounded-xl border border-slate-300 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors">
+                    Batal
+                </button>
+                <button type="submit" class="py-2.5 px-5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-md shadow-blue-500/20 transition-all cursor-pointer">
+                    Terapkan Filter
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function cleanEmptyInputs(form) {
+        const inputs = form.querySelectorAll('input, select');
+        inputs.forEach(input => {
+            if (!input.value) {
+                input.name = ''; 
+            }
+        });
+    }
+</script>
+
 @endsection

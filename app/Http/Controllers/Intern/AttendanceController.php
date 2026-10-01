@@ -189,16 +189,30 @@ class AttendanceController extends Controller
     public function history(Request $request)
     {
         $user = Auth::user();
-        $now = Carbon::now();
+        
+        $selectedMonth = $request->get('month');
+        $selectedDate = $request->get('date');
+        $startDate = $request->get('start_date');
+        $endDate = $request->get('end_date');
+        $selectedType = $request->get('type');
 
-        $selectedMonth = $request->get('month', $now->format('Y-m'));
-        $startDate = Carbon::parse($selectedMonth . '-01')->startOfMonth()->toDateString();
-        $endDate = Carbon::parse($selectedMonth . '-01')->endOfMonth()->toDateString();
+        $query = Attendance::where('user_id', $user->id);
 
-        $attendances = Attendance::where('user_id', $user->id)
-            ->whereBetween('date', [$startDate, $endDate])
-            ->orderBy('date', 'desc')
-            ->get();
+        if ($selectedDate) {
+            $query->where('date', $selectedDate);
+        } elseif ($startDate && $endDate) {
+            $query->whereBetween('date', [$startDate, $endDate]);
+        } elseif ($selectedMonth) {
+            $monthStart = Carbon::parse($selectedMonth . '-01')->startOfMonth()->toDateString();
+            $monthEnd = Carbon::parse($selectedMonth . '-01')->endOfMonth()->toDateString();
+            $query->whereBetween('date', [$monthStart, $monthEnd]);
+        }
+
+        if ($selectedType) {
+            $query->where('type', $selectedType);
+        }
+
+        $attendances = $query->orderBy('date', 'desc')->get();
 
         $stats = [
             'total_hadir' => $attendances->count(),
@@ -207,6 +221,6 @@ class AttendanceController extends Controller
             'wfh' => $attendances->where('type', 'WFH')->count(),
         ];
 
-        return view('intern.history', compact('user', 'attendances', 'selectedMonth', 'stats'));
+        return view('intern.history', compact('user', 'attendances', 'selectedMonth', 'selectedDate', 'startDate', 'endDate', 'selectedType', 'stats'));
     }
 }

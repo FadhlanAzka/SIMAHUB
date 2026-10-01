@@ -21,6 +21,8 @@ class AttendanceSeeder extends Seeder
             '2026-09-24',
             '2026-09-25',
             '2026-09-28',
+            '2026-09-29',
+            '2026-09-30',
         ];
 
         $interns = User::where('role', 'intern')->get();

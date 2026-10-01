@@ -124,13 +124,13 @@
 
             <hr class="border-slate-100">
 
-            <!-- Section 3: Aturan Waktu Absensi Per Hari -->
+            <!-- Section 3: Pengaturan Jadwal Kerja & WFH Per Hari -->
             <div>
                 <h3 class="text-sm font-bold text-slate-900 mb-3 flex items-center gap-2">
                     <div class="w-6 h-6 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
-                        <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+                        <i data-lucide="calendar-clock" class="w-3.5 h-3.5"></i>
                     </div>
-                    <span>Batas Jam Presensi Masuk & Pulang (Per Hari)</span>
+                    <span>Pengaturan Jadwal Kerja & WFH (Per Hari)</span>
                 </h3>
 
                 @php
@@ -142,6 +142,7 @@
                         5 => 'Jumat',
                     ];
                     $workHours = is_array($office->work_hours) ? $office->work_hours : (json_decode($office->work_hours, true) ?? []);
+                    $wfhDays = old('wfh_days', is_array($office->wfh_days) ? $office->wfh_days : json_decode($office->wfh_days, true) ?? []);
                 @endphp
 
                 <div class="space-y-3">
@@ -150,8 +151,18 @@
                             $start = $workHours[$val]['start'] ?? substr($office->work_start_time, 0, 5);
                             $end = $workHours[$val]['end'] ?? substr($office->work_end_time, 0, 5);
                         @endphp
-                        <div class="flex flex-col sm:flex-row gap-4 items-start sm:items-center p-4 rounded-xl border border-slate-200/60 bg-slate-50/50">
-                            <div class="w-full sm:w-1/4 text-sm font-bold text-slate-800">{{ $dayName }}</div>
+                        <div class="flex flex-col sm:flex-row gap-4 items-start sm:items-center p-4 rounded-xl border border-slate-200/60 bg-slate-50/50 hover:bg-slate-50 transition-colors">
+                            <div class="w-full sm:w-1/4 flex flex-col gap-1">
+                                <div class="text-sm font-bold text-slate-800">{{ $dayName }}</div>
+                                <label class="flex items-center gap-2 cursor-pointer group mt-1">
+                                    <input type="checkbox" name="wfh_days[]" value="{{ $val }}" 
+                                        {{ in_array($val, $wfhDays) ? 'checked' : '' }}
+                                        class="w-3.5 h-3.5 text-blue-600 border-slate-300 rounded focus:ring-blue-500 cursor-pointer">
+                                    <span class="text-[10px] font-bold text-slate-500 group-hover:text-blue-600 transition-colors uppercase tracking-wider">
+                                        Izinkan WFH
+                                    </span>
+                                </label>
+                            </div>
                             <div class="w-full sm:w-3/4 grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Masuk (Maksimal)</label>
@@ -165,48 +176,12 @@
                         </div>
                     @endforeach
                 </div>
-                <span class="text-[11px] text-slate-500 mt-3 block">
-                    Absen masuk \(\le\) jam masuk berstatus <strong>Tepat Waktu</strong>. intern hanya dapat absen pulang jika waktu sudah mencapai jam pulang.
-                </span>
-            </div>
-
-            <hr class="border-slate-100">
-
-            <!-- Section 4: Pengaturan Hari WFH -->
-            <div>
-                <h3 class="text-sm font-bold text-slate-900 mb-3 flex items-center gap-2">
-                    <div class="w-6 h-6 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
-                        <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
-                    </div>
-                    <span>Pengaturan Hari WFH (Bebas Lokasi)</span>
-                </h3>
-                
-                <p class="text-xs text-slate-500 mb-3">
-                    Pilih hari apa saja yang diizinkan untuk Work From Home (WFH). Pada hari yang dipilih, intern dapat melakukan absen dari mana saja (validasi radius lokasi ditiadakan).
-                </p>
-
-                @php
-                    $wfhDays = old('wfh_days', is_array($office->wfh_days) ? $office->wfh_days : json_decode($office->wfh_days, true) ?? []);
-                    $days = [
-                        1 => 'Senin',
-                        2 => 'Selasa',
-                        3 => 'Rabu',
-                        4 => 'Kamis',
-                        5 => 'Jumat',
-                    ];
-                @endphp
-
-                <div class="flex flex-wrap gap-4 mt-2">
-                    @foreach($days as $val => $dayName)
-                        <label class="flex items-center gap-2 cursor-pointer group">
-                            <input type="checkbox" name="wfh_days[]" value="{{ $val }}" 
-                                {{ in_array($val, $wfhDays) ? 'checked' : '' }}
-                                class="w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500 cursor-pointer">
-                            <span class="text-xs font-semibold text-slate-700 group-hover:text-blue-600 transition-colors">
-                                {{ $dayName }}
-                            </span>
-                        </label>
-                    @endforeach
+                <div class="mt-3 p-3 bg-blue-50/50 border border-blue-100 rounded-xl">
+                    <p class="text-[11px] text-slate-600 leading-relaxed">
+                        <i data-lucide="info" class="w-3.5 h-3.5 inline-block -mt-0.5 mr-1 text-blue-500"></i>
+                        <strong>Catatan:</strong> Absen masuk &le; jam masuk berstatus <strong>Tepat Waktu</strong>. intern hanya dapat absen pulang jika waktu sudah mencapai jam pulang.<br>
+                        * Centang opsi <strong>Izinkan WFH</strong> jika pada hari tersebut intern diperbolehkan absen dari mana saja (Bebas Lokasi / mengabaikan validasi radius).
+                    </p>
                 </div>
             </div>
 

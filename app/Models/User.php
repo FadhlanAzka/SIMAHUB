@@ -23,6 +23,7 @@ class User extends Authenticatable
         'position',
         'phone',
         'password',
+        'mentor_id',
     ];
 
     /**
@@ -71,5 +72,15 @@ class User extends Authenticatable
     public function attendances(): HasMany
     {
         return $this->hasMany(Attendance::class);
+    }
+
+    public function mentor()
+    {
+        return $this->belongsTo(User::class, 'mentor_id');
+    }
+
+    public function mentees(): HasMany
+    {
+        return $this->hasMany(User::class, 'mentor_id');
     }
 }

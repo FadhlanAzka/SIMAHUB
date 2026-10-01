@@ -80,6 +80,23 @@
                            class="w-full text-xs font-medium py-2.5 px-3.5 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-slate-900 transition-all">
                 </div>
 
+                <!-- Mentor Pendamping -->
+                <div>
+                    <label for="mentor_id" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                        Mentor Pendamping
+                    </label>
+                    <select name="mentor_id" 
+                            id="mentor_id" 
+                            class="w-full text-xs font-medium py-2.5 px-3.5 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-slate-900 transition-all">
+                        <option value="">-- Pilih Mentor (Opsional) --</option>
+                        @foreach($mentors as $mentor)
+                            <option value="{{ $mentor->id }}" {{ old('mentor_id') == $mentor->id ? 'selected' : '' }}>
+                                {{ $mentor->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
                 <!-- Password -->
                 <div class="sm:col-span-2">
                     <label for="password" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">

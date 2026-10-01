@@ -17,18 +17,42 @@ class ExportController extends Controller
      */
     public function exportCsv(Request $request): StreamedResponse
     {
-        $now = Carbon::now();
-        $selectedMonth = $request->get('month', $now->format('Y-m'));
+        $selectedMonth = $request->get('month');
+        $selectedDate = $request->get('date');
+        $startDate = $request->get('start_date');
+        $endDate = $request->get('end_date');
         $userId = $request->get('user_id');
+        $selectedStatus = $request->get('status');
+        $selectedType = $request->get('type');
 
-        $startDate = Carbon::parse($selectedMonth . '-01')->startOfMonth()->toDateString();
-        $endDate = Carbon::parse($selectedMonth . '-01')->endOfMonth()->toDateString();
+        $query = Attendance::with('user');
 
-        $query = Attendance::with('user')
-            ->whereBetween('date', [$startDate, $endDate]);
+        if (auth()->user()->role === 'mentor') {
+            $query->whereHas('user', function ($q) {
+                $q->where('mentor_id', auth()->id());
+            });
+        }
+
+        if ($selectedDate) {
+            $query->where('date', $selectedDate);
+        } elseif ($startDate && $endDate) {
+            $query->whereBetween('date', [$startDate, $endDate]);
+        } elseif ($selectedMonth) {
+            $monthStart = Carbon::parse($selectedMonth . '-01')->startOfMonth()->toDateString();
+            $monthEnd = Carbon::parse($selectedMonth . '-01')->endOfMonth()->toDateString();
+            $query->whereBetween('date', [$monthStart, $monthEnd]);
+        }
 
         if ($userId) {
             $query->where('user_id', $userId);
+        }
+
+        if ($selectedStatus) {
+            $query->where('status', $selectedStatus);
+        }
+
+        if ($selectedType) {
+            $query->where('type', $selectedType);
         }
 
         $attendances = $query->orderBy('date', 'asc')
@@ -36,7 +60,16 @@ class ExportController extends Controller
             ->get();
 
         $office = OfficeSetting::getSetting();
-        $monthLabel = Carbon::parse($selectedMonth . '-01')->translatedFormat('F Y');
+        
+        $monthLabel = 'Semua Data';
+        if ($selectedDate) {
+            $monthLabel = Carbon::parse($selectedDate)->translatedFormat('d F Y');
+        } elseif ($startDate && $endDate) {
+            $monthLabel = Carbon::parse($startDate)->translatedFormat('d M Y') . ' sd ' . Carbon::parse($endDate)->translatedFormat('d M Y');
+        } elseif ($selectedMonth) {
+            $monthLabel = Carbon::parse($selectedMonth . '-01')->translatedFormat('F Y');
+        }
+
         $fileName = "Rekap_Presensi_SIMAHUB_" . str_replace(' ', '_', $monthLabel) . ".csv";
 
         $headers = [
@@ -112,18 +145,42 @@ class ExportController extends Controller
      */
     public function printReport(Request $request)
     {
-        $now = Carbon::now();
-        $selectedMonth = $request->get('month', $now->format('Y-m'));
+        $selectedMonth = $request->get('month');
+        $selectedDate = $request->get('date');
+        $startDate = $request->get('start_date');
+        $endDate = $request->get('end_date');
         $userId = $request->get('user_id');
+        $selectedStatus = $request->get('status');
+        $selectedType = $request->get('type');
 
-        $startDate = Carbon::parse($selectedMonth . '-01')->startOfMonth()->toDateString();
-        $endDate = Carbon::parse($selectedMonth . '-01')->endOfMonth()->toDateString();
+        $query = Attendance::with('user');
 
-        $query = Attendance::with('user')
-            ->whereBetween('date', [$startDate, $endDate]);
+        if (auth()->user()->role === 'mentor') {
+            $query->whereHas('user', function ($q) {
+                $q->where('mentor_id', auth()->id());
+            });
+        }
+
+        if ($selectedDate) {
+            $query->where('date', $selectedDate);
+        } elseif ($startDate && $endDate) {
+            $query->whereBetween('date', [$startDate, $endDate]);
+        } elseif ($selectedMonth) {
+            $monthStart = Carbon::parse($selectedMonth . '-01')->startOfMonth()->toDateString();
+            $monthEnd = Carbon::parse($selectedMonth . '-01')->endOfMonth()->toDateString();
+            $query->whereBetween('date', [$monthStart, $monthEnd]);
+        }
 
         if ($userId) {
             $query->where('user_id', $userId);
+        }
+
+        if ($selectedStatus) {
+            $query->where('status', $selectedStatus);
+        }
+
+        if ($selectedType) {
+            $query->where('type', $selectedType);
         }
 
         $attendances = $query->orderBy('date', 'asc')
@@ -131,7 +188,15 @@ class ExportController extends Controller
             ->get();
 
         $office = OfficeSetting::getSetting();
-        $monthLabel = Carbon::parse($selectedMonth . '-01')->translatedFormat('F Y');
+        
+        $monthLabel = 'Semua Data';
+        if ($selectedDate) {
+            $monthLabel = Carbon::parse($selectedDate)->translatedFormat('d F Y');
+        } elseif ($startDate && $endDate) {
+            $monthLabel = Carbon::parse($startDate)->translatedFormat('d M Y') . ' sd ' . Carbon::parse($endDate)->translatedFormat('d M Y');
+        } elseif ($selectedMonth) {
+            $monthLabel = Carbon::parse($selectedMonth . '-01')->translatedFormat('F Y');
+        }
 
         $totalHadir = $attendances->count();
         $totalTepatWaktu = $attendances->where('status', 'tepat_waktu')->count();
