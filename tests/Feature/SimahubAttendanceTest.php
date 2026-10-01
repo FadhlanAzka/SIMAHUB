@@ -26,6 +26,7 @@ class SimahubAttendanceTest extends TestCase
                 'radius_meters' => 100,
                 'work_start_time' => '07:30:00',
                 'work_end_time' => '16:00:00',
+                'wfh_days' => [5],
             ]
         );
     }
@@ -35,70 +36,46 @@ class SimahubAttendanceTest extends TestCase
         $response = $this->get('/login');
         $response->assertStatus(200);
         $response->assertSee('SIMAHUB');
-        $response->assertSee('Email atau NIM');
+        $response->assertSee('Username');
     }
 
-    public function test_admin_can_login_with_email_and_access_dashboard()
+    public function test_admin_can_login_with_username_and_access_dashboard()
     {
         $admin = User::firstOrCreate(
-            ['email' => 'admin@simahub.id'],
+            ['username' => 'admin'],
             [
-                'name' => 'Admin',
-                'nim' => 'ADMIN',
-                'institution' => 'Instansi MagangHub',
+                'name' => 'Admin Instansi',
                 'role' => 'admin',
+                'position' => 'Administrator',
                 'password' => bcrypt('admin123'),
             ]
         );
 
         $response = $this->post('/login', [
-            'login' => 'admin@simahub.id',
+            'login' => 'admin',
             'password' => 'admin123',
         ]);
 
-        $response->assertRedirect('/admin/dashboard');
+        $response->assertRedirect('/dashboard');
         $this->assertAuthenticatedAs($admin);
-    }
-
-    public function test_admin_can_login_with_nim_and_access_dashboard()
-    {
-        $admin = User::firstOrCreate(
-            ['email' => 'admin@simahub.id'],
-            [
-                'name' => 'Admin',
-                'nim' => 'ADMIN',
-                'institution' => 'Instansi MagangHub',
-                'role' => 'admin',
-                'password' => bcrypt('admin123'),
-            ]
-        );
-
-        $response = $this->post('/login', [
-            'login' => 'ADMIN',
-            'password' => 'admin123',
-        ]);
-
-        $response->assertRedirect('/admin/dashboard');
     }
 
     public function test_student_can_login_and_access_student_dashboard()
     {
         $student = User::create([
-            'name' => 'Siswa Tes',
-            'email' => 'siswates@magang.id',
-            'nim' => 'TEST1234',
-            'institution' => 'Universitas Indonesia',
+            'name' => 'Peserta Tes',
+            'username' => 'peserta_tes',
             'position' => 'Web Developer',
             'role' => 'intern',
             'password' => bcrypt('password123'),
         ]);
 
         $response = $this->post('/login', [
-            'login' => 'TEST1234',
+            'login' => 'peserta_tes',
             'password' => 'password123',
         ]);
 
-        $response->assertRedirect('/intern/dashboard');
+        $response->assertRedirect('/dashboard');
         $this->assertAuthenticatedAs($student);
 
         $student->delete();
@@ -110,10 +87,8 @@ class SimahubAttendanceTest extends TestCase
         Carbon::setTestNow(Carbon::create(2026, 9, 25, 7, 15, 0)); // 25 Sept 2026 is Friday
 
         $student = User::create([
-            'name' => 'intern WFH',
-            'email' => 'wfh@magang.id',
-            'nim' => 'WFH001',
-            'institution' => 'ITB',
+            'name' => 'Peserta WFH',
+            'username' => 'peserta_wfh',
             'position' => 'Data Analyst',
             'role' => 'intern',
             'password' => bcrypt('password123'),
@@ -146,10 +121,8 @@ class SimahubAttendanceTest extends TestCase
         Carbon::setTestNow(Carbon::create(2026, 9, 24, 7, 15, 0)); // Thursday
 
         $student = User::create([
-            'name' => 'intern Jauh',
-            'email' => 'jauh@magang.id',
-            'nim' => 'JAUH001',
-            'institution' => 'UGM',
+            'name' => 'Peserta Jauh',
+            'username' => 'peserta_jauh',
             'position' => 'UI UX Designer',
             'role' => 'intern',
             'password' => bcrypt('password123'),
@@ -179,10 +152,8 @@ class SimahubAttendanceTest extends TestCase
         Carbon::setTestNow(Carbon::create(2026, 9, 25, 8, 0, 0));
 
         $student = User::create([
-            'name' => 'intern Telat',
-            'email' => 'telat@magang.id',
-            'nim' => 'TELAT001',
-            'institution' => 'UI',
+            'name' => 'Peserta Telat',
+            'username' => 'peserta_telat',
             'position' => 'Technical Writer',
             'role' => 'intern',
             'password' => bcrypt('password123'),
@@ -212,10 +183,8 @@ class SimahubAttendanceTest extends TestCase
         Carbon::setTestNow(Carbon::create(2026, 9, 25, 7, 15, 0));
 
         $student = User::create([
-            'name' => 'intern Pulang Cepat',
-            'email' => 'cepat@magang.id',
-            'nim' => 'CEPAT001',
-            'institution' => 'UNDIP',
+            'name' => 'Peserta Pulang Cepat',
+            'username' => 'peserta_pulang_cepat',
             'position' => 'Network Engineer',
             'role' => 'intern',
             'password' => bcrypt('password123'),

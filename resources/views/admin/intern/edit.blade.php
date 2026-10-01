@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Edit Data intern')
+@section('title', 'Edit Data Peserta Magang')
 
 @section('content')
 <div class="max-w-3xl mx-auto space-y-6">
@@ -9,15 +9,15 @@
     <div class="flex items-center justify-between">
         <a href="{{ route('admin.intern.index') }}" class="text-xs font-bold text-slate-500 hover:text-slate-800 inline-flex items-center gap-1.5 transition-colors">
             <i data-lucide="arrow-left" class="w-4 h-4"></i>
-            Kembali ke Daftar intern
+            Kembali ke Daftar Peserta Magang
         </a>
     </div>
 
     <!-- Form Card -->
     <div class="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200/80 shadow-xs">
         <div class="pb-5 border-b border-slate-100 mb-6">
-            <h1 class="text-lg font-bold text-slate-900">Perbarui Data intern</h1>
-            <p class="text-xs text-slate-500 mt-0.5">Edit informasi profil untuk intern: <strong>{{ $intern->name }}</strong></p>
+            <h1 class="text-lg font-bold text-slate-900">Perbarui Data Peserta Magang</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Edit informasi profil untuk peserta magang: <strong>{{ $intern->name }}</strong></p>
         </div>
 
         <form action="{{ route('admin.intern.update', $intern->id) }}" method="POST" class="space-y-5">
@@ -25,10 +25,10 @@
             @method('PUT')
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                <!-- Nama intern -->
+                <!-- Nama Peserta Magang -->
                 <div class="sm:col-span-2">
                     <label for="name" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2">
-                        Nama Lengkap intern <span class="text-rose-500">*</span>
+                        Nama Lengkap Peserta Magang <span class="text-rose-500">*</span>
                     </label>
                     <input type="text" 
                            name="name" 

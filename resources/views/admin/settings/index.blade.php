@@ -73,7 +73,7 @@
                 </div>
 
                 <p class="text-xs text-slate-500 mb-3">
-                    Klik di area peta mana saja atau geser pin marker biru untuk menentukan lokasi instansi Anda. Lingkaran biru menandakan zona toleransi absensi WFO intern.
+                    Klik di area peta mana saja atau geser pin marker biru untuk menentukan lokasi instansi Anda. Lingkaran biru menandakan zona toleransi absensi WFO peserta magang.
                 </p>
 
                 <!-- Interactive Visual Map Container -->
@@ -166,7 +166,7 @@
                     @endforeach
                 </div>
                 <span class="text-[11px] text-slate-500 mt-3 block">
-                    Absen masuk \(\le\) jam masuk berstatus <strong>Tepat Waktu</strong>. intern hanya dapat absen pulang jika waktu sudah mencapai jam pulang.
+                    Absen masuk \(\le\) jam masuk berstatus <strong>Tepat Waktu</strong>. Peserta magang hanya dapat absen pulang jika waktu sudah mencapai jam pulang.
                 </span>
             </div>
 
@@ -182,7 +182,7 @@
                 </h3>
                 
                 <p class="text-xs text-slate-500 mb-3">
-                    Pilih hari apa saja yang diizinkan untuk Work From Home (WFH). Pada hari yang dipilih, intern dapat melakukan absen dari mana saja (validasi radius lokasi ditiadakan).
+                    Pilih hari apa saja yang diizinkan untuk Work From Home (WFH). Pada hari yang dipilih, peserta magang dapat melakukan absen dari mana saja (validasi radius lokasi ditiadakan).
                 </p>
 
                 @php

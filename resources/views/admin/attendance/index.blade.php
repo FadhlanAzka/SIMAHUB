@@ -9,7 +9,7 @@
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-3xl border border-slate-200/80 shadow-xs">
         <div>
             <h1 class="text-xl font-black text-slate-900 tracking-tight">Rekapitulasi Data Absensi</h1>
-            <p class="text-xs text-slate-500 mt-0.5">Monitoring riwayat dan transaksi kehadiran seluruh intern magang</p>
+            <p class="text-xs text-slate-500 mt-0.5">Monitoring riwayat dan transaksi kehadiran seluruh peserta magang</p>
         </div>
 
         <div class="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
@@ -49,11 +49,11 @@
                        class="w-full py-2.5 px-3 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-slate-800 font-medium">
             </div>
 
-            <!-- intern Filter -->
+            <!-- Filter Peserta Magang -->
             <div>
-                <label class="block font-bold text-slate-700 mb-1">Pilih intern</label>
+                <label class="block font-bold text-slate-700 mb-1">Pilih Peserta Magang</label>
                 <select name="user_id" class="w-full py-2.5 px-3 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-slate-800 font-medium">
-                    <option value="">-- Semua intern --</option>
+                    <option value="">-- Semua Peserta Magang --</option>
                     @foreach($allintern as $m)
                         <option value="{{ $m->id }}" {{ $selectedUserId == $m->id ? 'selected' : '' }}>
                             {{ $m->name }}
@@ -99,7 +99,7 @@
                 <thead class="bg-slate-50/80 text-slate-500 uppercase tracking-wider font-bold border-b border-slate-100 text-[11px]">
                     <tr>
                         <th class="px-6 py-3.5">Tanggal</th>
-                        <th class="px-6 py-3.5">Nama intern</th>
+                        <th class="px-6 py-3.5">Nama Peserta Magang</th>
                         <th class="px-6 py-3.5">Tipe</th>
                         <th class="px-6 py-3.5">Masuk</th>
                         <th class="px-6 py-3.5">Status</th>

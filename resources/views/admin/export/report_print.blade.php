@@ -64,7 +64,7 @@
                         {{ $office->office_name }}
                     </h1>
                     <h2 class="text-xs font-bold text-slate-700 uppercase tracking-widest">
-                        PROGRAM MAGANG intern &bull; SISTEM INFORMASI MAGANGHUB (SIMAHUB)
+                        PROGRAM MAGANG &bull; SISTEM INFORMASI MAGANGHUB (SIMAHUB)
                     </h2>
                     <p class="text-[10px] text-slate-500 font-medium">
                         Wilayah Presensi: Radius {{ $office->radius_meters }}m Kantor | Jadwal Kerja: 07:30 - 16:00 WIB
@@ -76,7 +76,7 @@
         <!-- Report Title & Metadata -->
         <div class="text-center my-6">
             <h3 class="text-base font-extrabold text-slate-900 uppercase tracking-wide">
-                LAPORAN REKAPITULASI PRESENSI intern MAGANG
+                LAPORAN REKAPITULASI PRESENSI PESERTA MAGANG
             </h3>
             <p class="text-xs font-semibold text-slate-600 mt-1">
                 PERIODE BULAN: <span class="text-blue-700 font-bold uppercase">{{ $monthLabel }}</span>
@@ -110,7 +110,7 @@
                     <th class="p-2 border-r border-slate-300 text-center w-8">No</th>
                     <th class="p-2 border-r border-slate-300">Tanggal</th>
                     <th class="p-2 border-r border-slate-300">NIM</th>
-                    <th class="p-2 border-r border-slate-300">Nama intern</th>
+                    <th class="p-2 border-r border-slate-300">Nama Peserta Magang</th>
                     <th class="p-2 border-r border-slate-300">Tipe</th>
                     <th class="p-2 border-r border-slate-300 text-center">Masuk</th>
                     <th class="p-2 border-r border-slate-300 text-center">Status</th>

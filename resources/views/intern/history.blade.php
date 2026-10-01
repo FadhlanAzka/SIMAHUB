@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Riwayat Presensi intern')
+@section('title', 'Riwayat Presensi Peserta Magang')
 
 @section('content')
 <div class="space-y-6">
@@ -8,7 +8,7 @@
     <!-- Header & Filter Bar -->
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-3xl border border-slate-200/80 shadow-xs">
         <div>
-            <h1 class="text-xl font-black text-slate-900 tracking-tight">Riwayat Presensi intern</h1>
+            <h1 class="text-xl font-black text-slate-900 tracking-tight">Riwayat Presensi Peserta Magang</h1>
             <p class="text-xs text-slate-500 mt-0.5">Catatan seluruh kehadiran Anda selama pelaksanaan program magang</p>
         </div>
 

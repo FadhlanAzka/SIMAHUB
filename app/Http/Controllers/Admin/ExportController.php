@@ -54,7 +54,7 @@ class ExportController extends Controller
             fputs($handle, "\xEF\xBB\xBF");
 
             // Header Dokumen Spreadsheet
-            fputcsv($handle, ['REKAPITULASI PRESENSI intern MAGANG - SIMAHUB']);
+            fputcsv($handle, ['REKAPITULASI PRESENSI PESERTA MAGANG - SIMAHUB']);
             fputcsv($handle, ['Instansi', $office->office_name]);
             fputcsv($handle, ['Periode Bulan', $monthLabel]);
             fputcsv($handle, ['Waktu Ekspor', $now->translatedFormat('d F Y, H:i') . ' WIB']);
@@ -65,7 +65,7 @@ class ExportController extends Controller
             fputcsv($handle, [
                 'No',
                 'NIM',
-                'Nama intern',
+                'Nama Peserta Magang',
                 'Perguruan Tinggi / Asal Instansi',
                 'Posisi Magang',
                 'Tanggal',

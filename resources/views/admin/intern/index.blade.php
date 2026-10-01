@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Kelola intern Magang')
+@section('title', 'Kelola Peserta Magang')
 
 @section('content')
 <div class="space-y-6">
@@ -8,8 +8,8 @@
     <!-- Header & Action Bar -->
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs">
         <div>
-            <h1 class="text-xl font-bold text-slate-900">Manajemen intern Magang</h1>
-            <p class="text-xs text-slate-500 mt-0.5">Kelola akun, data identitas, dan status intern maganghub</p>
+            <h1 class="text-xl font-bold text-slate-900">Manajemen Peserta Magang</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Kelola akun, data identitas, dan status peserta magang</p>
         </div>
 
         <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full sm:w-auto">
@@ -18,7 +18,7 @@
                 <input type="text" 
                        name="search" 
                        value="{{ $search }}" 
-                       placeholder="Cari nama / NIM / kampus..." 
+                       placeholder="Cari Nama / Posisi Magang / WA" 
                        class="text-xs py-2 pl-8 pr-3 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-slate-800 w-full sm:w-60">
                 <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5"></i>
             </form>
@@ -26,13 +26,13 @@
             @if(auth()->user()->role === 'admin')
             <a href="{{ route('admin.intern.create') }}" class="inline-flex items-center justify-center gap-2 py-2 px-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-xs transition-all cursor-pointer">
                 <i data-lucide="user-plus" class="w-4 h-4"></i>
-                <span>Tambah intern</span>
+                <span>Tambah Peserta Magang</span>
             </a>
             @endif
         </div>
     </div>
 
-    <!-- intern Table -->
+    <!-- Tabel Peserta Magang -->
     <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
         <div class="overflow-x-auto">
             <table class="w-full text-left text-xs text-slate-600">
@@ -84,7 +84,7 @@
 
                                     <!-- Reset Password -->
                                     <form action="{{ route('admin.intern.reset_password', $mhs->id) }}" method="POST" class="inline"
-                                          onsubmit="return confirm('Reset kata sandi intern {{ $mhs->name }}?')">
+                                          onsubmit="return confirm('Reset kata sandi peserta magang {{ $mhs->name }}?')">
                                         @csrf
                                         <button type="submit" 
                                                 title="Reset Kata Sandi"
@@ -95,11 +95,11 @@
 
                                     <!-- Delete -->
                                     <form action="{{ route('admin.intern.destroy', $mhs->id) }}" method="POST" class="inline"
-                                          onsubmit="return confirm('Hapus intern {{ $mhs->name }} beserta seluruh riwayat absensinya? Tindakan ini tidak dapat dibatalkan.')">
+                                          onsubmit="return confirm('Hapus peserta magang {{ $mhs->name }} beserta seluruh riwayat absensinya? Tindakan ini tidak dapat dibatalkan.')">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" 
-                                                title="Hapus intern"
+                                                title="Hapus Peserta Magang"
                                                 class="p-1.5 rounded-lg text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer">
                                             <i data-lucide="trash-2" class="w-4 h-4"></i>
                                         </button>
@@ -112,7 +112,7 @@
                         <tr>
                             <td colspan="{{ auth()->user()->role === 'admin' ? '4' : '3' }}" class="px-6 py-12 text-center text-slate-400">
                                 <i data-lucide="user-x" class="w-8 h-8 mx-auto text-slate-300 mb-2"></i>
-                                Belum ada intern magang terdaftar. Silakan klik tombol <strong>Tambah intern</strong>.
+                                Belum ada peserta magang terdaftar. Silakan klik tombol <strong>Tambah Peserta Magang</strong>.
                             </td>
                         </tr>
                     @endforelse

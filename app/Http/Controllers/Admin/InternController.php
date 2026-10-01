@@ -18,7 +18,8 @@ class internController extends Controller
             ->when($search, function ($query, $search) {
                 return $query->where(function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%")
-                      ->orWhere('position', 'like', "%{$search}%");
+                      ->orWhere('position', 'like', "%{$search}%")
+                      ->orWhere('phone', 'like', "%{$search}%");
                 });
             })
             ->withCount('attendances')
@@ -45,7 +46,7 @@ class internController extends Controller
             'phone' => ['nullable', 'string', 'max:20'],
             'password' => ['required', 'string', 'min:6'],
         ], [
-            'name.required' => 'Nama intern wajib diisi.',
+            'name.required' => 'Nama peserta magang wajib diisi.',
             'username.required' => 'Username wajib diisi.',
             'username.unique' => 'Username tersebut sudah terdaftar.',
             'password.required' => 'Kata sandi wajib diisi (minimal 6 karakter).',
@@ -58,7 +59,7 @@ class internController extends Controller
         User::create($validated);
 
         return redirect()->route('admin.intern.index')
-            ->with('success', "intern magang {$validated['name']} berhasil ditambahkan.");
+            ->with('success', "Peserta magang {$validated['name']} berhasil ditambahkan.");
     }
 
     public function edit(User $intern)
@@ -85,7 +86,7 @@ class internController extends Controller
             'phone' => ['nullable', 'string', 'max:20'],
             'password' => ['nullable', 'string', 'min:6'],
         ], [
-            'name.required' => 'Nama intern wajib diisi.',
+            'name.required' => 'Nama peserta magang wajib diisi.',
             'username.required' => 'Username wajib diisi.',
             'username.unique' => 'Username sudah digunakan.',
         ]);
@@ -99,7 +100,7 @@ class internController extends Controller
         $intern->update($validated);
 
         return redirect()->route('admin.intern.index')
-            ->with('success', "Data intern {$intern->name} berhasil diperbarui.");
+            ->with('success', "Data peserta magang {$intern->name} berhasil diperbarui.");
     }
 
     public function destroy(User $intern)
@@ -113,7 +114,7 @@ class internController extends Controller
         $intern->delete();
 
         return redirect()->route('admin.intern.index')
-            ->with('success', "intern {$name} beserta seluruh data absensinya berhasil dihapus.");
+            ->with('success', "Peserta magang {$name} beserta seluruh data absensinya berhasil dihapus.");
     }
 
     public function resetPassword(User $intern)
@@ -129,6 +130,6 @@ class internController extends Controller
         ]);
 
         return redirect()->route('admin.intern.index')
-            ->with('success', "Kata sandi {$intern->name} berhasil direset menjadi: {$defaultPassword}");
+            ->with('success', "Kata sandi peserta magang {$intern->name} berhasil direset menjadi: {$defaultPassword}");
     }
 }

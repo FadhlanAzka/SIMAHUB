@@ -23,7 +23,7 @@
         <div class="flex flex-wrap items-center gap-2.5">
             <a href="{{ route('admin.intern.create') }}" class="inline-flex items-center gap-2 py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-md shadow-blue-500/20 transition-all cursor-pointer">
                 <i data-lucide="user-plus" class="w-4 h-4"></i>
-                <span>Tambah intern</span>
+                <span>Tambah Peserta Magang</span>
             </a>
             <a href="{{ route('admin.export.csv', ['month' => date('Y-m')]) }}" class="inline-flex items-center gap-2 py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-md shadow-emerald-500/20 transition-all cursor-pointer">
                 <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
@@ -41,7 +41,7 @@
         
         <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-shadow">
             <div class="flex items-center justify-between text-slate-500 mb-2">
-                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Total intern</span>
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Peserta Magang</span>
                 <div class="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
                     <i data-lucide="users" class="w-4 h-4"></i>
                 </div>
@@ -58,7 +58,7 @@
                 </div>
             </div>
             <div class="text-2xl font-black text-emerald-600">{{ $hadirCount }}</div>
-            <span class="text-[11px] text-slate-500 font-medium">Dari {{ $totalintern }} intern</span>
+            <span class="text-[11px] text-slate-500 font-medium">Dari {{ $totalintern }} peserta magang</span>
         </div>
 
         <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-shadow">
@@ -115,7 +115,7 @@
             <table class="w-full text-left text-xs text-slate-600">
                 <thead class="bg-slate-50/80 text-slate-500 uppercase tracking-wider font-bold border-b border-slate-100 text-[11px]">
                     <tr>
-                        <th class="px-6 py-3.5">Nama intern</th>
+                        <th class="px-6 py-3.5">Nama Peserta Magang</th>
                         <th class="px-6 py-3.5">Tipe</th>
                         <th class="px-6 py-3.5">Jam Masuk</th>
                         <th class="px-6 py-3.5">Status</th>
@@ -156,7 +156,7 @@
                         <tr>
                             <td colspan="6" class="px-6 py-12 text-center text-slate-400">
                                 <i data-lucide="inbox" class="w-8 h-8 mx-auto text-slate-300 mb-2"></i>
-                                Belum ada intern yang melakukan absensi hari ini.
+                                Belum ada peserta magang yang melakukan absensi hari ini.
                             </td>
                         </tr>
                     @endforelse
