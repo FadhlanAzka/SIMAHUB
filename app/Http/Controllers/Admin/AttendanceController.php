@@ -53,13 +53,18 @@ class AttendanceController extends Controller
         // Hitung total keterlambatan per peserta magang untuk periode aktif
         $userLateTotals = [];
         $lateUsersCount = 0;
+        $totalLateMinutes = 0;
         foreach ($matchingAttendances as $att) {
             $uid = $att->user_id;
             if (!isset($userLateTotals[$uid])) {
                 $userLateTotals[$uid] = 0;
             }
             $userLateTotals[$uid] += $att->late_minutes;
+            $totalLateMinutes += (int) $att->late_minutes;
         }
+
+        $totalLateHours = (int) floor($totalLateMinutes / 60);
+        $remLateMins = $totalLateMinutes % 60;
 
         $userLateTotalsText = [];
         foreach ($userLateTotals as $uid => $mins) {

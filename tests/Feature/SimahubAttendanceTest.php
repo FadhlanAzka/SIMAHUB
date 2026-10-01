@@ -65,6 +65,12 @@ class SimahubAttendanceTest extends TestCase
 
         $response->assertRedirect('/dashboard');
         $this->assertAuthenticatedAs($admin);
+
+        // Akses halaman rekapitulasi absensi admin
+        $attendanceResponse = $this->get('/admin/attendance');
+        $attendanceResponse->assertStatus(200);
+        $attendanceResponse->assertSee('Data Presensi');
+        $attendanceResponse->assertSee('Total Durasi Terlambat');
     }
 
     public function test_student_can_login_and_access_student_dashboard()
