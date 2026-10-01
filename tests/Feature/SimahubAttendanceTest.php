@@ -418,4 +418,97 @@ class SimahubAttendanceTest extends TestCase
         $student->delete();
         Carbon::setTestNow();
     }
+
+    public function test_admin_can_manually_record_edit_and_delete_attendance_for_leave_sick_or_forgotten_checkin()
+    {
+        $admin = User::create([
+            'name' => 'Admin Super',
+            'username' => 'admin_super',
+            'role' => 'admin',
+            'password' => bcrypt('password123'),
+        ]);
+
+        $intern = User::create([
+            'name' => 'Akbar Ramdani',
+            'username' => 'akbar_ramdani',
+            'position' => 'Pengolah Data dan Informasi',
+            'phone' => '081234567890',
+            'role' => 'intern',
+            'password' => bcrypt('password123'),
+        ]);
+
+        $this->actingAs($admin);
+
+        // 1. Admin input presensi izin sakit
+        $response = $this->post('/admin/attendance', [
+            'user_id' => $intern->id,
+            'date' => '2026-09-15',
+            'status' => 'sakit',
+            'notes' => 'Surat sakit dokter terlampir',
+        ]);
+
+        $response->assertRedirect();
+        $this->assertDatabaseHas('attendances', [
+            'user_id' => $intern->id,
+            'date' => '2026-09-15',
+            'status' => 'sakit',
+            'notes' => 'Surat sakit dokter terlampir',
+        ]);
+
+        $att = Attendance::where('user_id', $intern->id)->where('date', '2026-09-15')->first();
+        $this->assertEquals('Sakit', $att->duration);
+
+        // 2. Admin input presensi dispensasi (lupa absen masuk/pulang)
+        $response = $this->post('/admin/attendance', [
+            'user_id' => $intern->id,
+            'date' => '2026-09-16',
+            'status' => 'dispensasi',
+            'type' => 'WFO',
+            'check_in_time' => '07:30',
+            'check_out_time' => '16:00',
+            'notes' => 'Dispensasi lupa presensi pagi',
+        ]);
+
+        $response->assertRedirect();
+        $this->assertDatabaseHas('attendances', [
+            'user_id' => $intern->id,
+            'date' => '2026-09-16',
+            'status' => 'dispensasi',
+        ]);
+
+        $attDispensasi = Attendance::where('user_id', $intern->id)->where('date', '2026-09-16')->first();
+
+        // 3. Admin edit presensi
+        $response = $this->put('/admin/attendance/' . $attDispensasi->id, [
+            'status' => 'tepat_waktu',
+            'type' => 'WFO',
+            'check_in_time' => '07:25',
+            'check_out_time' => '16:05',
+            'notes' => 'Koreksi jam oleh admin',
+        ]);
+
+        $response->assertRedirect();
+        $this->assertDatabaseHas('attendances', [
+            'id' => $attDispensasi->id,
+            'status' => 'tepat_waktu',
+            'check_in_time' => '07:25:00',
+        ]);
+
+        // 4. Periksa PDF report: menampilkan Akbar Ramdani & Pengolah Data dan Informasi, tanpa @akbar_ramdani atau WA:
+        $pdfResponse = $this->get('/admin/export/print?month=2026-09');
+        $pdfResponse->assertStatus(200);
+        $pdfResponse->assertSee('Akbar Ramdani');
+        $pdfResponse->assertSee('Pengolah Data dan Informasi');
+        $pdfResponse->assertDontSee('@akbar_ramdani');
+        $pdfResponse->assertDontSee('WA: 081234567890');
+
+        // 5. Admin hapus presensi
+        $deleteResponse = $this->delete('/admin/attendance/' . $att->id);
+        $deleteResponse->assertRedirect();
+        $this->assertDatabaseMissing('attendances', ['id' => $att->id]);
+
+        $attDispensasi->delete();
+        $intern->delete();
+        $admin->delete();
+    }
 }

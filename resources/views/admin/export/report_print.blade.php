@@ -165,23 +165,11 @@
                             <div class="font-bold text-slate-900 leading-snug text-xs">
                                 {{ $row->user ? $row->user->name : '-' }}
                             </div>
-                            <div class="flex items-center gap-1.5 flex-wrap mt-0.5">
-                                @if($row->user && $row->user->position)
-                                    <span class="text-[10px] text-blue-700 font-bold bg-blue-50/80 px-1.5 py-0.5 rounded border border-blue-200/80">
-                                        {{ $row->user->position }}
-                                    </span>
-                                @endif
-                                @if($row->user && $row->user->username)
-                                    <span class="text-[10px] text-slate-500 font-mono">
-                                        {{ '@' . $row->user->username }}
-                                    </span>
-                                @endif
-                                @if($row->user && $row->user->phone)
-                                    <span class="text-[10px] text-slate-400">
-                                        &bull; WA: {{ $row->user->phone }}
-                                    </span>
-                                @endif
-                            </div>
+                            @if($row->user && $row->user->position)
+                                <div class="text-[10px] text-slate-600 font-medium mt-0.5">
+                                    {{ $row->user->position }}
+                                </div>
+                            @endif
                         </td>
                         <td class="p-2.5 border-r border-slate-300 text-center align-middle">
                             @if($row->type === 'WFH')

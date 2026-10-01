@@ -41,6 +41,10 @@ class Attendance extends Model
      */
     public function getDurationAttribute(): ?string
     {
+        if (in_array($this->status, ['izin', 'sakit', 'alpa'])) {
+            return ucfirst($this->status);
+        }
+
         if (!$this->check_in_time || !$this->check_out_time) {
             return '-';
         }
@@ -108,6 +112,14 @@ class Attendance extends Model
         } elseif ($this->status === 'terlambat') {
             $duration = $this->late_duration_text ?: '0 jam 0 Menit';
             return "TELAT\n({$duration})";
+        } elseif ($this->status === 'izin') {
+            return 'Izin';
+        } elseif ($this->status === 'sakit') {
+            return 'Sakit';
+        } elseif ($this->status === 'dispensasi') {
+            return 'Dispensasi (Lupa Absen)';
+        } elseif ($this->status === 'alpa') {
+            return 'Alpa';
         }
 
         return '-';
@@ -126,6 +138,14 @@ class Attendance extends Model
                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-black bg-rose-100 text-rose-800 tracking-wide">TELAT</span>
                 <span class="text-[10px] text-rose-600 font-bold mt-0.5">(' . $duration . ')</span>
             </div>';
+        } elseif ($this->status === 'izin') {
+            return '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-800">Izin</span>';
+        } elseif ($this->status === 'sakit') {
+            return '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800">Sakit</span>';
+        } elseif ($this->status === 'dispensasi') {
+            return '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-100 text-indigo-800" title="Dispensasi Lupa Absen oleh Admin">Dispensasi</span>';
+        } elseif ($this->status === 'alpa') {
+            return '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-100 text-red-800">Alpa</span>';
         }
 
         return '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-700">-</span>';
@@ -136,6 +156,14 @@ class Attendance extends Model
      */
     public function getTypeBadgeAttribute(): string
     {
+        if ($this->status === 'izin') {
+            return '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-600">Perizinan</span>';
+        } elseif ($this->status === 'sakit') {
+            return '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-700">Surat Sakit</span>';
+        } elseif ($this->status === 'alpa') {
+            return '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-50 text-red-700">Tidak Hadir</span>';
+        }
+
         if ($this->type === 'WFH') {
             return '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 font-semibold">WFH (Bebas Lokasi)</span>';
         }
