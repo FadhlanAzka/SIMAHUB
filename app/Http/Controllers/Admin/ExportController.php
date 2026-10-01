@@ -39,6 +39,14 @@ class ExportController extends Controller
         $monthLabel = Carbon::parse($selectedMonth . '-01')->translatedFormat('F Y');
         $fileName = "Rekap_Presensi_SIMAHUB_" . str_replace(' ', '_', $monthLabel) . ".csv";
 
+        $totalLateMinutes = 0;
+        foreach ($attendances as $row) {
+            $totalLateMinutes += $row->late_minutes;
+        }
+        $totalLateHours = (int) floor($totalLateMinutes / 60);
+        $remLateMins = $totalLateMinutes % 60;
+        $accumulatedLateText = "{$totalLateHours} jam {$remLateMins} Menit";
+
         $headers = [
             'Content-Type' => 'text/csv; charset=UTF-8',
             'Content-Disposition' => "attachment; filename=\"{$fileName}\"",
@@ -47,7 +55,7 @@ class ExportController extends Controller
             'Expires' => '0',
         ];
 
-        return response()->stream(function () use ($attendances, $office, $monthLabel, $now) {
+        return response()->stream(function () use ($attendances, $office, $monthLabel, $now, $accumulatedLateText) {
             $handle = fopen('php://output', 'w');
 
             // Tambahkan UTF-8 BOM agar Excel/Spreadsheets otomatis membaca karakter dengan rapi
@@ -58,21 +66,25 @@ class ExportController extends Controller
             fputcsv($handle, ['Instansi', $office->office_name]);
             fputcsv($handle, ['Periode Bulan', $monthLabel]);
             fputcsv($handle, ['Waktu Ekspor', $now->translatedFormat('d F Y, H:i') . ' WIB']);
-            fputcsv($handle, ['Total Data', $attendances->count() . ' catatan presensi']);
+            fputcsv($handle, ['Total Data', $attendances->count() . ' catatan']);
+            fputcsv($handle, ['Total Terlambat', $attendances->where('status', 'terlambat')->count() . ' kali']);
+            fputcsv($handle, ['Total Akumulasi Terlambat', $accumulatedLateText]);
+            fputcsv($handle, ['Ketentuan Jam Kerja', 'Senin - Kamis (07:30 - 16:00 WIB), Jumat (07:30 - 16:30 WIB)']);
             fputcsv($handle, []); // Baris kosong pemisah
 
-            // Header Kolom Tabel
+            // Header Kolom Tabel yang Tersinkronisasi dengan Sistem Terkini
             fputcsv($handle, [
                 'No',
-                'NIM',
+                'Username',
                 'Nama Peserta Magang',
-                'Perguruan Tinggi / Asal Instansi',
                 'Posisi Magang',
+                'No. WhatsApp / HP',
                 'Tanggal',
                 'Hari',
                 'Metode Kerja',
                 'Jam Masuk (WIB)',
                 'Status Masuk',
+                'Durasi Terlambat',
                 'Jam Pulang (WIB)',
                 'Durasi Kerja',
                 'Jarak Presensi (Meter)',
@@ -82,20 +94,26 @@ class ExportController extends Controller
             $no = 1;
             foreach ($attendances as $row) {
                 $dayName = Carbon::parse($row->date)->translatedFormat('l');
-                $statusText = ($row->status === 'tepat_waktu') ? 'Tepat Waktu' : (($row->status === 'terlambat') ? 'Terlambat' : '-');
+                $lateDuration = $row->late_duration_text ?: '-';
+                $statusText = ($row->status === 'tepat_waktu') 
+                    ? 'Tepat Waktu' 
+                    : (($row->status === 'terlambat') 
+                        ? "TELAT\n(" . ($row->late_duration_text ?: '0 jam 0 Menit') . ")" 
+                        : '-');
                 $typeText = ($row->type === 'WFH') ? 'WFH (Rumah)' : 'WFO (Kantor)';
 
                 fputcsv($handle, [
                     $no++,
-                    $row->user ? $row->user->nim : '-',
+                    $row->user ? $row->user->username : '-',
                     $row->user ? $row->user->name : '-',
-                    $row->user ? $row->user->institution : '-',
                     $row->user ? ($row->user->position ?: '-') : '-',
+                    $row->user ? ($row->user->phone ?: '-') : '-',
                     $row->date->format('d/m/Y'),
                     $dayName,
                     $typeText,
                     $row->check_in_time ? substr($row->check_in_time, 0, 5) : '-',
                     $statusText,
+                    $lateDuration,
                     $row->check_out_time ? substr($row->check_out_time, 0, 5) : '-',
                     $row->duration,
                     $row->check_in_distance ? $row->check_in_distance . ' m' : '-',
@@ -139,6 +157,14 @@ class ExportController extends Controller
         $totalWfh = $attendances->where('type', 'WFH')->count();
         $totalWfo = $attendances->where('type', 'WFO')->count();
 
+        $totalLateMinutes = 0;
+        foreach ($attendances as $row) {
+            $totalLateMinutes += $row->late_minutes;
+        }
+        $totalLateHours = (int) floor($totalLateMinutes / 60);
+        $remLateMins = $totalLateMinutes % 60;
+        $accumulatedLateText = "{$totalLateHours} jam {$remLateMins} Menit";
+
         return view('admin.export.report_print', compact(
             'attendances',
             'office',
@@ -148,7 +174,9 @@ class ExportController extends Controller
             'totalTepatWaktu',
             'totalTerlambat',
             'totalWfh',
-            'totalWfo'
+            'totalWfo',
+            'totalLateMinutes',
+            'accumulatedLateText'
         ));
     }
 }

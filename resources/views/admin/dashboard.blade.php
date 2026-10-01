@@ -16,7 +16,7 @@
                 Dashboard Monitoring Presensi
             </h1>
             <p class="text-xs text-slate-500 mt-0.5">
-                {{ \Carbon\Carbon::now()->translatedFormat('l, d F Y') }} &bull; Jam Kerja: {{ substr($office->work_start_time, 0, 5) }} - {{ substr($office->work_end_time, 0, 5) }} WIB
+                {{ \Carbon\Carbon::now()->translatedFormat('l, d F Y') }} &bull; Jam Kerja: Senin - Kamis (07:30 - 16:00 WIB) | Jumat (07:30 - 16:30 WIB)
             </p>
         </div>
 

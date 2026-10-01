@@ -67,7 +67,7 @@
                         PROGRAM MAGANG &bull; SISTEM INFORMASI MAGANGHUB (SIMAHUB)
                     </h2>
                     <p class="text-[10px] text-slate-500 font-medium">
-                        Wilayah Presensi: Radius {{ $office->radius_meters }}m Kantor | Jadwal Kerja: 07:30 - 16:00 WIB
+                        Wilayah Presensi: Radius {{ $office->radius_meters }}m Kantor | Jadwal Kerja: Senin - Kamis (07:30 - 16:00 WIB), Jumat (07:30 - 16:30 WIB)
                     </p>
                 </div>
             </div>
@@ -83,23 +83,27 @@
             </p>
         </div>
 
-        <!-- Metric Summary Chips -->
-        <div class="grid grid-cols-4 gap-3 my-6 text-center text-xs">
-            <div class="p-3 rounded-lg border border-slate-300 bg-slate-50">
+        <!-- Metric Summary Chips (5 Kolom Termasuk Akumulasi Terlambat) -->
+        <div class="grid grid-cols-5 gap-2.5 my-6 text-center text-xs">
+            <div class="p-2.5 rounded-lg border border-slate-300 bg-slate-50">
                 <span class="text-[10px] text-slate-500 uppercase font-bold block">Total Presensi</span>
-                <span class="text-base font-black text-slate-900">{{ $totalHadir }} Hari</span>
+                <span class="text-sm font-black text-slate-900">{{ $totalHadir }} Catatan</span>
             </div>
-            <div class="p-3 rounded-lg border border-slate-300 bg-slate-50">
+            <div class="p-2.5 rounded-lg border border-slate-300 bg-slate-50">
                 <span class="text-[10px] text-slate-500 uppercase font-bold block">Tepat Waktu</span>
-                <span class="text-base font-black text-emerald-700">{{ $totalTepatWaktu }} Hari</span>
+                <span class="text-sm font-black text-emerald-700">{{ $totalTepatWaktu }} Hari</span>
             </div>
-            <div class="p-3 rounded-lg border border-slate-300 bg-slate-50">
+            <div class="p-2.5 rounded-lg border border-slate-300 bg-slate-50">
                 <span class="text-[10px] text-slate-500 uppercase font-bold block">Terlambat</span>
-                <span class="text-base font-black text-rose-700">{{ $totalTerlambat }} Hari</span>
+                <span class="text-sm font-black text-rose-700">{{ $totalTerlambat }} Kali</span>
             </div>
-            <div class="p-3 rounded-lg border border-slate-300 bg-slate-50">
-                <span class="text-[10px] text-slate-500 uppercase font-bold block">WFH (Bebas Lokasi)</span>
-                <span class="text-base font-black text-purple-700">{{ $totalWfh }} Hari</span>
+            <div class="p-2.5 rounded-lg border border-rose-300 bg-rose-50/70">
+                <span class="text-[10px] text-rose-700 uppercase font-bold block">Akumulasi Terlambat</span>
+                <span class="text-xs font-black text-rose-800">{{ $accumulatedLateText }}</span>
+            </div>
+            <div class="p-2.5 rounded-lg border border-slate-300 bg-slate-50">
+                <span class="text-[10px] text-slate-500 uppercase font-bold block">WFH (Rumah)</span>
+                <span class="text-sm font-black text-purple-700">{{ $totalWfh }} Hari</span>
             </div>
         </div>
 
@@ -109,11 +113,12 @@
                 <tr>
                     <th class="p-2 border-r border-slate-300 text-center w-8">No</th>
                     <th class="p-2 border-r border-slate-300">Tanggal</th>
-                    <th class="p-2 border-r border-slate-300">NIM</th>
-                    <th class="p-2 border-r border-slate-300">Nama Peserta Magang</th>
+                    <th class="p-2 border-r border-slate-300">Username</th>
+                    <th class="p-2 border-r border-slate-300">Nama & Posisi Magang</th>
+                    <th class="p-2 border-r border-slate-300">No. WA</th>
                     <th class="p-2 border-r border-slate-300">Tipe</th>
                     <th class="p-2 border-r border-slate-300 text-center">Masuk</th>
-                    <th class="p-2 border-r border-slate-300 text-center">Status</th>
+                    <th class="p-2 border-r border-slate-300 text-center">Status Masuk</th>
                     <th class="p-2 border-r border-slate-300 text-center">Pulang</th>
                     <th class="p-2 text-center">Durasi</th>
                 </tr>
@@ -127,14 +132,16 @@
                             <span class="text-[10px] text-slate-500 block">({{ \Carbon\Carbon::parse($row->date)->translatedFormat('l') }})</span>
                         </td>
                         <td class="p-2 border-r border-slate-300 font-mono text-slate-700 whitespace-nowrap">
-                            {{ $row->user ? $row->user->nim : '-' }}
+                            {{ $row->user ? $row->user->username : '-' }}
                         </td>
                         <td class="p-2 border-r border-slate-300 font-semibold text-slate-900 whitespace-nowrap">
                             {{ $row->user ? $row->user->name : '-' }}
                             @if($row->user && $row->user->position)
                                 <span class="text-[10px] text-blue-700 font-bold block">{{ $row->user->position }}</span>
                             @endif
-                            <span class="text-[10px] text-slate-500 font-normal block">{{ $row->user ? $row->user->institution : '' }}</span>
+                        </td>
+                        <td class="p-2 border-r border-slate-300 font-mono text-slate-600 text-[10px] whitespace-nowrap">
+                            {{ $row->user && $row->user->phone ? $row->user->phone : '-' }}
                         </td>
                         <td class="p-2 border-r border-slate-300 font-bold text-[10px] whitespace-nowrap">
                             {{ $row->type === 'WFH' ? 'WFH (Rumah)' : 'WFO (Kantor)' }}
@@ -142,11 +149,12 @@
                         <td class="p-2 border-r border-slate-300 font-mono text-center whitespace-nowrap">
                             {{ $row->check_in_time ? substr($row->check_in_time, 0, 5) : '-' }}
                         </td>
-                        <td class="p-2 border-r border-slate-300 text-center font-semibold whitespace-nowrap text-[10px]">
+                        <td class="p-2 border-r border-slate-300 text-center whitespace-nowrap text-[10px]">
                             @if($row->status === 'tepat_waktu')
-                                <span class="text-emerald-700">Tepat Waktu</span>
+                                <span class="text-emerald-700 font-bold">Tepat Waktu</span>
                             @elseif($row->status === 'terlambat')
-                                <span class="text-rose-700">Terlambat</span>
+                                <span class="text-rose-700 font-black block leading-tight">TELAT</span>
+                                <span class="text-[9px] text-rose-600 font-bold block leading-tight">({{ $row->late_duration_text ?: '0 jam 0 Menit' }})</span>
                             @else
                                 -
                             @endif

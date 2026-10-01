@@ -41,6 +41,33 @@ class AttendanceController extends Controller
             $query->where('type', $selectedType);
         }
 
+        // Hitung statistik dan total akumulasi keterlambatan untuk data yang sesuai filter
+        $matchingQuery = clone $query;
+        $matchingAttendances = $matchingQuery->get();
+
+        $totalHadir = $matchingAttendances->count();
+        $totalTepatWaktu = $matchingAttendances->where('status', 'tepat_waktu')->count();
+        $totalTerlambat = $matchingAttendances->where('status', 'terlambat')->count();
+        $totalWfh = $matchingAttendances->where('type', 'WFH')->count();
+
+        $totalLateMinutes = 0;
+        foreach ($matchingAttendances as $att) {
+            $totalLateMinutes += $att->late_minutes;
+        }
+
+        $totalLateHours = (int) floor($totalLateMinutes / 60);
+        $remLateMins = $totalLateMinutes % 60;
+        $accumulatedLateText = "{$totalLateHours} jam {$remLateMins} Menit";
+
+        $stats = [
+            'total_hadir' => $totalHadir,
+            'tepat_waktu' => $totalTepatWaktu,
+            'terlambat' => $totalTerlambat,
+            'wfh' => $totalWfh,
+            'total_late_minutes' => $totalLateMinutes,
+            'accumulated_late_text' => $accumulatedLateText,
+        ];
+
         $attendances = $query->orderBy('date', 'desc')
             ->orderBy('check_in_time', 'desc')
             ->paginate(20)
@@ -55,7 +82,8 @@ class AttendanceController extends Controller
             'selectedDate',
             'selectedUserId',
             'selectedStatus',
-            'selectedType'
+            'selectedType',
+            'stats'
         ));
     }
 }

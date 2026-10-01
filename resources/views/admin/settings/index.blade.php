@@ -172,17 +172,33 @@
 
             <hr class="border-slate-100">
 
-            <!-- Section 4: Pengaturan Hari WFH -->
+            <!-- Section 4: Pengaturan Hari WFH Fleksibel -->
             <div>
-                <h3 class="text-sm font-bold text-slate-900 mb-3 flex items-center gap-2">
-                    <div class="w-6 h-6 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
-                        <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+                    <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                        <div class="w-6 h-6 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+                            <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
+                        </div>
+                        <span>Pengaturan Hari WFH (Bebas Lokasi) & Kebijakan Fleksibel</span>
+                    </h3>
+                    
+                    <!-- Quick Presets -->
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                        <span class="text-[11px] font-bold text-slate-400">Pilihan Cepat:</span>
+                        <button type="button" onclick="setWfhPreset([5])" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-700 text-[11px] font-semibold transition-colors cursor-pointer border border-slate-200">
+                            Jumat Saja
+                        </button>
+                        <button type="button" onclick="setWfhPreset([])" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-rose-50 text-slate-700 hover:text-rose-700 text-[11px] font-semibold transition-colors cursor-pointer border border-slate-200">
+                            Full WFO (Tanpa WFH)
+                        </button>
+                        <button type="button" onclick="setWfhPreset([4, 5])" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-purple-50 text-slate-700 hover:text-purple-700 text-[11px] font-semibold transition-colors cursor-pointer border border-slate-200">
+                            Kamis & Jumat
+                        </button>
                     </div>
-                    <span>Pengaturan Hari WFH (Bebas Lokasi)</span>
-                </h3>
+                </div>
                 
                 <p class="text-xs text-slate-500 mb-3">
-                    Pilih hari apa saja yang diizinkan untuk Work From Home (WFH). Pada hari yang dipilih, peserta magang dapat melakukan absen dari mana saja (validasi radius lokasi ditiadakan).
+                    Atur hari kerja mana saja yang diizinkan untuk <em>Work From Home</em> (WFH). Jika tidak ada hari yang dicentang, maka sistem otomatis menerapkan <strong>Full WFO</strong> (seluruh hari wajib berada di area radius kantor). Mentor/Admin bebas mengubah hari WFH kapan saja sesuai instruksi instansi.
                 </p>
 
                 @php
@@ -196,17 +212,25 @@
                     ];
                 @endphp
 
-                <div class="flex flex-wrap gap-4 mt-2">
-                    @foreach($days as $val => $dayName)
-                        <label class="flex items-center gap-2 cursor-pointer group">
-                            <input type="checkbox" name="wfh_days[]" value="{{ $val }}" 
-                                {{ in_array($val, $wfhDays) ? 'checked' : '' }}
-                                class="w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500 cursor-pointer">
-                            <span class="text-xs font-semibold text-slate-700 group-hover:text-blue-600 transition-colors">
-                                {{ $dayName }}
-                            </span>
-                        </label>
-                    @endforeach
+                <div class="p-4 rounded-xl border border-slate-200/80 bg-slate-50/50 space-y-3">
+                    <div class="flex flex-wrap gap-4" id="wfhCheckboxesContainer">
+                        @foreach($days as $val => $dayName)
+                            <label class="inline-flex items-center gap-2.5 px-3.5 py-2 rounded-xl bg-white border border-slate-200 shadow-2xs hover:border-blue-300 hover:bg-blue-50/30 transition-all cursor-pointer group">
+                                <input type="checkbox" name="wfh_days[]" value="{{ $val }}" 
+                                    id="wfh_day_{{ $val }}"
+                                    {{ in_array($val, $wfhDays) ? 'checked' : '' }}
+                                    class="w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500 cursor-pointer">
+                                <span class="text-xs font-bold text-slate-700 group-hover:text-blue-600 transition-colors">
+                                    {{ $dayName }}
+                                </span>
+                            </label>
+                        @endforeach
+                    </div>
+
+                    <div class="text-[11px] text-slate-500 flex items-center gap-1.5 pt-1">
+                        <i data-lucide="info" class="w-3.5 h-3.5 text-blue-500 shrink-0"></i>
+                        <span>Hari yang <strong>tidak dicentang</strong> otomatis berstatus <strong>WFO</strong> (peserta magang wajib presensi di radius {{ $office->radius_meters }} meter dari kantor).</span>
+                    </div>
                 </div>
             </div>
 
@@ -312,6 +336,16 @@
             );
         });
     });
+
+    // Helper Preset WFH
+    function setWfhPreset(allowedDays) {
+        for (let i = 1; i <= 5; i++) {
+            const cb = document.getElementById('wfh_day_' + i);
+            if (cb) {
+                cb.checked = allowedDays.includes(i);
+            }
+        }
+    }
 </script>
 @endpush
 @endsection

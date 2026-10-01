@@ -27,7 +27,7 @@
     </div>
 
     <!-- Monthly Statistics Widget -->
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
         <div class="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs">
             <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Hadir</span>
             <div class="text-2xl font-black text-blue-600 mt-1">{{ $stats['total_hadir'] }} <span class="text-xs font-normal text-slate-500">Hari</span></div>
@@ -40,7 +40,11 @@
             <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Terlambat</span>
             <div class="text-2xl font-black text-rose-600 mt-1">{{ $stats['terlambat'] }} <span class="text-xs font-normal text-slate-500">Hari</span></div>
         </div>
-        <div class="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs">
+        <div class="bg-rose-50/70 p-5 rounded-3xl border border-rose-200 shadow-xs">
+            <span class="text-xs font-bold uppercase tracking-wider text-rose-700">Akumulasi Terlambat</span>
+            <div class="text-base sm:text-lg font-black text-rose-800 mt-1 font-mono leading-tight">{{ $stats['accumulated_late_text'] }}</div>
+        </div>
+        <div class="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs col-span-2 sm:col-span-1">
             <span class="text-xs font-bold uppercase tracking-wider text-slate-400">WFH (Bebas Lokasi)</span>
             <div class="text-2xl font-black text-purple-600 mt-1">{{ $stats['wfh'] }} <span class="text-xs font-normal text-slate-500">Hari</span></div>
         </div>

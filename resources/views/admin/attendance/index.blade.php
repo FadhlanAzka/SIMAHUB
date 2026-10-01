@@ -86,6 +86,30 @@
         </form>
     </div>
 
+    <!-- Summary Statistics Cards Grid -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
+        <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-2xs">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Total Presensi</span>
+            <div class="text-xl font-black text-slate-900 mt-1">{{ $stats['total_hadir'] }} <span class="text-[10px] font-normal text-slate-500">Catatan</span></div>
+        </div>
+        <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-2xs">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Tepat Waktu</span>
+            <div class="text-xl font-black text-emerald-600 mt-1">{{ $stats['tepat_waktu'] }} <span class="text-[10px] font-normal text-slate-500">Hari</span></div>
+        </div>
+        <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-2xs">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Terlambat</span>
+            <div class="text-xl font-black text-rose-600 mt-1">{{ $stats['terlambat'] }} <span class="text-[10px] font-normal text-slate-500">Kali</span></div>
+        </div>
+        <div class="bg-rose-50/70 p-4 rounded-2xl border border-rose-200 shadow-2xs">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-rose-600">Akumulasi Terlambat</span>
+            <div class="text-sm sm:text-base font-black text-rose-700 mt-1 font-mono">{{ $stats['accumulated_late_text'] }}</div>
+        </div>
+        <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-2xs col-span-2 sm:col-span-1">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">WFH (Bebas Lokasi)</span>
+            <div class="text-xl font-black text-purple-600 mt-1">{{ $stats['wfh'] }} <span class="text-[10px] font-normal text-slate-500">Hari</span></div>
+        </div>
+    </div>
+
     <!-- Attendance Table -->
     <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden">
         <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">

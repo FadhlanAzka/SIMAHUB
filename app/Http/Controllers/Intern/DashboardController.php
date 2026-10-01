@@ -39,6 +39,11 @@ class DashboardController extends Controller
             ->where('date', $today)
             ->first();
 
+        // Batas jam kerja spesifik hari ini
+        $workHours = is_array($office->work_hours) ? $office->work_hours : (json_decode($office->work_hours, true) ?? []);
+        $todayStartLimit = $workHours[$dayOfWeek]['start'] ?? substr($office->work_start_time, 0, 5);
+        $todayEndLimit = $workHours[$dayOfWeek]['end'] ?? substr($office->work_end_time, 0, 5);
+
         // Statistik bulan berjalan
         $startOfMonth = $now->copy()->startOfMonth()->toDateString();
         $endOfMonth = $now->copy()->endOfMonth()->toDateString();
@@ -47,11 +52,21 @@ class DashboardController extends Controller
             ->whereBetween('date', [$startOfMonth, $endOfMonth])
             ->get();
 
+        $totalLateMinutes = 0;
+        foreach ($monthlyAttendances as $att) {
+            $totalLateMinutes += $att->late_minutes;
+        }
+        $lateHours = (int) floor($totalLateMinutes / 60);
+        $remLateMins = $totalLateMinutes % 60;
+        $accumulatedLateText = "{$lateHours} jam {$remLateMins} Menit";
+
         $stats = [
             'total_hadir' => $monthlyAttendances->count(),
             'tepat_waktu' => $monthlyAttendances->where('status', 'tepat_waktu')->count(),
             'terlambat' => $monthlyAttendances->where('status', 'terlambat')->count(),
             'wfh' => $monthlyAttendances->where('type', 'WFH')->count(),
+            'total_late_minutes' => $totalLateMinutes,
+            'accumulated_late_text' => $accumulatedLateText,
         ];
 
         // 5 riwayat absensi terakhir
@@ -71,7 +86,9 @@ class DashboardController extends Controller
             'office',
             'todayAttendance',
             'stats',
-            'recentAttendances'
+            'recentAttendances',
+            'todayStartLimit',
+            'todayEndLimit'
         ));
     }
 }

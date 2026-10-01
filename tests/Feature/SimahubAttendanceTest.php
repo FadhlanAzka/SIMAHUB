@@ -27,6 +27,13 @@ class SimahubAttendanceTest extends TestCase
                 'work_start_time' => '07:30:00',
                 'work_end_time' => '16:00:00',
                 'wfh_days' => [5],
+                'work_hours' => [
+                    1 => ['start' => '07:30:00', 'end' => '16:00:00'],
+                    2 => ['start' => '07:30:00', 'end' => '16:00:00'],
+                    3 => ['start' => '07:30:00', 'end' => '16:00:00'],
+                    4 => ['start' => '07:30:00', 'end' => '16:00:00'],
+                    5 => ['start' => '07:30:00', 'end' => '16:30:00'],
+                ],
             ]
         );
     }
@@ -177,14 +184,14 @@ class SimahubAttendanceTest extends TestCase
         Carbon::setTestNow();
     }
 
-    public function test_checkout_before_1600_is_rejected()
+    public function test_checkout_before_1600_on_thursday_is_rejected()
     {
-        // 25 Sept 2026 07:15
-        Carbon::setTestNow(Carbon::create(2026, 9, 25, 7, 15, 0));
+        // 24 Sept 2026 (Thursday) 07:15
+        Carbon::setTestNow(Carbon::create(2026, 9, 24, 7, 15, 0));
 
         $student = User::create([
-            'name' => 'Peserta Pulang Cepat',
-            'username' => 'peserta_pulang_cepat',
+            'name' => 'Peserta Pulang Kamis',
+            'username' => 'peserta_pulang_kamis',
             'position' => 'Network Engineer',
             'role' => 'intern',
             'password' => bcrypt('password123'),
@@ -199,7 +206,7 @@ class SimahubAttendanceTest extends TestCase
         ]);
 
         // Attempt checkout at 15:30 (before 16:00)
-        Carbon::setTestNow(Carbon::create(2026, 9, 25, 15, 30, 0));
+        Carbon::setTestNow(Carbon::create(2026, 9, 24, 15, 30, 0));
 
         $checkoutResponse = $this->post('/intern/attendance/check-out', [
             'latitude' => -6.17539240,
@@ -208,12 +215,61 @@ class SimahubAttendanceTest extends TestCase
 
         $checkoutResponse->assertSessionHas('error');
 
-        // Attempt checkout at 16:05 (allowed!)
-        Carbon::setTestNow(Carbon::create(2026, 9, 25, 16, 5, 0));
+        // Attempt checkout at 16:05 (allowed on Thursday!)
+        Carbon::setTestNow(Carbon::create(2026, 9, 24, 16, 5, 0));
 
         $validCheckoutResponse = $this->post('/intern/attendance/check-out', [
             'latitude' => -6.17539240,
             'longitude' => 106.82715280,
+        ]);
+
+        $validCheckoutResponse->assertSessionHas('success');
+
+        $attendance = Attendance::where('user_id', $student->id)->where('date', '2026-09-24')->first();
+        $this->assertNotNull($attendance->check_out_time);
+
+        $attendance->delete();
+        $student->delete();
+        Carbon::setTestNow();
+    }
+
+    public function test_friday_checkout_before_1630_is_rejected_and_allowed_after_1630()
+    {
+        // 25 Sept 2026 (Friday) 07:15
+        Carbon::setTestNow(Carbon::create(2026, 9, 25, 7, 15, 0));
+
+        $student = User::create([
+            'name' => 'Peserta Pulang Jumat',
+            'username' => 'peserta_pulang_jumat',
+            'position' => 'Frontend Developer',
+            'role' => 'intern',
+            'password' => bcrypt('password123'),
+        ]);
+
+        $this->actingAs($student);
+
+        // Check in first (Friday WFH)
+        $this->post('/intern/attendance/check-in', [
+            'latitude' => -6.917464,
+            'longitude' => 107.619123,
+        ]);
+
+        // Attempt checkout at 16:15 (after 16:00, but before Friday limit 16:30)
+        Carbon::setTestNow(Carbon::create(2026, 9, 25, 16, 15, 0));
+
+        $checkoutResponse = $this->post('/intern/attendance/check-out', [
+            'latitude' => -6.917464,
+            'longitude' => 107.619123,
+        ]);
+
+        $checkoutResponse->assertSessionHas('error');
+
+        // Attempt checkout at 16:35 (allowed on Friday!)
+        Carbon::setTestNow(Carbon::create(2026, 9, 25, 16, 35, 0));
+
+        $validCheckoutResponse = $this->post('/intern/attendance/check-out', [
+            'latitude' => -6.917464,
+            'longitude' => 107.619123,
         ]);
 
         $validCheckoutResponse->assertSessionHas('success');
@@ -224,5 +280,66 @@ class SimahubAttendanceTest extends TestCase
         $attendance->delete();
         $student->delete();
         Carbon::setTestNow();
+    }
+
+    public function test_lateness_duration_calculation_and_badge()
+    {
+        $student = User::create([
+            'name' => 'Peserta Uji Telat',
+            'username' => 'uji_telat',
+            'position' => 'Data Analyst',
+            'role' => 'intern',
+            'password' => bcrypt('password123'),
+        ]);
+
+        // Masuk jam 08:05 pada hari Kamis (limit 07:30 => telat 35 menit)
+        $attendance = Attendance::create([
+            'user_id' => $student->id,
+            'date' => '2026-09-24', // Thursday
+            'check_in_time' => '08:05:00',
+            'status' => 'terlambat',
+            'type' => 'WFO',
+        ]);
+
+        $this->assertEquals(35, $attendance->late_minutes);
+        $this->assertEquals('0 jam 35 Menit', $attendance->late_duration_text);
+        $this->assertStringContainsString('TELAT', $attendance->status_badge);
+        $this->assertStringContainsString('(0 jam 35 Menit)', $attendance->status_badge);
+        $this->assertStringContainsString("TELAT\n(0 jam 35 Menit)", $attendance->status_with_late_duration);
+
+        $attendance->delete();
+        $student->delete();
+    }
+
+    public function test_export_csv_headers_and_metadata_sync()
+    {
+        $admin = User::create([
+            'name' => 'Admin Export',
+            'username' => 'admin_export',
+            'role' => 'admin',
+            'password' => bcrypt('password123'),
+        ]);
+
+        $this->actingAs($admin);
+
+        $response = $this->get('/admin/export/csv?month=2026-09');
+        $response->assertStatus(200);
+        $response->assertHeader('Content-Type', 'text/csv; charset=UTF-8');
+
+        $content = $response->streamedContent();
+
+        // Verifikasi tidak ada kolom usang NIM
+        $this->assertStringNotContainsString('NIM', $content);
+        $this->assertStringNotContainsString('Perguruan Tinggi', $content);
+
+        // Verifikasi kolom baru tersinkronisasi
+        $this->assertStringContainsString('Username', $content);
+        $this->assertStringContainsString('Posisi Magang', $content);
+        $this->assertStringContainsString('No. WhatsApp / HP', $content);
+        $this->assertStringContainsString('Durasi Terlambat', $content);
+        $this->assertStringContainsString('Total Akumulasi Terlambat', $content);
+        $this->assertStringContainsString('Jumat (07:30 - 16:30 WIB)', $content);
+
+        $admin->delete();
     }
 }

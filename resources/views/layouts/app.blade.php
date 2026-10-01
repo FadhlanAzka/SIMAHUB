@@ -225,9 +225,7 @@
                 Sistem Informasi Absensi MagangHub
             </div>
             <div class="flex items-center gap-3 text-slate-500 text-[11px]">
-                <span>Jam Kerja: 07:30 - 16:00 WIB</span>
-                <span>&bull;</span>
-                <span>WFO (Senin - Kamis) | WFH (Jumat)</span>
+                <span>Jam Kerja: Senin - Kamis (07:30 - 16:00 WIB) | Jumat (07:30 - 16:30 WIB)</span>
             </div>
         </div>
     </footer>
