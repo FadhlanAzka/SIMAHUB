@@ -45,9 +45,8 @@
             </form>
 
             @if(auth()->user()->role === 'admin')
-            <a href="{{ route('admin.intern.create') }}" class="inline-flex items-center justify-center gap-2 py-2 px-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-xs transition-all cursor-pointer">
-                <i data-lucide="user-plus" class="w-4 h-4"></i>
-                <span>Tambah Peserta Magang</span>
+            <a href="{{ route('admin.intern.create') }}" title="Tambah Peserta Magang" class="inline-flex items-center justify-center p-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-xs transition-all cursor-pointer">
+                <i data-lucide="user-plus" class="w-5 h-5"></i>
             </a>
             @endif
         </div>
