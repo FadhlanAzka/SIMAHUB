@@ -151,6 +151,9 @@ class AttendanceController extends Controller
         $office = OfficeSetting::getSetting();
         $workHours = is_array($office->work_hours) ? $office->work_hours : (json_decode($office->work_hours, true) ?? []);
         $endLimit = $workHours[$dayOfWeek]['end'] ?? $office->work_end_time;
+        if (strlen($endLimit) === 5) {
+            $endLimit .= ':00';
+        }
 
         if ($currentTime < $endLimit) {
             return back()->with(
@@ -214,11 +217,26 @@ class AttendanceController extends Controller
 
         $attendances = $query->orderBy('date', 'desc')->get();
 
+        $totalLateMinutes = 0;
+        foreach ($attendances as $att) {
+            $totalLateMinutes += $att->late_minutes;
+        }
+
+        $lateHours = (int) floor($totalLateMinutes / 60);
+        $remLateMins = $totalLateMinutes % 60;
+        $accumulatedLateText = $totalLateMinutes > 0 ? "{$lateHours} jam {$remLateMins} Menit" : "0 Menit";
+
+        foreach ($attendances as $att) {
+            $att->user_total_late_text = $accumulatedLateText;
+        }
+
         $stats = [
             'total_hadir' => $attendances->count(),
             'tepat_waktu' => $attendances->where('status', 'tepat_waktu')->count(),
             'terlambat' => $attendances->where('status', 'terlambat')->count(),
             'wfh' => $attendances->where('type', 'WFH')->count(),
+            'total_late_minutes' => $totalLateMinutes,
+            'accumulated_late_text' => $accumulatedLateText,
         ];
 
         return view('intern.history', compact('user', 'attendances', 'selectedMonth', 'selectedDate', 'startDate', 'endDate', 'selectedType', 'stats'));

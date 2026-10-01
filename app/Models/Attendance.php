@@ -41,6 +41,10 @@ class Attendance extends Model
      */
     public function getDurationAttribute(): ?string
     {
+        if (in_array($this->status, ['izin', 'sakit', 'alpa'])) {
+            return ucfirst($this->status);
+        }
+
         if (!$this->check_in_time || !$this->check_out_time) {
             return '-';
         }
@@ -58,39 +62,90 @@ class Attendance extends Model
     }
 
     /**
+     * Hitung selisih menit keterlambatan jika status terlambat
+     */
+    public function getLateMinutesAttribute(): int
+    {
+        if ($this->status !== 'terlambat' || !$this->check_in_time || !$this->date) {
+            return 0;
+        }
+
+        $office = \App\Models\OfficeSetting::getSetting();
+        $dayOfWeek = Carbon::parse($this->date)->dayOfWeekIso;
+
+        $workHours = is_string($office->work_hours) ? json_decode($office->work_hours, true) : $office->work_hours;
+        $startLimitStr = $workHours[$dayOfWeek]['start'] ?? $office->work_start_time;
+
+        $limit = Carbon::parse($startLimitStr);
+        $checkIn = Carbon::parse($this->check_in_time);
+
+        if ($checkIn->gt($limit)) {
+            return (int) $limit->diffInMinutes($checkIn);
+        }
+
+        return 0;
+    }
+
+    /**
+     * Format durasi keterlambatan (contoh: 0 jam 30 Menit)
+     */
+    public function getLateDurationTextAttribute(): ?string
+    {
+        $minutes = $this->late_minutes;
+        if ($minutes <= 0) {
+            return null;
+        }
+
+        $hours = (int) floor($minutes / 60);
+        $mins = $minutes % 60;
+
+        return "{$hours} jam {$mins} Menit";
+    }
+
+    /**
+     * Format status teks untuk ekspor spreadsheet / cetak
+     */
+    public function getStatusWithLateDurationAttribute(): string
+    {
+        if ($this->status === 'tepat_waktu') {
+            return 'Tepat Waktu';
+        } elseif ($this->status === 'terlambat') {
+            $duration = $this->late_duration_text ?: '0 jam 0 Menit';
+            return "TELAT\n({$duration})";
+        } elseif ($this->status === 'izin') {
+            return 'Izin';
+        } elseif ($this->status === 'sakit') {
+            return 'Sakit';
+        } elseif ($this->status === 'dispensasi') {
+            return 'Dispensasi (Lupa Absen)';
+        } elseif ($this->status === 'alpa') {
+            return 'Alpa';
+        }
+
+        return '-';
+    }
+
+    /**
      * Badge status keterlambatan
      */
     public function getStatusBadgeAttribute(): string
     {
         if ($this->status === 'tepat_waktu') {
-            return '<div class="inline-flex flex-col items-center"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">Tepat Waktu</span></div>';
+            return '<div class="inline-flex flex-col items-center"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">Tepat Waktu</span></div>';
         } elseif ($this->status === 'terlambat') {
-            $latenessText = '';
-            if ($this->check_in_time && $this->date) {
-                $office = \App\Models\OfficeSetting::getSetting();
-                $dayOfWeek = Carbon::parse($this->date)->dayOfWeekIso;
-                
-                $workHours = is_string($office->work_hours) ? json_decode($office->work_hours, true) : $office->work_hours;
-                $startLimitStr = $workHours[$dayOfWeek]['start'] ?? $office->work_start_time;
-                
-                $limit = Carbon::parse($startLimitStr);
-                $checkIn = Carbon::parse($this->check_in_time);
-                
-                if ($checkIn->gt($limit)) {
-                    $diffMins = $limit->diffInMinutes($checkIn);
-                    $hours = (int) floor($diffMins / 60);
-                    $mins = $diffMins % 60;
-                    
-                    if ($hours > 0) {
-                        $latenessText = "({$hours}j {$mins}m)";
-                    } else {
-                        $latenessText = "({$mins} mnt)";
-                    }
-                    $latenessText = "<span class=\"block text-[9.5px] text-rose-500 font-bold mt-1 leading-none tracking-tight\">{$latenessText}</span>";
-                }
-            }
-
-            return '<div class="inline-flex flex-col items-center justify-center"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-rose-100 text-rose-800">Terlambat</span>' . $latenessText . '</div>';
+            $duration = $this->late_duration_text ?: '0 jam 0 Menit';
+            return '<div class="inline-flex flex-col items-center justify-center leading-tight">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-black bg-rose-100 text-rose-800 tracking-wide">TELAT</span>
+                <span class="text-[10px] text-rose-600 font-bold mt-0.5">(' . $duration . ')</span>
+            </div>';
+        } elseif ($this->status === 'izin') {
+            return '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-800">Izin</span>';
+        } elseif ($this->status === 'sakit') {
+            return '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800">Sakit</span>';
+        } elseif ($this->status === 'dispensasi') {
+            return '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-100 text-indigo-800" title="Dispensasi Lupa Absen oleh Admin">Dispensasi</span>';
+        } elseif ($this->status === 'alpa') {
+            return '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-100 text-red-800">Alpa</span>';
         }
 
         return '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-700">-</span>';
@@ -101,6 +156,14 @@ class Attendance extends Model
      */
     public function getTypeBadgeAttribute(): string
     {
+        if ($this->status === 'izin') {
+            return '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-600">Perizinan</span>';
+        } elseif ($this->status === 'sakit') {
+            return '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-700">Surat Sakit</span>';
+        } elseif ($this->status === 'alpa') {
+            return '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-50 text-red-700">Tidak Hadir</span>';
+        }
+
         if ($this->type === 'WFH') {
             return '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 font-semibold">WFH (Bebas Lokasi)</span>';
         }

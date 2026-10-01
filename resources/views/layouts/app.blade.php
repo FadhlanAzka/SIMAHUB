@@ -70,7 +70,7 @@
                             <div class="flex items-center gap-2">
                                 <span class="text-lg font-black tracking-tight text-slate-900 leading-none">SIMAHUB</span>
                                 <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 border border-slate-200/80 tracking-wide uppercase">
-                                    {{ auth()->user()->role === 'admin' ? 'Admin' : (auth()->user()->role === 'mentor' ? 'Mentor' : 'Intern') }}
+                                    {{ auth()->user()->role === 'admin' ? 'Admin' : (auth()->user()->role === 'mentor' ? 'Mentor' : 'Peserta Magang') }}
                                 </span>
                             </div>
                             <p class="text-[11px] text-slate-400 font-medium mt-1 leading-none">
@@ -91,7 +91,7 @@
                         <a href="{{ route('admin.intern.index') }}" 
                            class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 {{ request()->routeIs('admin.intern.*') ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/20' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100' }}">
                             <i data-lucide="users" class="w-4 h-4"></i>
-                            Data intern
+                            Data Peserta Magang
                         </a>
                         <a href="{{ route('admin.attendance.index') }}" 
                            class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 {{ request()->routeIs('admin.attendance.*') ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/20' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100' }}">
@@ -134,7 +134,7 @@
                     <div class="hidden sm:block text-right">
                         <div class="text-xs font-bold text-slate-900 leading-tight">{{ auth()->user()->name }}</div>
                         <div class="text-[11px] text-blue-600 font-semibold">
-                            {{ auth()->user()->role === 'admin' ? 'Administrator Instansi' : (auth()->user()->role === 'mentor' ? 'Mentor' : (auth()->user()->position ?: 'intern Magang')) }}
+                            {{ auth()->user()->role === 'admin' ? 'Administrator Instansi' : (auth()->user()->role === 'mentor' ? 'Mentor' : (auth()->user()->position ?: 'Peserta Magang')) }}
                         </div>
                     </div>
 
@@ -158,7 +158,7 @@
                     <i data-lucide="layout-dashboard" class="w-3.5 h-3.5"></i> Dashboard
                 </a>
                 <a href="{{ route('admin.intern.index') }}" class="{{ request()->routeIs('admin.intern.*') ? 'text-blue-600 font-bold' : 'text-slate-600' }} py-1 flex items-center gap-1">
-                    <i data-lucide="users" class="w-3.5 h-3.5"></i> intern
+                    <i data-lucide="users" class="w-3.5 h-3.5"></i> Peserta Magang
                 </a>
                 <a href="{{ route('admin.attendance.index') }}" class="{{ request()->routeIs('admin.attendance.*') ? 'text-blue-600 font-bold' : 'text-slate-600' }} py-1 flex items-center gap-1">
                     <i data-lucide="clipboard-list" class="w-3.5 h-3.5"></i> Rekap
@@ -233,9 +233,7 @@
                 Sistem Informasi Absensi MagangHub
             </div>
             <div class="flex items-center gap-3 text-slate-500 text-[11px]">
-                <span>Jam Kerja: 07:30 - 16:00 WIB</span>
-                <span>&bull;</span>
-                <span>WFO (Senin - Kamis) | WFH (Jumat)</span>
+                <span>Jam Kerja: Senin - Kamis (07:30 - 16:00 WIB) | Jumat (07:30 - 16:30 WIB)</span>
             </div>
         </div>
     </footer>

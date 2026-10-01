@@ -73,7 +73,7 @@
                 </div>
 
                 <p class="text-xs text-slate-500 mb-3">
-                    Klik di area peta mana saja atau geser pin marker biru untuk menentukan lokasi instansi Anda. Lingkaran biru menandakan zona toleransi absensi WFO intern.
+                    Klik di area peta mana saja atau geser pin marker biru untuk menentukan lokasi instansi Anda. Lingkaran biru menandakan zona toleransi absensi WFO peserta magang.
                 </p>
 
                 <!-- Interactive Visual Map Container -->
@@ -182,6 +182,8 @@
                         <strong>Catatan:</strong> Absen masuk &le; jam masuk berstatus <strong>Tepat Waktu</strong>. intern hanya dapat absen pulang jika waktu sudah mencapai jam pulang.<br>
                         * Centang opsi <strong>Izinkan WFH</strong> jika pada hari tersebut intern diperbolehkan absen dari mana saja (Bebas Lokasi / mengabaikan validasi radius).
                     </p>
+                </div>
+            </div>
                 </div>
             </div>
 

@@ -48,6 +48,9 @@ Route::middleware(['auth', 'role:admin,pengawas,mentor'])->prefix('admin')->name
     
     // Monitoring & Rekap Absensi
     Route::get('/attendance', [AdminAttendanceController::class, 'index'])->name('attendance.index');
+    Route::post('/attendance', [AdminAttendanceController::class, 'store'])->name('attendance.store');
+    Route::put('/attendance/{attendance}', [AdminAttendanceController::class, 'update'])->name('attendance.update');
+    Route::delete('/attendance/{attendance}', [AdminAttendanceController::class, 'destroy'])->name('attendance.destroy');
     
     // Export Data Bulanan
     Route::get('/export/csv', [ExportController::class, 'exportCsv'])->name('export.csv');

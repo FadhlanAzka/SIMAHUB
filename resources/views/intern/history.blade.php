@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Riwayat Presensi intern')
+@section('title', 'Riwayat Presensi Peserta Magang')
 
 @section('content')
 <div class="space-y-6">
@@ -8,7 +8,7 @@
     <!-- Header & Filter Bar -->
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-3xl border border-slate-200/80 shadow-xs">
         <div>
-            <h1 class="text-xl font-black text-slate-900 tracking-tight">Riwayat Presensi intern</h1>
+            <h1 class="text-xl font-black text-slate-900 tracking-tight">Riwayat Presensi Peserta Magang</h1>
             <p class="text-xs text-slate-500 mt-0.5">Catatan seluruh kehadiran Anda selama pelaksanaan program magang</p>
         </div>
 
@@ -28,7 +28,7 @@
     </div>
 
     <!-- Monthly Statistics Widget -->
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
         <div class="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs">
             <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Hadir</span>
             <div class="text-2xl font-black text-blue-600 mt-1">{{ $stats['total_hadir'] }} <span class="text-xs font-normal text-slate-500">Hari</span></div>
@@ -41,7 +41,11 @@
             <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Terlambat</span>
             <div class="text-2xl font-black text-rose-600 mt-1">{{ $stats['terlambat'] }} <span class="text-xs font-normal text-slate-500">Hari</span></div>
         </div>
-        <div class="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs">
+        <div class="bg-rose-50/70 p-5 rounded-3xl border border-rose-200 shadow-xs">
+            <span class="text-xs font-bold uppercase tracking-wider text-rose-700">Akumulasi Terlambat</span>
+            <div class="text-base sm:text-lg font-black text-rose-800 mt-1 font-mono leading-tight">{{ $stats['accumulated_late_text'] }}</div>
+        </div>
+        <div class="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs col-span-2 sm:col-span-1">
             <span class="text-xs font-bold uppercase tracking-wider text-slate-400">WFH (Bebas Lokasi)</span>
             <div class="text-2xl font-black text-purple-600 mt-1">{{ $stats['wfh'] }} <span class="text-xs font-normal text-slate-500">Hari</span></div>
         </div>
@@ -88,6 +92,7 @@
                                 <div class="absolute bottom-full left-1/2 -translate-x-1/2 border-4 border-transparent border-b-slate-800"></div>
                             </div>
                         </th>
+                        <th class="px-6 py-3.5 whitespace-nowrap">Total Durasi Terlambat</th>
                         <th class="px-6 py-3.5">Lokasi GPS</th>
                     </tr>
                 </thead>
@@ -115,6 +120,9 @@
                             <td class="px-6 py-4 text-slate-600 whitespace-nowrap font-medium">
                                 {{ $row->duration }}
                             </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="font-mono font-bold text-slate-800">{{ $row->user_total_late_text ?? '0 Menit' }}</span>
+                            </td>
                             <td class="px-6 py-4 text-slate-500 whitespace-nowrap">
                                 @if($row->check_in_distance !== null)
                                     <span class="inline-flex items-center gap-1 font-mono text-[11px]">
@@ -128,7 +136,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="px-6 py-12 text-center text-slate-400">
+                            <td colspan="9" class="px-6 py-12 text-center text-slate-400">
                                 <i data-lucide="inbox" class="w-8 h-8 mx-auto text-slate-300 mb-2"></i>
                                 Tidak ada data presensi pada bulan yang dipilih.
                             </td>

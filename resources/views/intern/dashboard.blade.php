@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Dashboard Presensi intern')
+@section('title', 'Dashboard Presensi Peserta Magang')
 
 @section('content')
 <div class="space-y-6">
@@ -17,7 +17,7 @@
                 <div class="flex flex-wrap items-center gap-2 mb-3">
                     <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 text-blue-100 text-xs font-bold backdrop-blur-md border border-white/10">
                         <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                        <span>Posisi: {{ $user->position ?: 'intern Magang' }}</span>
+                        <span>Posisi: {{ $user->position ?: 'Peserta Magang' }}</span>
                     </div>
                     <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 text-blue-100 text-xs font-bold backdrop-blur-md border border-white/10">
                         <i data-lucide="user-check" class="w-3.5 h-3.5"></i>
@@ -51,8 +51,8 @@
                     <i data-lucide="clock" class="w-4 h-4"></i>
                 </div>
                 <div>
-                    <span class="text-blue-200/90 text-[11px] font-medium block">Batas Masuk:</span>
-                    <span class="font-extrabold text-white text-sm">Maks. {{ substr($office->work_start_time, 0, 5) }} WIB</span>
+                    <span class="text-blue-200/90 text-[11px] font-medium block">Batas Masuk (Hari {{ $todayDayName }}):</span>
+                    <span class="font-extrabold text-white text-sm">Maks. {{ substr($todayStartLimit, 0, 5) }} WIB</span>
                     <span class="text-[10px] text-blue-200/75 block">(Lewat = Terlambat)</span>
                 </div>
             </div>
@@ -62,9 +62,9 @@
                     <i data-lucide="log-out" class="w-4 h-4"></i>
                 </div>
                 <div>
-                    <span class="text-blue-200/90 text-[11px] font-medium block">Jam Pulang:</span>
-                    <span class="font-extrabold text-white text-sm">Min. {{ substr($office->work_end_time, 0, 5) }} WIB</span>
-                    <span class="text-[10px] text-blue-200/75 block">(Dibuka mulai 16:00)</span>
+                    <span class="text-blue-200/90 text-[11px] font-medium block">Jam Pulang (Hari {{ $todayDayName }}):</span>
+                    <span class="font-extrabold text-white text-sm">Min. {{ substr($todayEndLimit, 0, 5) }} WIB</span>
+                    <span class="text-[10px] text-blue-200/75 block">(Dibuka mulai {{ substr($todayEndLimit, 0, 5) }})</span>
                 </div>
             </div>
 
@@ -73,7 +73,7 @@
                     <i data-lucide="navigation-2" class="w-4 h-4"></i>
                 </div>
                 <div>
-                    <span class="text-blue-200/90 text-[11px] font-medium block">Ketentuan Hari Ini:</span>
+                    <span class="text-blue-200/90 text-[11px] font-medium block">Ketentuan Hari {{ $todayDayName }}:</span>
                     @if($isWeekend)
                         <span class="font-black text-amber-300 text-sm">Libur Akhir Pekan</span>
                     @elseif($isWfhDay)
@@ -81,7 +81,6 @@
                     @else
                         <span class="font-black text-emerald-300 text-sm">WFO (Radius {{ $office->radius_meters }}m)</span>
                     @endif
-                    <span class="text-[10px] text-blue-200/75 block">Kerja sesuai dengan jadwal yang telah diatur Admin</span>
                 </div>
             </div>
         </div>
@@ -152,7 +151,7 @@
                         <div>
                             <div class="flex items-center justify-between mb-3">
                                 <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Absen Masuk</span>
-                                <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">Maks 07:30</span>
+                                <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">Maks {{ substr($todayStartLimit, 0, 5) }}</span>
                             </div>
 
                             @if($todayAttendance && $todayAttendance->check_in_time)
@@ -169,7 +168,7 @@
                                 </div>
                             @else
                                 <div class="text-slate-600 text-xs mb-4 leading-relaxed">
-                                    Pastikan berada di area instansi (Senin-Kamis) atau di kediaman (Jumat), lalu tekan tombol di bawah ini.
+                                    Pastikan berada di {{ $isWfhDay ? 'kediaman (WFH Bebas Lokasi)' : 'area kantor instansi (Radius ' . $office->radius_meters . 'm)' }}, lalu tekan tombol di bawah ini.
                                 </div>
                             @endif
                         </div>
@@ -201,7 +200,7 @@
                         <div>
                             <div class="flex items-center justify-between mb-3">
                                 <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Absen Pulang</span>
-                                <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-slate-200 text-slate-700">Mulai 16:00</span>
+                                <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-slate-200 text-slate-700">Mulai {{ substr($todayEndLimit, 0, 5) }}</span>
                             </div>
 
                             @if($todayAttendance && $todayAttendance->check_out_time)
@@ -220,7 +219,7 @@
                                 </div>
                             @else
                                 <div class="text-slate-600 text-xs mb-4 leading-relaxed">
-                                    Dapat dilakukan mulai pukul 16:00 WIB setelah menyelesaikan tugas magang Anda hari ini.
+                                    Dapat dilakukan mulai pukul {{ substr($todayEndLimit, 0, 5) }} WIB setelah menyelesaikan jam kerja Anda hari ini.
                                 </div>
                             @endif
                         </div>
@@ -282,6 +281,13 @@
                         <div class="text-2xl font-black text-purple-600">{{ $stats['wfh'] }}</div>
                         <div class="text-[11px] font-bold text-purple-900 mt-0.5">WFH (Bebas Lokasi)</div>
                     </div>
+                    <div class="col-span-2 p-3 rounded-2xl bg-amber-50/80 border border-amber-200/80 flex items-center justify-between px-4 text-left">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="timer" class="w-4 h-4 text-amber-600"></i>
+                            <span class="text-xs font-bold text-amber-900">Akumulasi Terlambat</span>
+                        </div>
+                        <span class="text-xs font-black text-amber-700 font-mono">{{ $stats['accumulated_late_text'] }}</span>
+                    </div>
                 </div>
 
                 <div class="mt-5 pt-4 border-t border-slate-100 text-center">
@@ -300,7 +306,37 @@
                 </div>
                 <p><strong>Instansi:</strong> {{ $office->office_name }}</p>
                 <p><strong>Radius WFO:</strong> {{ $office->radius_meters }} meter</p>
-                <p><strong>Ketentuan Jumat:</strong> WFH (Diizinkan dari kediaman masing-masing).</p>
+                <p><strong>Hari WFH:</strong> {{ $office->wfh_days_text }}</p>
+            </div>
+
+            <!-- Weekly Work & WFH Schedule Card -->
+            <div class="bg-white rounded-3xl p-5 border border-slate-200/80 shadow-xs space-y-3">
+                <div class="font-bold text-slate-900 flex items-center justify-between text-xs">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="calendar-clock" class="w-4 h-4 text-blue-600"></i>
+                        <span>Jadwal Kerja & WFH Mingguan</span>
+                    </div>
+                </div>
+                <div class="divide-y divide-slate-100 text-xs">
+                    @foreach($weeklySchedule as $ws)
+                        <div class="py-2.5 flex items-center justify-between {{ $ws['is_today'] ? 'bg-blue-50/70 -mx-2 px-2.5 rounded-xl font-bold text-blue-900' : 'text-slate-600' }}">
+                            <div class="flex items-center gap-2">
+                                <span>{{ $ws['day_name'] }}</span>
+                                @if($ws['is_today'])
+                                    <span class="text-[9px] px-1.5 py-0.5 rounded-full bg-blue-600 text-white font-black tracking-wider">HARI INI</span>
+                                @endif
+                            </div>
+                            <div class="flex items-center gap-2.5">
+                                <span class="font-mono text-[11px]">{{ $ws['start'] }} - {{ $ws['end'] }}</span>
+                                @if($ws['is_wfh'])
+                                    <span class="px-2 py-0.5 rounded-md bg-purple-100 text-purple-800 text-[10px] font-bold">WFH</span>
+                                @else
+                                    <span class="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 text-[10px] font-medium">WFO</span>
+                                @endif
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
             </div>
 
         </div>
@@ -336,6 +372,7 @@
                                 <div class="absolute bottom-full left-1/2 -translate-x-1/2 border-4 border-transparent border-b-slate-800"></div>
                             </div>
                         </th>
+                        <th class="px-6 py-3 whitespace-nowrap">Total Durasi Terlambat</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
@@ -359,10 +396,13 @@
                             <td class="px-6 py-3.5 text-slate-600 font-medium">
                                 {{ $att->duration }}
                             </td>
+                            <td class="px-6 py-3.5 whitespace-nowrap">
+                                <span class="font-mono font-bold text-slate-800">{{ $att->user_total_late_text ?? '0 Menit' }}</span>
+                            </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-6 py-8 text-center text-slate-400">
+                            <td colspan="7" class="px-6 py-8 text-center text-slate-400">
                                 Belum ada riwayat absensi.
                             </td>
                         </tr>

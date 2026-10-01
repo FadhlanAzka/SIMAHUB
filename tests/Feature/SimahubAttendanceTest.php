@@ -26,6 +26,14 @@ class SimahubAttendanceTest extends TestCase
                 'radius_meters' => 100,
                 'work_start_time' => '07:30:00',
                 'work_end_time' => '16:00:00',
+                'wfh_days' => [5],
+                'work_hours' => [
+                    1 => ['start' => '07:30:00', 'end' => '16:00:00'],
+                    2 => ['start' => '07:30:00', 'end' => '16:00:00'],
+                    3 => ['start' => '07:30:00', 'end' => '16:00:00'],
+                    4 => ['start' => '07:30:00', 'end' => '16:00:00'],
+                    5 => ['start' => '07:30:00', 'end' => '16:30:00'],
+                ],
             ]
         );
     }
@@ -35,70 +43,52 @@ class SimahubAttendanceTest extends TestCase
         $response = $this->get('/login');
         $response->assertStatus(200);
         $response->assertSee('SIMAHUB');
-        $response->assertSee('Email atau NIM');
+        $response->assertSee('Username');
     }
 
-    public function test_admin_can_login_with_email_and_access_dashboard()
+    public function test_admin_can_login_with_username_and_access_dashboard()
     {
         $admin = User::firstOrCreate(
-            ['email' => 'admin@simahub.id'],
+            ['username' => 'admin'],
             [
-                'name' => 'Admin',
-                'nim' => 'ADMIN',
-                'institution' => 'Instansi MagangHub',
+                'name' => 'Admin Instansi',
                 'role' => 'admin',
+                'position' => 'Administrator',
                 'password' => bcrypt('admin123'),
             ]
         );
 
         $response = $this->post('/login', [
-            'login' => 'admin@simahub.id',
+            'login' => 'admin',
             'password' => 'admin123',
         ]);
 
-        $response->assertRedirect('/admin/dashboard');
+        $response->assertRedirect('/dashboard');
         $this->assertAuthenticatedAs($admin);
-    }
 
-    public function test_admin_can_login_with_nim_and_access_dashboard()
-    {
-        $admin = User::firstOrCreate(
-            ['email' => 'admin@simahub.id'],
-            [
-                'name' => 'Admin',
-                'nim' => 'ADMIN',
-                'institution' => 'Instansi MagangHub',
-                'role' => 'admin',
-                'password' => bcrypt('admin123'),
-            ]
-        );
-
-        $response = $this->post('/login', [
-            'login' => 'ADMIN',
-            'password' => 'admin123',
-        ]);
-
-        $response->assertRedirect('/admin/dashboard');
+        // Akses halaman rekapitulasi absensi admin
+        $attendanceResponse = $this->get('/admin/attendance');
+        $attendanceResponse->assertStatus(200);
+        $attendanceResponse->assertSee('Data Presensi');
+        $attendanceResponse->assertSee('Total Durasi Terlambat');
     }
 
     public function test_student_can_login_and_access_student_dashboard()
     {
         $student = User::create([
-            'name' => 'Siswa Tes',
-            'email' => 'siswates@magang.id',
-            'nim' => 'TEST1234',
-            'institution' => 'Universitas Indonesia',
+            'name' => 'Peserta Tes',
+            'username' => 'peserta_tes',
             'position' => 'Web Developer',
             'role' => 'intern',
             'password' => bcrypt('password123'),
         ]);
 
         $response = $this->post('/login', [
-            'login' => 'TEST1234',
+            'login' => 'peserta_tes',
             'password' => 'password123',
         ]);
 
-        $response->assertRedirect('/intern/dashboard');
+        $response->assertRedirect('/dashboard');
         $this->assertAuthenticatedAs($student);
 
         $student->delete();
@@ -110,10 +100,8 @@ class SimahubAttendanceTest extends TestCase
         Carbon::setTestNow(Carbon::create(2026, 9, 25, 7, 15, 0)); // 25 Sept 2026 is Friday
 
         $student = User::create([
-            'name' => 'intern WFH',
-            'email' => 'wfh@magang.id',
-            'nim' => 'WFH001',
-            'institution' => 'ITB',
+            'name' => 'Peserta WFH',
+            'username' => 'peserta_wfh',
             'position' => 'Data Analyst',
             'role' => 'intern',
             'password' => bcrypt('password123'),
@@ -146,10 +134,8 @@ class SimahubAttendanceTest extends TestCase
         Carbon::setTestNow(Carbon::create(2026, 9, 24, 7, 15, 0)); // Thursday
 
         $student = User::create([
-            'name' => 'intern Jauh',
-            'email' => 'jauh@magang.id',
-            'nim' => 'JAUH001',
-            'institution' => 'UGM',
+            'name' => 'Peserta Jauh',
+            'username' => 'peserta_jauh',
             'position' => 'UI UX Designer',
             'role' => 'intern',
             'password' => bcrypt('password123'),
@@ -179,10 +165,8 @@ class SimahubAttendanceTest extends TestCase
         Carbon::setTestNow(Carbon::create(2026, 9, 25, 8, 0, 0));
 
         $student = User::create([
-            'name' => 'intern Telat',
-            'email' => 'telat@magang.id',
-            'nim' => 'TELAT001',
-            'institution' => 'UI',
+            'name' => 'Peserta Telat',
+            'username' => 'peserta_telat',
             'position' => 'Technical Writer',
             'role' => 'intern',
             'password' => bcrypt('password123'),
@@ -206,16 +190,14 @@ class SimahubAttendanceTest extends TestCase
         Carbon::setTestNow();
     }
 
-    public function test_checkout_before_1600_is_rejected()
+    public function test_checkout_before_1600_on_thursday_is_rejected()
     {
-        // 25 Sept 2026 07:15
-        Carbon::setTestNow(Carbon::create(2026, 9, 25, 7, 15, 0));
+        // 24 Sept 2026 (Thursday) 07:15
+        Carbon::setTestNow(Carbon::create(2026, 9, 24, 7, 15, 0));
 
         $student = User::create([
-            'name' => 'intern Pulang Cepat',
-            'email' => 'cepat@magang.id',
-            'nim' => 'CEPAT001',
-            'institution' => 'UNDIP',
+            'name' => 'Peserta Pulang Kamis',
+            'username' => 'peserta_pulang_kamis',
             'position' => 'Network Engineer',
             'role' => 'intern',
             'password' => bcrypt('password123'),
@@ -230,7 +212,7 @@ class SimahubAttendanceTest extends TestCase
         ]);
 
         // Attempt checkout at 15:30 (before 16:00)
-        Carbon::setTestNow(Carbon::create(2026, 9, 25, 15, 30, 0));
+        Carbon::setTestNow(Carbon::create(2026, 9, 24, 15, 30, 0));
 
         $checkoutResponse = $this->post('/intern/attendance/check-out', [
             'latitude' => -6.17539240,
@@ -239,12 +221,61 @@ class SimahubAttendanceTest extends TestCase
 
         $checkoutResponse->assertSessionHas('error');
 
-        // Attempt checkout at 16:05 (allowed!)
-        Carbon::setTestNow(Carbon::create(2026, 9, 25, 16, 5, 0));
+        // Attempt checkout at 16:05 (allowed on Thursday!)
+        Carbon::setTestNow(Carbon::create(2026, 9, 24, 16, 5, 0));
 
         $validCheckoutResponse = $this->post('/intern/attendance/check-out', [
             'latitude' => -6.17539240,
             'longitude' => 106.82715280,
+        ]);
+
+        $validCheckoutResponse->assertSessionHas('success');
+
+        $attendance = Attendance::where('user_id', $student->id)->where('date', '2026-09-24')->first();
+        $this->assertNotNull($attendance->check_out_time);
+
+        $attendance->delete();
+        $student->delete();
+        Carbon::setTestNow();
+    }
+
+    public function test_friday_checkout_before_1630_is_rejected_and_allowed_after_1630()
+    {
+        // 25 Sept 2026 (Friday) 07:15
+        Carbon::setTestNow(Carbon::create(2026, 9, 25, 7, 15, 0));
+
+        $student = User::create([
+            'name' => 'Peserta Pulang Jumat',
+            'username' => 'peserta_pulang_jumat',
+            'position' => 'Frontend Developer',
+            'role' => 'intern',
+            'password' => bcrypt('password123'),
+        ]);
+
+        $this->actingAs($student);
+
+        // Check in first (Friday WFH)
+        $this->post('/intern/attendance/check-in', [
+            'latitude' => -6.917464,
+            'longitude' => 107.619123,
+        ]);
+
+        // Attempt checkout at 16:15 (after 16:00, but before Friday limit 16:30)
+        Carbon::setTestNow(Carbon::create(2026, 9, 25, 16, 15, 0));
+
+        $checkoutResponse = $this->post('/intern/attendance/check-out', [
+            'latitude' => -6.917464,
+            'longitude' => 107.619123,
+        ]);
+
+        $checkoutResponse->assertSessionHas('error');
+
+        // Attempt checkout at 16:35 (allowed on Friday!)
+        Carbon::setTestNow(Carbon::create(2026, 9, 25, 16, 35, 0));
+
+        $validCheckoutResponse = $this->post('/intern/attendance/check-out', [
+            'latitude' => -6.917464,
+            'longitude' => 107.619123,
         ]);
 
         $validCheckoutResponse->assertSessionHas('success');
@@ -255,5 +286,229 @@ class SimahubAttendanceTest extends TestCase
         $attendance->delete();
         $student->delete();
         Carbon::setTestNow();
+    }
+
+    public function test_lateness_duration_calculation_and_badge()
+    {
+        $student = User::create([
+            'name' => 'Peserta Uji Telat',
+            'username' => 'uji_telat',
+            'position' => 'Data Analyst',
+            'role' => 'intern',
+            'password' => bcrypt('password123'),
+        ]);
+
+        // Masuk jam 08:05 pada hari Kamis (limit 07:30 => telat 35 menit)
+        $attendance = Attendance::create([
+            'user_id' => $student->id,
+            'date' => '2026-09-24', // Thursday
+            'check_in_time' => '08:05:00',
+            'status' => 'terlambat',
+            'type' => 'WFO',
+        ]);
+
+        $this->assertEquals(35, $attendance->late_minutes);
+        $this->assertEquals('0 jam 35 Menit', $attendance->late_duration_text);
+        $this->assertStringContainsString('TELAT', $attendance->status_badge);
+        $this->assertStringContainsString('(0 jam 35 Menit)', $attendance->status_badge);
+        $this->assertStringContainsString("TELAT\n(0 jam 35 Menit)", $attendance->status_with_late_duration);
+
+        $attendance->delete();
+        $student->delete();
+    }
+
+    public function test_export_csv_headers_and_metadata_sync()
+    {
+        $admin = User::create([
+            'name' => 'Admin Export',
+            'username' => 'admin_export',
+            'role' => 'admin',
+            'password' => bcrypt('password123'),
+        ]);
+
+        $this->actingAs($admin);
+
+        $response = $this->get('/admin/export/csv?month=2026-09');
+        $response->assertStatus(200);
+        $response->assertHeader('Content-Type', 'text/csv; charset=UTF-8');
+
+        $content = $response->streamedContent();
+
+        // Verifikasi tidak ada kolom usang NIM
+        $this->assertStringNotContainsString('NIM', $content);
+        $this->assertStringNotContainsString('Perguruan Tinggi', $content);
+
+        // Verifikasi metadata Total Data dan Total Terlambat telah dihapus dari header CSV
+        $this->assertStringNotContainsString('Total Data', $content);
+        $this->assertStringNotContainsString("Total Terlambat,", $content);
+
+        // Verifikasi kolom baru tersinkronisasi
+        $this->assertStringContainsString('Username', $content);
+        $this->assertStringContainsString('Posisi Magang', $content);
+        $this->assertStringContainsString('No. WhatsApp / HP', $content);
+        $this->assertStringContainsString('Durasi Terlambat', $content);
+        $this->assertStringContainsString('Total Durasi Terlambat', $content);
+        $this->assertStringContainsString('Jumat (07:30 - 16:30 WIB)', $content);
+
+        // Uji cetak PDF / print report
+        $printResponse = $this->get('/admin/export/print?month=2026-09');
+        $printResponse->assertStatus(200);
+        $printResponse->assertSee('LAPORAN REKAPITULASI PRESENSI PESERTA MAGANG');
+        $printResponse->assertDontSee('Wilayah Presensi: Radius');
+        $printResponse->assertSee('Jadwal Kerja: Senin - Kamis (07:30 - 16:00 WIB)');
+
+        // Uji admin settings tidak ada string \le
+        $settingsResponse = $this->get('/admin/settings');
+        $settingsResponse->assertStatus(200);
+        $settingsResponse->assertDontSee('\le');
+        $settingsResponse->assertSee('sebelum atau tepat pada batas jam masuk');
+
+        $admin->delete();
+    }
+
+    public function test_wfh_days_text_and_schedule_sync_on_student_dashboard()
+    {
+        $office = OfficeSetting::getSetting();
+
+        // 1. Uji jika WFH hanya Senin
+        $office->update(['wfh_days' => [1]]);
+        $this->assertEquals('Senin', $office->wfh_days_text);
+
+        // 2. Uji jika WFH Senin dan Selasa
+        $office->update(['wfh_days' => [1, 2]]);
+        $this->assertEquals('Senin, Selasa', $office->wfh_days_text);
+
+        // 3. Uji jika Full WFO (tidak ada WFH)
+        $office->update(['wfh_days' => []]);
+        $this->assertEquals('Tidak ada (Full WFO di kantor)', $office->wfh_days_text);
+
+        // 4. Uji tampilan pada dashboard peserta magang saat WFH diset ke hari Selasa 08:00 - 17:00
+        $workHours = $office->work_hours;
+        $workHours[2] = ['start' => '08:00:00', 'end' => '17:00:00'];
+        $office->update([
+            'wfh_days' => [2],
+            'work_hours' => $workHours,
+        ]);
+
+        $student = User::create([
+            'name' => 'Peserta Sync Test',
+            'username' => 'sync_test',
+            'position' => 'Backend Engineer',
+            'role' => 'intern',
+            'password' => bcrypt('password123'),
+        ]);
+
+        $this->actingAs($student);
+
+        // Akses dashboard pada hari Selasa (22 Sept 2026)
+        Carbon::setTestNow(Carbon::create(2026, 9, 22, 7, 50, 0)); // Tuesday
+        $response = $this->get('/dashboard');
+        $response->assertStatus(200);
+        $response->assertSeeText('Hari WFH: Selasa');
+        $response->assertSee('Batas Masuk (Hari Selasa):');
+        $response->assertSee('08:00 WIB');
+        $response->assertSee('Jam Pulang (Hari Selasa):');
+        $response->assertSee('17:00 WIB');
+        $response->assertSee('WFH (Bebas dari Rumah)');
+        $response->assertDontSee('Sesuai sinkronisasi pengaturan Admin');
+        $response->assertSee('Jadwal Kerja & WFH Mingguan', false);
+        $response->assertDontSee('Sinkron Admin');
+        $response->assertSee('Total Durasi Terlambat');
+
+        $student->delete();
+        Carbon::setTestNow();
+    }
+
+    public function test_admin_can_manually_record_edit_and_delete_attendance_for_leave_sick_or_forgotten_checkin()
+    {
+        $admin = User::create([
+            'name' => 'Admin Super',
+            'username' => 'admin_super',
+            'role' => 'admin',
+            'password' => bcrypt('password123'),
+        ]);
+
+        $intern = User::create([
+            'name' => 'Akbar Ramdani',
+            'username' => 'akbar_ramdani',
+            'position' => 'Pengolah Data dan Informasi',
+            'phone' => '081234567890',
+            'role' => 'intern',
+            'password' => bcrypt('password123'),
+        ]);
+
+        $this->actingAs($admin);
+
+        // 1. Admin input presensi izin sakit
+        $response = $this->post('/admin/attendance', [
+            'user_id' => $intern->id,
+            'date' => '2026-09-15',
+            'status' => 'sakit',
+            'notes' => 'Surat sakit dokter terlampir',
+        ]);
+
+        $response->assertRedirect();
+        $this->assertDatabaseHas('attendances', [
+            'user_id' => $intern->id,
+            'date' => '2026-09-15',
+            'status' => 'sakit',
+            'notes' => 'Surat sakit dokter terlampir',
+        ]);
+
+        $att = Attendance::where('user_id', $intern->id)->where('date', '2026-09-15')->first();
+        $this->assertEquals('Sakit', $att->duration);
+
+        // 2. Admin input presensi dispensasi (lupa absen masuk/pulang)
+        $response = $this->post('/admin/attendance', [
+            'user_id' => $intern->id,
+            'date' => '2026-09-16',
+            'status' => 'dispensasi',
+            'type' => 'WFO',
+            'check_in_time' => '07:30',
+            'check_out_time' => '16:00',
+            'notes' => 'Dispensasi lupa presensi pagi',
+        ]);
+
+        $response->assertRedirect();
+        $this->assertDatabaseHas('attendances', [
+            'user_id' => $intern->id,
+            'date' => '2026-09-16',
+            'status' => 'dispensasi',
+        ]);
+
+        $attDispensasi = Attendance::where('user_id', $intern->id)->where('date', '2026-09-16')->first();
+
+        // 3. Admin edit presensi
+        $response = $this->put('/admin/attendance/' . $attDispensasi->id, [
+            'status' => 'tepat_waktu',
+            'type' => 'WFO',
+            'check_in_time' => '07:25',
+            'check_out_time' => '16:05',
+            'notes' => 'Koreksi jam oleh admin',
+        ]);
+
+        $response->assertRedirect();
+        $this->assertDatabaseHas('attendances', [
+            'id' => $attDispensasi->id,
+            'status' => 'tepat_waktu',
+            'check_in_time' => '07:25:00',
+        ]);
+
+        // 4. Periksa PDF report: menampilkan Akbar Ramdani & Pengolah Data dan Informasi, tanpa @akbar_ramdani atau WA:
+        $pdfResponse = $this->get('/admin/export/print?month=2026-09');
+        $pdfResponse->assertStatus(200);
+        $pdfResponse->assertSee('Akbar Ramdani');
+        $pdfResponse->assertSee('Pengolah Data dan Informasi');
+        $pdfResponse->assertDontSee('@akbar_ramdani');
+        $pdfResponse->assertDontSee('WA: 081234567890');
+
+        // 5. Admin hapus presensi
+        $deleteResponse = $this->delete('/admin/attendance/' . $att->id);
+        $deleteResponse->assertRedirect();
+        $this->assertDatabaseMissing('attendances', ['id' => $att->id]);
+
+        $attDispensasi->delete();
+        $intern->delete();
+        $admin->delete();
     }
 }

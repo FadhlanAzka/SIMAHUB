@@ -66,7 +66,7 @@ class internController extends Controller
             'mentor_id' => ['nullable', 'exists:users,id'],
             'password' => ['required', 'string', 'min:8'],
         ], [
-            'name.required' => 'Nama intern wajib diisi.',
+            'name.required' => 'Nama peserta magang wajib diisi.',
             'username.required' => 'Username wajib diisi.',
             'username.unique' => 'Username tersebut sudah terdaftar.',
             'username.not_regex' => 'Username intern tidak boleh mengandung kata "admin" atau "mentor".',
@@ -81,7 +81,7 @@ class internController extends Controller
         User::create($validated);
 
         return redirect()->route('admin.intern.index')
-            ->with('success', "intern magang {$validated['name']} berhasil ditambahkan.");
+            ->with('success', "Peserta magang {$validated['name']} berhasil ditambahkan.");
     }
 
     public function edit(User $intern)
@@ -110,7 +110,7 @@ class internController extends Controller
             'mentor_id' => ['nullable', 'exists:users,id'],
             'password' => ['nullable', 'string', 'min:8'],
         ], [
-            'name.required' => 'Nama intern wajib diisi.',
+            'name.required' => 'Nama peserta magang wajib diisi.',
             'username.required' => 'Username wajib diisi.',
             'username.unique' => 'Username sudah digunakan.',
             'username.not_regex' => 'Username intern tidak boleh mengandung kata "admin" atau "mentor".',
@@ -126,7 +126,7 @@ class internController extends Controller
         $intern->update($validated);
 
         return redirect()->route('admin.intern.index')
-            ->with('success', "Data intern {$intern->name} berhasil diperbarui.");
+            ->with('success', "Data peserta magang {$intern->name} berhasil diperbarui.");
     }
 
     public function destroy(User $intern)
@@ -140,7 +140,7 @@ class internController extends Controller
         $intern->delete();
 
         return redirect()->route('admin.intern.index')
-            ->with('success', "intern {$name} beserta seluruh data absensinya berhasil dihapus.");
+            ->with('success', "Peserta magang {$name} beserta seluruh data absensinya berhasil dihapus.");
     }
 
     public function resetPassword(User $intern)
@@ -156,6 +156,6 @@ class internController extends Controller
         ]);
 
         return redirect()->route('admin.intern.index')
-            ->with('success', "Kata sandi {$intern->name} berhasil direset menjadi: {$defaultPassword}");
+            ->with('success', "Kata sandi peserta magang {$intern->name} berhasil direset menjadi: {$defaultPassword}");
     }
 }

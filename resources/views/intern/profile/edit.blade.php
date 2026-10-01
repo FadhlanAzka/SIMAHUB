@@ -25,7 +25,7 @@
             @method('PUT')
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                <!-- Nama intern (Readonly) -->
+                <!-- Nama Peserta Magang (Readonly) -->
                 <div class="sm:col-span-2">
                     <label for="name" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2">
                         Nama Lengkap <span class="text-slate-400 font-normal normal-case ml-1">(Tidak dapat diubah)</span>
