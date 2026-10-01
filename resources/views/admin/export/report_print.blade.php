@@ -97,9 +97,13 @@
                 <span class="text-[10px] text-slate-500 uppercase font-bold block">Terlambat</span>
                 <span class="text-sm font-black text-rose-700">{{ $totalTerlambat }} Kali</span>
             </div>
-            <div class="p-2.5 rounded-lg border border-rose-300 bg-rose-50/70">
-                <span class="text-[10px] text-rose-700 uppercase font-bold block">Akumulasi Terlambat</span>
-                <span class="text-xs font-black text-rose-800">{{ $accumulatedLateText }}</span>
+            <div class="p-2.5 rounded-lg border {{ $accumulatedLateText ? 'border-rose-300 bg-rose-50/70' : 'border-amber-300 bg-amber-50/70' }}">
+                <span class="text-[10px] {{ $accumulatedLateText ? 'text-rose-700' : 'text-amber-800' }} uppercase font-bold block">
+                    {{ $accumulatedLateText ? 'Total Terlambat Peserta' : 'Peserta Terlambat' }}
+                </span>
+                <span class="text-xs font-black {{ $accumulatedLateText ? 'text-rose-800 font-mono' : 'text-amber-900' }}">
+                    {{ $accumulatedLateText ?: ($lateUsersCount . ' Orang') }}
+                </span>
             </div>
             <div class="p-2.5 rounded-lg border border-slate-300 bg-slate-50">
                 <span class="text-[10px] text-slate-500 uppercase font-bold block">WFH (Rumah)</span>
@@ -120,7 +124,8 @@
                     <th class="p-2 border-r border-slate-300 text-center">Masuk</th>
                     <th class="p-2 border-r border-slate-300 text-center">Status Masuk</th>
                     <th class="p-2 border-r border-slate-300 text-center">Pulang</th>
-                    <th class="p-2 text-center">Durasi</th>
+                    <th class="p-2 border-r border-slate-300 text-center">Durasi</th>
+                    <th class="p-2 text-center whitespace-nowrap">Total Durasi Terlambat</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-200">
@@ -162,13 +167,16 @@
                         <td class="p-2 border-r border-slate-300 font-mono text-center whitespace-nowrap">
                             {{ $row->check_out_time ? substr($row->check_out_time, 0, 5) : '-' }}
                         </td>
-                        <td class="p-2 text-center text-slate-700 whitespace-nowrap font-medium">
+                        <td class="p-2 border-r border-slate-300 text-center text-slate-700 whitespace-nowrap font-medium">
                             {{ $row->duration }}
+                        </td>
+                        <td class="p-2 text-center font-mono font-bold text-slate-800 whitespace-nowrap text-[10px]">
+                            {{ $row->user_total_late_text ?? '0 Menit' }}
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="9" class="p-6 text-center text-slate-400 italic">
+                        <td colspan="11" class="p-6 text-center text-slate-400 italic">
                             Tidak ada catatan absensi pada periode bulan ini.
                         </td>
                     </tr>

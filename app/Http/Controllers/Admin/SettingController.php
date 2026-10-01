@@ -46,8 +46,15 @@ class SettingController extends Controller
             }
         }
 
-        // Pastikan wfh_days menjadi array, jika tidak ada yang diceklis maka array kosong
-        $validated['wfh_days'] = $request->input('wfh_days', []);
+        // Pastikan wfh_days menjadi array of integers
+        $rawWfhDays = $request->input('wfh_days', []);
+        $validated['wfh_days'] = array_values(array_map('intval', (array) $rawWfhDays));
+
+        // Selaraskan default work_start_time dan work_end_time
+        if (isset($validated['work_hours'][1])) {
+            $validated['work_start_time'] = $validated['work_hours'][1]['start'];
+            $validated['work_end_time'] = $validated['work_hours'][1]['end'];
+        }
 
         $office = OfficeSetting::getSetting();
         $office->update($validated);

@@ -337,9 +337,60 @@ class SimahubAttendanceTest extends TestCase
         $this->assertStringContainsString('Posisi Magang', $content);
         $this->assertStringContainsString('No. WhatsApp / HP', $content);
         $this->assertStringContainsString('Durasi Terlambat', $content);
-        $this->assertStringContainsString('Total Akumulasi Terlambat', $content);
+        $this->assertStringContainsString('Total Durasi Terlambat', $content);
         $this->assertStringContainsString('Jumat (07:30 - 16:30 WIB)', $content);
 
         $admin->delete();
+    }
+
+    public function test_wfh_days_text_and_schedule_sync_on_student_dashboard()
+    {
+        $office = OfficeSetting::getSetting();
+
+        // 1. Uji jika WFH hanya Senin
+        $office->update(['wfh_days' => [1]]);
+        $this->assertEquals('Senin', $office->wfh_days_text);
+
+        // 2. Uji jika WFH Senin dan Selasa
+        $office->update(['wfh_days' => [1, 2]]);
+        $this->assertEquals('Senin, Selasa', $office->wfh_days_text);
+
+        // 3. Uji jika Full WFO (tidak ada WFH)
+        $office->update(['wfh_days' => []]);
+        $this->assertEquals('Tidak ada (Full WFO di kantor)', $office->wfh_days_text);
+
+        // 4. Uji tampilan pada dashboard peserta magang saat WFH diset ke hari Selasa 08:00 - 17:00
+        $workHours = $office->work_hours;
+        $workHours[2] = ['start' => '08:00:00', 'end' => '17:00:00'];
+        $office->update([
+            'wfh_days' => [2],
+            'work_hours' => $workHours,
+        ]);
+
+        $student = User::create([
+            'name' => 'Peserta Sync Test',
+            'username' => 'sync_test',
+            'position' => 'Backend Engineer',
+            'role' => 'intern',
+            'password' => bcrypt('password123'),
+        ]);
+
+        $this->actingAs($student);
+
+        // Akses dashboard pada hari Selasa (22 Sept 2026)
+        Carbon::setTestNow(Carbon::create(2026, 9, 22, 7, 50, 0)); // Tuesday
+        $response = $this->get('/dashboard');
+        $response->assertStatus(200);
+        $response->assertSeeText('Hari WFH: Selasa');
+        $response->assertSee('Batas Masuk (Hari Selasa):');
+        $response->assertSee('08:00 WIB');
+        $response->assertSee('Jam Pulang (Hari Selasa):');
+        $response->assertSee('17:00 WIB');
+        $response->assertSee('WFH (Bebas dari Rumah)');
+        $response->assertSee('Jadwal Kerja & WFH Mingguan', false);
+        $response->assertSee('Total Durasi Terlambat');
+
+        $student->delete();
+        Carbon::setTestNow();
     }
 }

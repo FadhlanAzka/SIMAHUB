@@ -20,10 +20,10 @@ class DashboardController extends Controller
 
         // Pengaturan kantor & jam kerja
         $office = OfficeSetting::getSetting();
-        $wfhDays = is_array($office->wfh_days) ? $office->wfh_days : (json_decode($office->wfh_days, true) ?? []);
+        $wfhDays = array_values(array_map('intval', is_array($office->wfh_days) ? $office->wfh_days : (json_decode($office->wfh_days, true) ?? [])));
 
         $isWeekend = ($dayOfWeek >= 6); // Sabtu (6) atau Minggu (7)
-        $isWfhDay = in_array($dayOfWeek, $wfhDays);
+        $isWfhDay = in_array((int) $dayOfWeek, $wfhDays, true);
         
         // Tipe kerja hari ini
         if ($isWeekend) {
@@ -41,8 +41,25 @@ class DashboardController extends Controller
 
         // Batas jam kerja spesifik hari ini
         $workHours = is_array($office->work_hours) ? $office->work_hours : (json_decode($office->work_hours, true) ?? []);
-        $todayStartLimit = $workHours[$dayOfWeek]['start'] ?? substr($office->work_start_time, 0, 5);
-        $todayEndLimit = $workHours[$dayOfWeek]['end'] ?? substr($office->work_end_time, 0, 5);
+        $todayStartLimit = $workHours[$dayOfWeek]['start'] ?? $workHours[(string)$dayOfWeek]['start'] ?? substr($office->work_start_time, 0, 5);
+        $todayEndLimit = $workHours[$dayOfWeek]['end'] ?? $workHours[(string)$dayOfWeek]['end'] ?? substr($office->work_end_time, 0, 5);
+
+        // Jadwal kerja & WFH mingguan untuk transparansi peserta
+        $daysMap = [1 => 'Senin', 2 => 'Selasa', 3 => 'Rabu', 4 => 'Kamis', 5 => 'Jumat', 6 => 'Sabtu', 7 => 'Minggu'];
+        $todayDayName = $daysMap[$dayOfWeek] ?? 'Hari Ini';
+        $weeklySchedule = [];
+        foreach ([1 => 'Senin', 2 => 'Selasa', 3 => 'Rabu', 4 => 'Kamis', 5 => 'Jumat'] as $dNum => $dName) {
+            $dStart = $workHours[$dNum]['start'] ?? $workHours[(string)$dNum]['start'] ?? '07:30';
+            $dEnd = $workHours[$dNum]['end'] ?? $workHours[(string)$dNum]['end'] ?? '16:00';
+            $weeklySchedule[] = [
+                'day_num' => $dNum,
+                'day_name' => $dName,
+                'is_today' => ($dayOfWeek == $dNum),
+                'is_wfh' => in_array($dNum, $wfhDays, true),
+                'start' => substr($dStart, 0, 5),
+                'end' => substr($dEnd, 0, 5),
+            ];
+        }
 
         // Statistik bulan berjalan
         $startOfMonth = $now->copy()->startOfMonth()->toDateString();
@@ -58,7 +75,7 @@ class DashboardController extends Controller
         }
         $lateHours = (int) floor($totalLateMinutes / 60);
         $remLateMins = $totalLateMinutes % 60;
-        $accumulatedLateText = "{$lateHours} jam {$remLateMins} Menit";
+        $accumulatedLateText = $totalLateMinutes > 0 ? "{$lateHours} jam {$remLateMins} Menit" : "0 Menit";
 
         $stats = [
             'total_hadir' => $monthlyAttendances->count(),
@@ -75,6 +92,10 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
+        foreach ($recentAttendances as $att) {
+            $att->user_total_late_text = $accumulatedLateText;
+        }
+
         return view('intern.dashboard', compact(
             'user',
             'now',
@@ -88,7 +109,10 @@ class DashboardController extends Controller
             'stats',
             'recentAttendances',
             'todayStartLimit',
-            'todayEndLimit'
+            'todayEndLimit',
+            'todayDayName',
+            'wfhDays',
+            'weeklySchedule'
         ));
     }
 }

@@ -100,9 +100,20 @@
             <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Terlambat</span>
             <div class="text-xl font-black text-rose-600 mt-1">{{ $stats['terlambat'] }} <span class="text-[10px] font-normal text-slate-500">Kali</span></div>
         </div>
-        <div class="bg-rose-50/70 p-4 rounded-2xl border border-rose-200 shadow-2xs">
-            <span class="text-[10px] font-bold uppercase tracking-wider text-rose-600">Akumulasi Terlambat</span>
-            <div class="text-sm sm:text-base font-black text-rose-700 mt-1 font-mono">{{ $stats['accumulated_late_text'] }}</div>
+        <div class="{{ $selectedUserId ? 'bg-rose-50/70 border-rose-200' : 'bg-amber-50/70 border-amber-200' }} p-4 rounded-2xl border shadow-2xs">
+            <span class="text-[10px] font-bold uppercase tracking-wider {{ $selectedUserId ? 'text-rose-600' : 'text-amber-700' }}">
+                {{ $selectedUserId ? 'Total Terlambat Peserta' : 'Peserta Terlambat' }}
+            </span>
+            <div class="text-sm sm:text-base font-black {{ $selectedUserId ? 'text-rose-700 font-mono' : 'text-amber-800' }} mt-1">
+                @if($selectedUserId)
+                    {{ $stats['accumulated_late_text'] }}
+                @else
+                    {{ $stats['late_users_count'] }} <span class="text-[10px] font-normal text-slate-500">Orang</span>
+                @endif
+            </div>
+            <span class="text-[10px] {{ $selectedUserId ? 'text-rose-500' : 'text-amber-600/90' }} block mt-0.5">
+                {{ $selectedUserId ? 'Total keterlambatan peserta ini' : 'Rincian per orang ada di kolom tabel' }}
+            </span>
         </div>
         <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-2xs col-span-2 sm:col-span-1">
             <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">WFH (Bebas Lokasi)</span>
@@ -139,6 +150,7 @@
                                 <div class="absolute bottom-full left-1/2 -translate-x-1/2 border-4 border-transparent border-b-slate-800"></div>
                             </div>
                         </th>
+                        <th class="px-6 py-3.5 whitespace-nowrap">Total Durasi Terlambat</th>
                         <th class="px-6 py-3.5">Jarak Masuk</th>
                     </tr>
                 </thead>
@@ -172,6 +184,9 @@
                             <td class="px-6 py-4 text-slate-600 whitespace-nowrap font-medium">
                                 {{ $row->duration }}
                             </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="font-mono font-bold text-slate-800 text-xs">{{ $row->user_total_late_text ?? '0 Menit' }}</span>
+                            </td>
                             <td class="px-6 py-4 text-slate-500 whitespace-nowrap">
                                 @if($row->check_in_distance !== null)
                                     <span class="font-mono text-[11px]">{{ $row->check_in_distance }} m</span>
@@ -182,7 +197,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="px-6 py-12 text-center text-slate-400">
+                            <td colspan="9" class="px-6 py-12 text-center text-slate-400">
                                 <i data-lucide="inbox" class="w-8 h-8 mx-auto text-slate-300 mb-2"></i>
                                 Tidak ada data absensi yang sesuai dengan kriteria filter.
                             </td>

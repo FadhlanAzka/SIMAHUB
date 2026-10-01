@@ -210,7 +210,11 @@ class AttendanceController extends Controller
 
         $lateHours = (int) floor($totalLateMinutes / 60);
         $remLateMins = $totalLateMinutes % 60;
-        $accumulatedLateText = "{$lateHours} jam {$remLateMins} Menit";
+        $accumulatedLateText = $totalLateMinutes > 0 ? "{$lateHours} jam {$remLateMins} Menit" : "0 Menit";
+
+        foreach ($attendances as $att) {
+            $att->user_total_late_text = $accumulatedLateText;
+        }
 
         $stats = [
             'total_hadir' => $attendances->count(),

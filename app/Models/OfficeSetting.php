@@ -50,4 +50,33 @@ class OfficeSetting extends Model
             ]
         );
     }
+
+    /**
+     * Mengambil array nama hari WFH yang aktif
+     */
+    public function getWfhDayNamesAttribute(): array
+    {
+        $daysMap = [1 => 'Senin', 2 => 'Selasa', 3 => 'Rabu', 4 => 'Kamis', 5 => 'Jumat'];
+        $wfh = is_array($this->wfh_days) ? $this->wfh_days : (json_decode($this->wfh_days, true) ?? []);
+        $names = [];
+        foreach ($wfh as $d) {
+            $intD = (int) $d;
+            if (isset($daysMap[$intD])) {
+                $names[] = $daysMap[$intD];
+            }
+        }
+        return $names;
+    }
+
+    /**
+     * Format teks fleksibel hari WFH (Contoh: "Senin", "Senin, Selasa", atau "Tidak ada (Full WFO di kantor)")
+     */
+    public function getWfhDaysTextAttribute(): string
+    {
+        $names = $this->wfh_day_names;
+        if (empty($names)) {
+            return 'Tidak ada (Full WFO di kantor)';
+        }
+        return implode(', ', $names);
+    }
 }

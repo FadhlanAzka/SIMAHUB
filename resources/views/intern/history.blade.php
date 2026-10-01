@@ -80,6 +80,7 @@
                                 <div class="absolute bottom-full left-1/2 -translate-x-1/2 border-4 border-transparent border-b-slate-800"></div>
                             </div>
                         </th>
+                        <th class="px-6 py-3.5 whitespace-nowrap">Total Durasi Terlambat</th>
                         <th class="px-6 py-3.5">Lokasi GPS</th>
                     </tr>
                 </thead>
@@ -107,6 +108,9 @@
                             <td class="px-6 py-4 text-slate-600 whitespace-nowrap font-medium">
                                 {{ $row->duration }}
                             </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="font-mono font-bold text-slate-800">{{ $row->user_total_late_text ?? '0 Menit' }}</span>
+                            </td>
                             <td class="px-6 py-4 text-slate-500 whitespace-nowrap">
                                 @if($row->check_in_distance !== null)
                                     <span class="inline-flex items-center gap-1 font-mono text-[11px]">
@@ -120,7 +124,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="px-6 py-12 text-center text-slate-400">
+                            <td colspan="9" class="px-6 py-12 text-center text-slate-400">
                                 <i data-lucide="inbox" class="w-8 h-8 mx-auto text-slate-300 mb-2"></i>
                                 Tidak ada data presensi pada bulan yang dipilih.
                             </td>

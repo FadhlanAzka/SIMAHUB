@@ -39,13 +39,27 @@ class ExportController extends Controller
         $monthLabel = Carbon::parse($selectedMonth . '-01')->translatedFormat('F Y');
         $fileName = "Rekap_Presensi_SIMAHUB_" . str_replace(' ', '_', $monthLabel) . ".csv";
 
-        $totalLateMinutes = 0;
+        $userLateTotals = [];
+        $lateUsersCount = 0;
         foreach ($attendances as $row) {
-            $totalLateMinutes += $row->late_minutes;
+            $uid = $row->user_id;
+            if (!isset($userLateTotals[$uid])) {
+                $userLateTotals[$uid] = 0;
+            }
+            $userLateTotals[$uid] += $row->late_minutes;
         }
-        $totalLateHours = (int) floor($totalLateMinutes / 60);
-        $remLateMins = $totalLateMinutes % 60;
-        $accumulatedLateText = "{$totalLateHours} jam {$remLateMins} Menit";
+
+        $userLateTotalsText = [];
+        foreach ($userLateTotals as $uid => $mins) {
+            if ($mins > 0) {
+                $lateUsersCount++;
+                $h = (int) floor($mins / 60);
+                $m = $mins % 60;
+                $userLateTotalsText[$uid] = "{$h} jam {$m} Menit";
+            } else {
+                $userLateTotalsText[$uid] = '0 Menit';
+            }
+        }
 
         $headers = [
             'Content-Type' => 'text/csv; charset=UTF-8',
@@ -55,7 +69,7 @@ class ExportController extends Controller
             'Expires' => '0',
         ];
 
-        return response()->stream(function () use ($attendances, $office, $monthLabel, $now, $accumulatedLateText) {
+        return response()->stream(function () use ($attendances, $office, $monthLabel, $now, $userLateTotalsText, $userId) {
             $handle = fopen('php://output', 'w');
 
             // Tambahkan UTF-8 BOM agar Excel/Spreadsheets otomatis membaca karakter dengan rapi
@@ -68,7 +82,9 @@ class ExportController extends Controller
             fputcsv($handle, ['Waktu Ekspor', $now->translatedFormat('d F Y, H:i') . ' WIB']);
             fputcsv($handle, ['Total Data', $attendances->count() . ' catatan']);
             fputcsv($handle, ['Total Terlambat', $attendances->where('status', 'terlambat')->count() . ' kali']);
-            fputcsv($handle, ['Total Akumulasi Terlambat', $accumulatedLateText]);
+            if ($userId && isset($userLateTotalsText[$userId])) {
+                fputcsv($handle, ['Total Terlambat Peserta Terpilih', $userLateTotalsText[$userId]]);
+            }
             fputcsv($handle, ['Ketentuan Jam Kerja', 'Senin - Kamis (07:30 - 16:00 WIB), Jumat (07:30 - 16:30 WIB)']);
             fputcsv($handle, []); // Baris kosong pemisah
 
@@ -87,6 +103,7 @@ class ExportController extends Controller
                 'Durasi Terlambat',
                 'Jam Pulang (WIB)',
                 'Durasi Kerja',
+                'Total Durasi Terlambat',
                 'Jarak Presensi (Meter)',
                 'Catatan / Keterangan',
             ]);
@@ -101,6 +118,7 @@ class ExportController extends Controller
                         ? "TELAT\n(" . ($row->late_duration_text ?: '0 jam 0 Menit') . ")" 
                         : '-');
                 $typeText = ($row->type === 'WFH') ? 'WFH (Rumah)' : 'WFO (Kantor)';
+                $userTotalLate = $userLateTotalsText[$row->user_id] ?? '0 Menit';
 
                 fputcsv($handle, [
                     $no++,
@@ -116,6 +134,7 @@ class ExportController extends Controller
                     $lateDuration,
                     $row->check_out_time ? substr($row->check_out_time, 0, 5) : '-',
                     $row->duration,
+                    $userTotalLate,
                     $row->check_in_distance ? $row->check_in_distance . ' m' : '-',
                     $row->notes ?: '-',
                 ]);
@@ -157,13 +176,37 @@ class ExportController extends Controller
         $totalWfh = $attendances->where('type', 'WFH')->count();
         $totalWfo = $attendances->where('type', 'WFO')->count();
 
-        $totalLateMinutes = 0;
+        // Hitung akumulasi terlambat per peserta magang
+        $userLateTotals = [];
+        $lateUsersCount = 0;
         foreach ($attendances as $row) {
-            $totalLateMinutes += $row->late_minutes;
+            $uid = $row->user_id;
+            if (!isset($userLateTotals[$uid])) {
+                $userLateTotals[$uid] = 0;
+            }
+            $userLateTotals[$uid] += $row->late_minutes;
         }
-        $totalLateHours = (int) floor($totalLateMinutes / 60);
-        $remLateMins = $totalLateMinutes % 60;
-        $accumulatedLateText = "{$totalLateHours} jam {$remLateMins} Menit";
+
+        $userLateTotalsText = [];
+        foreach ($userLateTotals as $uid => $mins) {
+            if ($mins > 0) {
+                $lateUsersCount++;
+                $h = (int) floor($mins / 60);
+                $m = $mins % 60;
+                $userLateTotalsText[$uid] = "{$h} jam {$m} Menit";
+            } else {
+                $userLateTotalsText[$uid] = '0 Menit';
+            }
+        }
+
+        // Pasangkan total durasi terlambat per peserta ke setiap baris data
+        foreach ($attendances as $row) {
+            $row->user_total_late_text = $userLateTotalsText[$row->user_id] ?? '0 Menit';
+        }
+
+        $accumulatedLateText = ($userId && isset($userLateTotalsText[$userId]))
+            ? $userLateTotalsText[$userId]
+            : null;
 
         return view('admin.export.report_print', compact(
             'attendances',
@@ -175,8 +218,9 @@ class ExportController extends Controller
             'totalTerlambat',
             'totalWfh',
             'totalWfo',
-            'totalLateMinutes',
-            'accumulatedLateText'
+            'lateUsersCount',
+            'accumulatedLateText',
+            'userId'
         ));
     }
 }

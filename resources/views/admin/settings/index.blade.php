@@ -172,33 +172,17 @@
 
             <hr class="border-slate-100">
 
-            <!-- Section 4: Pengaturan Hari WFH Fleksibel -->
+            <!-- Section 4: Pengaturan Hari WFH -->
             <div>
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
-                    <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
-                        <div class="w-6 h-6 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
-                            <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
-                        </div>
-                        <span>Pengaturan Hari WFH (Bebas Lokasi) & Kebijakan Fleksibel</span>
-                    </h3>
-                    
-                    <!-- Quick Presets -->
-                    <div class="flex items-center gap-1.5 flex-wrap">
-                        <span class="text-[11px] font-bold text-slate-400">Pilihan Cepat:</span>
-                        <button type="button" onclick="setWfhPreset([5])" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-700 text-[11px] font-semibold transition-colors cursor-pointer border border-slate-200">
-                            Jumat Saja
-                        </button>
-                        <button type="button" onclick="setWfhPreset([])" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-rose-50 text-slate-700 hover:text-rose-700 text-[11px] font-semibold transition-colors cursor-pointer border border-slate-200">
-                            Full WFO (Tanpa WFH)
-                        </button>
-                        <button type="button" onclick="setWfhPreset([4, 5])" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-purple-50 text-slate-700 hover:text-purple-700 text-[11px] font-semibold transition-colors cursor-pointer border border-slate-200">
-                            Kamis & Jumat
-                        </button>
+                <h3 class="text-sm font-bold text-slate-900 mb-2 flex items-center gap-2">
+                    <div class="w-6 h-6 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+                        <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
                     </div>
-                </div>
+                    <span>Pengaturan Hari WFH (Bebas Lokasi)</span>
+                </h3>
                 
                 <p class="text-xs text-slate-500 mb-3">
-                    Atur hari kerja mana saja yang diizinkan untuk <em>Work From Home</em> (WFH). Jika tidak ada hari yang dicentang, maka sistem otomatis menerapkan <strong>Full WFO</strong> (seluruh hari wajib berada di area radius kantor). Mentor/Admin bebas mengubah hari WFH kapan saja sesuai instruksi instansi.
+                    Centang hari kerja mana saja yang diizinkan untuk <em>Work From Home</em> (WFH). Jika tidak ada hari yang dicentang, maka seluruh hari otomatis berlaku <strong>Full WFO</strong> (peserta magang wajib presensi di area radius kantor).
                 </p>
 
                 @php
@@ -336,16 +320,6 @@
             );
         });
     });
-
-    // Helper Preset WFH
-    function setWfhPreset(allowedDays) {
-        for (let i = 1; i <= 5; i++) {
-            const cb = document.getElementById('wfh_day_' + i);
-            if (cb) {
-                cb.checked = allowedDays.includes(i);
-            }
-        }
-    }
 </script>
 @endpush
 @endsection

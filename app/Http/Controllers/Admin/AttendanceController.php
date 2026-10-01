@@ -50,28 +50,51 @@ class AttendanceController extends Controller
         $totalTerlambat = $matchingAttendances->where('status', 'terlambat')->count();
         $totalWfh = $matchingAttendances->where('type', 'WFH')->count();
 
-        $totalLateMinutes = 0;
+        // Hitung total keterlambatan per peserta magang untuk periode aktif
+        $userLateTotals = [];
+        $lateUsersCount = 0;
         foreach ($matchingAttendances as $att) {
-            $totalLateMinutes += $att->late_minutes;
+            $uid = $att->user_id;
+            if (!isset($userLateTotals[$uid])) {
+                $userLateTotals[$uid] = 0;
+            }
+            $userLateTotals[$uid] += $att->late_minutes;
         }
 
-        $totalLateHours = (int) floor($totalLateMinutes / 60);
-        $remLateMins = $totalLateMinutes % 60;
-        $accumulatedLateText = "{$totalLateHours} jam {$remLateMins} Menit";
+        $userLateTotalsText = [];
+        foreach ($userLateTotals as $uid => $mins) {
+            if ($mins > 0) {
+                $lateUsersCount++;
+                $h = (int) floor($mins / 60);
+                $m = $mins % 60;
+                $userLateTotalsText[$uid] = "{$h} jam {$m} Menit";
+            } else {
+                $userLateTotalsText[$uid] = '0 Menit';
+            }
+        }
+
+        $attendances = $query->orderBy('date', 'desc')
+            ->orderBy('check_in_time', 'desc')
+            ->paginate(20)
+            ->withQueryString();
+
+        // Pasangkan total durasi terlambat per peserta ke setiap baris data
+        $attendances->getCollection()->transform(function ($att) use ($userLateTotalsText) {
+            $att->user_total_late_text = $userLateTotalsText[$att->user_id] ?? '0 Menit';
+            return $att;
+        });
 
         $stats = [
             'total_hadir' => $totalHadir,
             'tepat_waktu' => $totalTepatWaktu,
             'terlambat' => $totalTerlambat,
             'wfh' => $totalWfh,
+            'late_users_count' => $lateUsersCount,
             'total_late_minutes' => $totalLateMinutes,
-            'accumulated_late_text' => $accumulatedLateText,
+            'accumulated_late_text' => ($selectedUserId && isset($userLateTotalsText[$selectedUserId]))
+                ? $userLateTotalsText[$selectedUserId]
+                : ($totalLateMinutes > 0 ? "{$totalLateHours} jam {$remLateMins} Menit" : '0 Menit'),
         ];
-
-        $attendances = $query->orderBy('date', 'desc')
-            ->orderBy('check_in_time', 'desc')
-            ->paginate(20)
-            ->withQueryString();
 
         $allintern = User::where('role', 'intern')->orderBy('name', 'asc')->get();
 
