@@ -86,6 +86,132 @@
         </div>
     </div>
 
+    <!-- Real-time Attendance Reminder Alert Banner -->
+    @php
+        $nowTimeStr = \Carbon\Carbon::now()->format('H:i');
+        $hasCheckedIn = $todayAttendance && $todayAttendance->check_in_time;
+        $hasCheckedOut = $todayAttendance && $todayAttendance->check_out_time;
+    @endphp
+
+    <div id="attendanceReminderBanner" class="transition-all duration-300">
+        @if($isWeekend)
+            <div class="rounded-2xl bg-amber-50 border border-amber-200/80 p-4 sm:p-5 flex items-start sm:items-center justify-between gap-4 shadow-xs">
+                <div class="flex items-center gap-3.5">
+                    <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
+                        <i data-lucide="coffee" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xs sm:text-sm font-bold text-amber-900">Libur Akhir Pekan</h3>
+                        <p class="text-xs text-amber-700 mt-0.5">Hari ini libur magang. Sistem presensi dan pengingat akan aktif kembali pada hari kerja berikutnya pukul 07:30 WIB.</p>
+                    </div>
+                </div>
+            </div>
+        @elseif(!$hasCheckedIn && $nowTimeStr < substr($todayStartLimit, 0, 5))
+            <div class="rounded-2xl bg-blue-50/90 border border-blue-200/90 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs">
+                <div class="flex items-start sm:items-center gap-3.5">
+                    <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-blue-500/20">
+                        <i data-lucide="bell-ring" class="w-5 h-5 animate-bounce"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h3 class="text-xs sm:text-sm font-bold text-blue-950">Pengingat Presensi Masuk (Hari {{ $todayDayName }})</h3>
+                            <span class="px-2 py-0.5 rounded-full bg-blue-200 text-blue-800 text-[10px] font-black uppercase tracking-wide">Penting</span>
+                        </div>
+                        <p class="text-xs text-blue-800/90 mt-0.5 leading-relaxed">
+                            Batas waktu presensi masuk adalah pukul <strong class="font-black text-blue-950 font-mono">{{ substr($todayStartLimit, 0, 5) }} WIB</strong> (Ketentuan: <strong>{{ $workType }}</strong>). Segera lakukan absensi masuk agar tercatat <strong>Tepat Waktu</strong>.
+                        </p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 shrink-0">
+                    <a href="#formCheckIn" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer">
+                        <i data-lucide="log-in" class="w-4 h-4"></i>
+                        <span>Absen Masuk</span>
+                    </a>
+                </div>
+            </div>
+        @elseif(!$hasCheckedIn && $nowTimeStr >= substr($todayStartLimit, 0, 5))
+            <div class="rounded-2xl bg-rose-50/90 border border-rose-200/90 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs">
+                <div class="flex items-start sm:items-center gap-3.5">
+                    <div class="w-10 h-10 rounded-xl bg-rose-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-rose-500/20">
+                        <i data-lucide="alert-triangle" class="w-5 h-5 animate-pulse"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h3 class="text-xs sm:text-sm font-bold text-rose-950">Peringatan: Belum Melakukan Presensi Masuk</h3>
+                            <span class="px-2 py-0.5 rounded-full bg-rose-200 text-rose-900 text-[10px] font-black uppercase tracking-wide">Terlambat</span>
+                        </div>
+                        <p class="text-xs text-rose-800 mt-0.5 leading-relaxed">
+                            Batas waktu masuk pukul <strong class="font-black text-rose-950 font-mono">{{ substr($todayStartLimit, 0, 5) }} WIB</strong> telah lewat. Segera lakukan presensi masuk sekarang agar durasi keterlambatan Anda tidak terus bertambah!
+                        </p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 shrink-0">
+                    <a href="#formCheckIn" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer">
+                        <i data-lucide="log-in" class="w-4 h-4"></i>
+                        <span>Absen Sekarang</span>
+                    </a>
+                </div>
+            </div>
+        @elseif($hasCheckedIn && !$hasCheckedOut && $nowTimeStr < substr($todayEndLimit, 0, 5))
+            <div class="rounded-2xl bg-indigo-50/70 border border-indigo-200/80 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs">
+                <div class="flex items-start sm:items-center gap-3.5">
+                    <div class="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-indigo-500/20">
+                        <i data-lucide="briefcase" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h3 class="text-xs sm:text-sm font-bold text-indigo-950">Jam Kerja Hari {{ $todayDayName }} Sedang Berlangsung</h3>
+                            <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">Masuk: {{ substr($todayAttendance->check_in_time, 0, 5) }} WIB</span>
+                        </div>
+                        <p class="text-xs text-indigo-800 mt-0.5 leading-relaxed">
+                            Presensi masuk terekam dengan baik. Sesuai jam operasional hari <strong>{{ $todayDayName }}</strong>, presensi pulang akan dibuka mulai pukul <strong class="font-black text-indigo-950 font-mono">{{ substr($todayEndLimit, 0, 5) }} WIB</strong>.
+                        </p>
+                    </div>
+                </div>
+                <div class="text-xs font-bold text-indigo-700 font-mono bg-white/80 px-3 py-1.5 rounded-xl border border-indigo-200/80 shrink-0">
+                    Pulang: {{ substr($todayEndLimit, 0, 5) }} WIB
+                </div>
+            </div>
+        @elseif($hasCheckedIn && !$hasCheckedOut && $nowTimeStr >= substr($todayEndLimit, 0, 5))
+            <div class="rounded-2xl bg-purple-50/90 border border-purple-200/90 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs">
+                <div class="flex items-start sm:items-center gap-3.5">
+                    <div class="w-10 h-10 rounded-xl bg-purple-700 text-white flex items-center justify-center shrink-0 shadow-md shadow-purple-600/20">
+                        <i data-lucide="clock" class="w-5 h-5 animate-pulse"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h3 class="text-xs sm:text-sm font-bold text-purple-950">Waktunya Presensi Pulang (Hari {{ $todayDayName }})</h3>
+                            <span class="px-2 py-0.5 rounded-full bg-purple-200 text-purple-900 text-[10px] font-black uppercase tracking-wide">Jam Pulang Tiba</span>
+                        </div>
+                        <p class="text-xs text-purple-800 mt-0.5 leading-relaxed">
+                            Jam kerja hari ini telah selesai (pukul <strong class="font-black text-purple-950 font-mono">{{ substr($todayEndLimit, 0, 5) }} WIB</strong>). Jangan lupa lakukan <strong>Absen Pulang</strong> sekarang sebelum meninggalkan instansi atau menutup aktivitas magang Anda!
+                        </p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 shrink-0">
+                    <a href="#formCheckOut" class="px-4 py-2 rounded-xl bg-purple-700 hover:bg-purple-800 text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer">
+                        <i data-lucide="log-out" class="w-4 h-4"></i>
+                        <span>Absen Pulang Sekarang</span>
+                    </a>
+                </div>
+            </div>
+        @else
+            <div class="rounded-2xl bg-emerald-50/90 border border-emerald-200/80 p-4 sm:p-5 flex items-center justify-between gap-4 shadow-xs">
+                <div class="flex items-center gap-3.5">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-emerald-500/20">
+                        <i data-lucide="check-check" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xs sm:text-sm font-bold text-emerald-950">Presensi Hari Ini Lengkap</h3>
+                        <p class="text-xs text-emerald-800 mt-0.5">
+                            Anda telah menyelesaikan absen masuk ({{ substr($todayAttendance->check_in_time, 0, 5) }} WIB) dan pulang ({{ substr($todayAttendance->check_out_time, 0, 5) }} WIB) dengan durasi kerja <strong>{{ $todayAttendance->duration }}</strong>. Terima kasih atas dedikasi Anda hari ini!
+                        </p>
+                    </div>
+                </div>
+            </div>
+        @endif
+    </div>
+
     <!-- Attendance Action & GPS Geofencing Section -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
@@ -336,6 +462,42 @@
                             </div>
                         </div>
                     @endforeach
+                </div>
+            </div>
+
+            <!-- Attendance Notification Control Card -->
+            <div class="bg-white rounded-3xl p-5 border border-slate-200/80 shadow-xs space-y-3">
+                <div class="font-bold text-slate-900 flex items-center justify-between text-xs">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="bell" class="w-4 h-4 text-blue-600"></i>
+                        <span>Pengingat Presensi Otomatis</span>
+                    </div>
+                    <span id="notifStatusBadge" class="text-[10px] px-2.5 py-0.5 rounded-full font-bold bg-slate-100 text-slate-600">
+                        Mengecek...
+                    </span>
+                </div>
+                <p class="text-slate-500 text-[11px] leading-relaxed">
+                    Sistem akan otomatis mengirimkan notifikasi peramban dan nada pengingat sesuai jadwal operasional instansi:
+                </p>
+                <div class="grid grid-cols-2 gap-2 text-[11px] bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                    <div class="flex flex-col">
+                        <span class="text-slate-400 text-[10px] uppercase font-bold">Batas Masuk</span>
+                        <span class="font-bold text-slate-800 font-mono">{{ substr($todayStartLimit, 0, 5) }} WIB</span>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-slate-400 text-[10px] uppercase font-bold">Jam Pulang</span>
+                        <span class="font-bold text-slate-800 font-mono">{{ substr($todayEndLimit, 0, 5) }} WIB</span>
+                    </div>
+                </div>
+                <div class="flex flex-col sm:flex-row gap-2 pt-1">
+                    <button type="button" id="btnEnableNotif" class="flex-1 py-2 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-bold shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+                        <i data-lucide="bell-ring" class="w-3.5 h-3.5"></i>
+                        <span id="btnEnableNotifText">Aktifkan Pengingat</span>
+                    </button>
+                    <button type="button" id="btnTestNotif" class="py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer" title="Coba bunyi dan notifikasi">
+                        <i data-lucide="volume-2" class="w-3.5 h-3.5"></i>
+                        <span>Uji Coba</span>
+                    </button>
                 </div>
             </div>
 

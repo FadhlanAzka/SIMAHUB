@@ -266,6 +266,10 @@
         </script>
     @endif
 
+    @if(auth()->check() && auth()->user()->isIntern())
+        @include('intern.partials.notification_script')
+    @endif
+
     @stack('scripts')
 </body>
 </html>

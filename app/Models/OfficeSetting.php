@@ -79,4 +79,21 @@ class OfficeSetting extends Model
         }
         return implode(', ', $names);
     }
+
+    /**
+     * Mengambil konfigurasi jam masuk dan pulang spesifik per hari
+     */
+    public function getTodayHours(?int $dayOfWeek = null): array
+    {
+        $dayOfWeek = $dayOfWeek ?? (int) \Carbon\Carbon::now()->dayOfWeekIso;
+        $wh = is_array($this->work_hours) ? $this->work_hours : (json_decode($this->work_hours, true) ?? []);
+
+        $start = $wh[$dayOfWeek]['start'] ?? $wh[(string)$dayOfWeek]['start'] ?? substr($this->work_start_time ?? '07:30', 0, 5);
+        $end = $wh[$dayOfWeek]['end'] ?? $wh[(string)$dayOfWeek]['end'] ?? substr($this->work_end_time ?? ($dayOfWeek == 5 ? '16:30' : '16:00'), 0, 5);
+
+        return [
+            'start' => substr($start, 0, 5),
+            'end' => substr($end, 0, 5),
+        ];
+    }
 }

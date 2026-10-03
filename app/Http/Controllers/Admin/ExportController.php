@@ -60,6 +60,7 @@ class ExportController extends Controller
             ->get();
 
         $office = OfficeSetting::getSetting();
+        $now = Carbon::now();
         
         $monthLabel = 'Semua Data';
         if ($selectedDate) {

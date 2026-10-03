@@ -41,23 +41,23 @@ class DashboardController extends Controller
 
         // Batas jam kerja spesifik hari ini
         $workHours = is_array($office->work_hours) ? $office->work_hours : (json_decode($office->work_hours, true) ?? []);
-        $todayStartLimit = $workHours[$dayOfWeek]['start'] ?? $workHours[(string)$dayOfWeek]['start'] ?? substr($office->work_start_time, 0, 5);
-        $todayEndLimit = $workHours[$dayOfWeek]['end'] ?? $workHours[(string)$dayOfWeek]['end'] ?? substr($office->work_end_time, 0, 5);
+        $todayHours = $office->getTodayHours($dayOfWeek);
+        $todayStartLimit = $todayHours['start'];
+        $todayEndLimit = $todayHours['end'];
 
         // Jadwal kerja & WFH mingguan untuk transparansi peserta
         $daysMap = [1 => 'Senin', 2 => 'Selasa', 3 => 'Rabu', 4 => 'Kamis', 5 => 'Jumat', 6 => 'Sabtu', 7 => 'Minggu'];
         $todayDayName = $daysMap[$dayOfWeek] ?? 'Hari Ini';
         $weeklySchedule = [];
         foreach ([1 => 'Senin', 2 => 'Selasa', 3 => 'Rabu', 4 => 'Kamis', 5 => 'Jumat'] as $dNum => $dName) {
-            $dStart = $workHours[$dNum]['start'] ?? $workHours[(string)$dNum]['start'] ?? '07:30';
-            $dEnd = $workHours[$dNum]['end'] ?? $workHours[(string)$dNum]['end'] ?? '16:00';
+            $dayHours = $office->getTodayHours($dNum);
             $weeklySchedule[] = [
                 'day_num' => $dNum,
                 'day_name' => $dName,
                 'is_today' => ($dayOfWeek == $dNum),
                 'is_wfh' => in_array($dNum, $wfhDays, true),
-                'start' => substr($dStart, 0, 5),
-                'end' => substr($dEnd, 0, 5),
+                'start' => $dayHours['start'],
+                'end' => $dayHours['end'],
             ];
         }
 

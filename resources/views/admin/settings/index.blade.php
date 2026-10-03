@@ -179,8 +179,8 @@
                 <div class="mt-3 p-3 bg-blue-50/50 border border-blue-100 rounded-xl">
                     <p class="text-[11px] text-slate-600 leading-relaxed">
                         <i data-lucide="info" class="w-3.5 h-3.5 inline-block -mt-0.5 mr-1 text-blue-500"></i>
-                        <strong>Catatan:</strong> Absen masuk &le; jam masuk berstatus <strong>Tepat Waktu</strong>. intern hanya dapat absen pulang jika waktu sudah mencapai jam pulang.<br>
-                        * Centang opsi <strong>Izinkan WFH</strong> jika pada hari tersebut intern diperbolehkan absen dari mana saja (Bebas Lokasi / mengabaikan validasi radius).
+                        <strong>Catatan:</strong> Absen masuk sebelum atau tepat pada batas jam masuk berstatus <strong>Tepat Waktu</strong> (jika melewati batas waktu dihitung <strong>Terlambat</strong>). Peserta magang hanya dapat absen pulang jika waktu sudah mencapai batas jam pulang minimal.<br>
+                        * Centang opsi <strong>Izinkan WFH</strong> jika pada hari tersebut peserta magang diperbolehkan absen dari mana saja (Bebas Lokasi / mengabaikan validasi radius).
                     </p>
                 </div>
             </div>

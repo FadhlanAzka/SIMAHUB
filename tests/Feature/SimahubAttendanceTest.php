@@ -511,4 +511,57 @@ class SimahubAttendanceTest extends TestCase
         $intern->delete();
         $admin->delete();
     }
+
+    public function test_attendance_reminder_notification_schedule_and_widgets()
+    {
+        $office = OfficeSetting::getSetting();
+
+        // 1. Uji jam operasional Senin - Kamis (07:30 dan 16:00)
+        for ($d = 1; $d <= 4; $d++) {
+            $hours = $office->getTodayHours($d);
+            $this->assertEquals('07:30', $hours['start']);
+            $this->assertEquals('16:00', $hours['end']);
+        }
+
+        // 2. Uji jam operasional Jumat (07:30 dan 16:30)
+        $fridayHours = $office->getTodayHours(5);
+        $this->assertEquals('07:30', $fridayHours['start']);
+        $this->assertEquals('16:30', $fridayHours['end']);
+
+        // 3. Uji fleksibilitas jam kerja jika diubah oleh admin (contoh: Selasa 08:00 - 17:00)
+        $wh = $office->work_hours;
+        $wh[2] = ['start' => '08:00', 'end' => '17:00'];
+        $office->update(['work_hours' => $wh]);
+
+        $tuesdayHours = $office->getTodayHours(2);
+        $this->assertEquals('08:00', $tuesdayHours['start']);
+        $this->assertEquals('17:00', $tuesdayHours['end']);
+
+        // Kembalikan setting Selasa ke default 07:30 - 16:00
+        $wh[2] = ['start' => '07:30', 'end' => '16:00'];
+        $office->update(['work_hours' => $wh]);
+
+        // 4. Uji tampilan dashboard peserta magang memuat komponen pengingat & script notifikasi
+        $intern = User::create([
+            'username' => 'intern_test_notif',
+            'name' => 'Peserta Notifikasi',
+            'role' => 'intern',
+            'position' => 'UI/UX Designer',
+            'password' => bcrypt('password'),
+        ]);
+
+        $this->actingAs($intern);
+        $response = $this->get('/dashboard');
+        $response->assertStatus(200);
+
+        // Verifikasi keberadaan widget pengingat dan script
+        $response->assertSee('attendanceReminderBanner');
+        $response->assertSee('Pengingat Presensi Otomatis');
+        $response->assertSee('btnEnableNotif');
+        $response->assertSee('btnTestNotif');
+        $response->assertSee('SIMAHUB_NOTIF_CONFIG');
+        $response->assertSee('07:30 WIB');
+
+        $intern->delete();
+    }
 }
