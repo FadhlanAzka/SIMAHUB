@@ -29,7 +29,7 @@ class internController extends Controller
         }
 
         if ($search) {
-            $query->where('name', 'LIKE', '%' . $search . '%');
+            $query->where('name', 'LIKE', '%'.$search.'%');
         }
 
         $intern = $query->with('mentor')
@@ -39,7 +39,7 @@ class internController extends Controller
             ->withQueryString();
 
         $positions = User::where('role', 'intern')->whereNotNull('position')->where('position', '!=', '')->distinct()->pluck('position');
-        
+
         $mentors = collect();
         if (auth()->user()->role === 'admin') {
             $mentors = User::where('role', 'mentor')->orderBy('name', 'asc')->get();
@@ -50,14 +50,19 @@ class internController extends Controller
 
     public function create()
     {
-        if (auth()->user()->role !== 'admin') abort(403, 'Akses ditolak.');
+        if (auth()->user()->role !== 'admin') {
+            abort(403, 'Akses ditolak.');
+        }
         $mentors = User::where('role', 'mentor')->orderBy('name', 'asc')->get();
+
         return view('admin.intern.create', compact('mentors'));
     }
 
     public function store(Request $request)
     {
-        if (auth()->user()->role !== 'admin') abort(403, 'Akses ditolak.');
+        if (auth()->user()->role !== 'admin') {
+            abort(403, 'Akses ditolak.');
+        }
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'username' => ['required', 'string', 'max:50', 'unique:users,username', 'not_regex:/admin|mentor/i'],
@@ -86,18 +91,23 @@ class internController extends Controller
 
     public function edit(User $intern)
     {
-        if (auth()->user()->role !== 'admin') abort(403, 'Akses ditolak.');
+        if (auth()->user()->role !== 'admin') {
+            abort(403, 'Akses ditolak.');
+        }
         if ($intern->role !== 'intern') {
             abort(404);
         }
 
         $mentors = User::where('role', 'mentor')->orderBy('name', 'asc')->get();
+
         return view('admin.intern.edit', compact('intern', 'mentors'));
     }
 
     public function update(Request $request, User $intern)
     {
-        if (auth()->user()->role !== 'admin') abort(403, 'Akses ditolak.');
+        if (auth()->user()->role !== 'admin') {
+            abort(403, 'Akses ditolak.');
+        }
         if ($intern->role !== 'intern') {
             abort(404);
         }
@@ -117,7 +127,7 @@ class internController extends Controller
             'mentor_id.exists' => 'Mentor yang dipilih tidak valid.',
         ]);
 
-        if (!empty($validated['password'])) {
+        if (! empty($validated['password'])) {
             $validated['password'] = Hash::make($validated['password']);
         } else {
             unset($validated['password']);
@@ -131,7 +141,9 @@ class internController extends Controller
 
     public function destroy(User $intern)
     {
-        if (auth()->user()->role !== 'admin') abort(403, 'Akses ditolak.');
+        if (auth()->user()->role !== 'admin') {
+            abort(403, 'Akses ditolak.');
+        }
         if ($intern->role !== 'intern') {
             abort(404);
         }
@@ -145,7 +157,9 @@ class internController extends Controller
 
     public function resetPassword(User $intern)
     {
-        if (auth()->user()->role !== 'admin') abort(403, 'Akses ditolak.');
+        if (auth()->user()->role !== 'admin') {
+            abort(403, 'Akses ditolak.');
+        }
         if ($intern->role !== 'intern') {
             abort(404);
         }

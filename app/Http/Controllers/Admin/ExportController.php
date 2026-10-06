@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Attendance;
 use App\Models\OfficeSetting;
-use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -38,8 +37,8 @@ class ExportController extends Controller
         } elseif ($startDate && $endDate) {
             $query->whereBetween('date', [$startDate, $endDate]);
         } elseif ($selectedMonth) {
-            $monthStart = Carbon::parse($selectedMonth . '-01')->startOfMonth()->toDateString();
-            $monthEnd = Carbon::parse($selectedMonth . '-01')->endOfMonth()->toDateString();
+            $monthStart = Carbon::parse($selectedMonth.'-01')->startOfMonth()->toDateString();
+            $monthEnd = Carbon::parse($selectedMonth.'-01')->endOfMonth()->toDateString();
             $query->whereBetween('date', [$monthStart, $monthEnd]);
         }
 
@@ -61,23 +60,23 @@ class ExportController extends Controller
 
         $office = OfficeSetting::getSetting();
         $now = Carbon::now();
-        
+
         $monthLabel = 'Semua Data';
         if ($selectedDate) {
             $monthLabel = Carbon::parse($selectedDate)->translatedFormat('d F Y');
         } elseif ($startDate && $endDate) {
-            $monthLabel = Carbon::parse($startDate)->translatedFormat('d M Y') . ' sd ' . Carbon::parse($endDate)->translatedFormat('d M Y');
+            $monthLabel = Carbon::parse($startDate)->translatedFormat('d M Y').' sd '.Carbon::parse($endDate)->translatedFormat('d M Y');
         } elseif ($selectedMonth) {
-            $monthLabel = Carbon::parse($selectedMonth . '-01')->translatedFormat('F Y');
+            $monthLabel = Carbon::parse($selectedMonth.'-01')->translatedFormat('F Y');
         }
 
-        $fileName = "Rekap_Presensi_SIMAHUB_" . str_replace(' ', '_', $monthLabel) . ".csv";
+        $fileName = 'Rekap_Presensi_SIMAHUB_'.str_replace(' ', '_', $monthLabel).'.csv';
 
         $userLateTotals = [];
         $lateUsersCount = 0;
         foreach ($attendances as $row) {
             $uid = $row->user_id;
-            if (!isset($userLateTotals[$uid])) {
+            if (! isset($userLateTotals[$uid])) {
                 $userLateTotals[$uid] = 0;
             }
             $userLateTotals[$uid] += $row->late_minutes;
@@ -103,17 +102,17 @@ class ExportController extends Controller
             'Expires' => '0',
         ];
 
-        return response()->stream(function () use ($attendances, $office, $monthLabel, $now, $userLateTotalsText, $userId) {
+        return response()->stream(function () use ($attendances, $office, $monthLabel, $now, $userLateTotalsText) {
             $handle = fopen('php://output', 'w');
 
             // Tambahkan UTF-8 BOM agar Excel/Spreadsheets otomatis membaca karakter dengan rapi
-            fputs($handle, "\xEF\xBB\xBF");
+            fwrite($handle, "\xEF\xBB\xBF");
 
             // Header Dokumen Spreadsheet
             fputcsv($handle, ['REKAPITULASI PRESENSI PESERTA MAGANG - SIMAHUB']);
             fputcsv($handle, ['Instansi', $office->office_name]);
             fputcsv($handle, ['Periode Bulan', $monthLabel]);
-            fputcsv($handle, ['Waktu Ekspor', $now->translatedFormat('d F Y, H:i') . ' WIB']);
+            fputcsv($handle, ['Waktu Ekspor', $now->translatedFormat('d F Y, H:i').' WIB']);
             fputcsv($handle, ['Ketentuan Jam Kerja', 'Senin - Kamis (07:30 - 16:00 WIB), Jumat (07:30 - 16:30 WIB)']);
             fputcsv($handle, []); // Baris kosong pemisah
 
@@ -141,10 +140,10 @@ class ExportController extends Controller
             foreach ($attendances as $row) {
                 $dayName = Carbon::parse($row->date)->translatedFormat('l');
                 $lateDuration = $row->late_duration_text ?: '-';
-                $statusText = ($row->status === 'tepat_waktu') 
-                    ? 'Tepat Waktu' 
-                    : (($row->status === 'terlambat') 
-                        ? "TELAT\n(" . ($row->late_duration_text ?: '0 jam 0 Menit') . ")" 
+                $statusText = ($row->status === 'tepat_waktu')
+                    ? 'Tepat Waktu'
+                    : (($row->status === 'terlambat')
+                        ? "TELAT\n(".($row->late_duration_text ?: '0 jam 0 Menit').')'
                         : '-');
                 $typeText = ($row->type === 'WFH') ? 'WFH (Rumah)' : 'WFO (Kantor)';
                 $userTotalLate = $userLateTotalsText[$row->user_id] ?? '0 Menit';
@@ -164,7 +163,7 @@ class ExportController extends Controller
                     $row->check_out_time ? substr($row->check_out_time, 0, 5) : '-',
                     $row->duration,
                     $userTotalLate,
-                    $row->check_in_distance ? $row->check_in_distance . ' m' : '-',
+                    $row->check_in_distance ? $row->check_in_distance.' m' : '-',
                     $row->notes ?: '-',
                 ]);
             }
@@ -199,8 +198,8 @@ class ExportController extends Controller
         } elseif ($startDate && $endDate) {
             $query->whereBetween('date', [$startDate, $endDate]);
         } elseif ($selectedMonth) {
-            $monthStart = Carbon::parse($selectedMonth . '-01')->startOfMonth()->toDateString();
-            $monthEnd = Carbon::parse($selectedMonth . '-01')->endOfMonth()->toDateString();
+            $monthStart = Carbon::parse($selectedMonth.'-01')->startOfMonth()->toDateString();
+            $monthEnd = Carbon::parse($selectedMonth.'-01')->endOfMonth()->toDateString();
             $query->whereBetween('date', [$monthStart, $monthEnd]);
         }
 
@@ -221,14 +220,14 @@ class ExportController extends Controller
             ->get();
 
         $office = OfficeSetting::getSetting();
-        
+
         $monthLabel = 'Semua Data';
         if ($selectedDate) {
             $monthLabel = Carbon::parse($selectedDate)->translatedFormat('d F Y');
         } elseif ($startDate && $endDate) {
-            $monthLabel = Carbon::parse($startDate)->translatedFormat('d M Y') . ' sd ' . Carbon::parse($endDate)->translatedFormat('d M Y');
+            $monthLabel = Carbon::parse($startDate)->translatedFormat('d M Y').' sd '.Carbon::parse($endDate)->translatedFormat('d M Y');
         } elseif ($selectedMonth) {
-            $monthLabel = Carbon::parse($selectedMonth . '-01')->translatedFormat('F Y');
+            $monthLabel = Carbon::parse($selectedMonth.'-01')->translatedFormat('F Y');
         }
 
         $totalHadir = $attendances->count();
@@ -242,7 +241,7 @@ class ExportController extends Controller
         $lateUsersCount = 0;
         foreach ($attendances as $row) {
             $uid = $row->user_id;
-            if (!isset($userLateTotals[$uid])) {
+            if (! isset($userLateTotals[$uid])) {
                 $userLateTotals[$uid] = 0;
             }
             $userLateTotals[$uid] += $row->late_minutes;

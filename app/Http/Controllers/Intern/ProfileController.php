@@ -4,12 +4,15 @@ namespace App\Http\Controllers\Intern;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class ProfileController extends Controller
 {
     public function edit()
     {
         $intern = auth()->user();
+
         return view('intern.profile.edit', compact('intern'));
     }
 
@@ -22,7 +25,7 @@ class ProfileController extends Controller
                 'required',
                 'string',
                 'max:255',
-                \Illuminate\Validation\Rule::unique('users')->ignore($intern->id),
+                Rule::unique('users')->ignore($intern->id),
                 'not_regex:/admin|mentor/i',
             ],
             'password' => 'nullable|string|min:8',
@@ -38,7 +41,7 @@ class ProfileController extends Controller
         ];
 
         if ($request->filled('password')) {
-            $data['password'] = \Illuminate\Support\Facades\Hash::make($request->password);
+            $data['password'] = Hash::make($request->password);
         }
 
         $intern->update($data);
