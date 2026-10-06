@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -65,6 +66,7 @@ class OfficeSetting extends Model
                 $names[] = $daysMap[$intD];
             }
         }
+
         return $names;
     }
 
@@ -77,6 +79,7 @@ class OfficeSetting extends Model
         if (empty($names)) {
             return 'Tidak ada (Full WFO di kantor)';
         }
+
         return implode(', ', $names);
     }
 
@@ -85,11 +88,11 @@ class OfficeSetting extends Model
      */
     public function getTodayHours(?int $dayOfWeek = null): array
     {
-        $dayOfWeek = $dayOfWeek ?? (int) \Carbon\Carbon::now()->dayOfWeekIso;
+        $dayOfWeek = $dayOfWeek ?? (int) Carbon::now()->dayOfWeekIso;
         $wh = is_array($this->work_hours) ? $this->work_hours : (json_decode($this->work_hours, true) ?? []);
 
-        $start = $wh[$dayOfWeek]['start'] ?? $wh[(string)$dayOfWeek]['start'] ?? substr($this->work_start_time ?? '07:30', 0, 5);
-        $end = $wh[$dayOfWeek]['end'] ?? $wh[(string)$dayOfWeek]['end'] ?? substr($this->work_end_time ?? ($dayOfWeek == 5 ? '16:30' : '16:00'), 0, 5);
+        $start = $wh[$dayOfWeek]['start'] ?? $wh[(string) $dayOfWeek]['start'] ?? substr($this->work_start_time ?? '07:30', 0, 5);
+        $end = $wh[$dayOfWeek]['end'] ?? $wh[(string) $dayOfWeek]['end'] ?? substr($this->work_end_time ?? ($dayOfWeek == 5 ? '16:30' : '16:00'), 0, 5);
 
         return [
             'start' => substr($start, 0, 5),

@@ -340,7 +340,7 @@ class SimahubAttendanceTest extends TestCase
 
         // Verifikasi metadata Total Data dan Total Terlambat telah dihapus dari header CSV
         $this->assertStringNotContainsString('Total Data', $content);
-        $this->assertStringNotContainsString("Total Terlambat,", $content);
+        $this->assertStringNotContainsString('Total Terlambat,', $content);
 
         // Verifikasi kolom baru tersinkronisasi
         $this->assertStringContainsString('Username', $content);
@@ -479,7 +479,7 @@ class SimahubAttendanceTest extends TestCase
         $attDispensasi = Attendance::where('user_id', $intern->id)->where('date', '2026-09-16')->first();
 
         // 3. Admin edit presensi
-        $response = $this->put('/admin/attendance/' . $attDispensasi->id, [
+        $response = $this->put('/admin/attendance/'.$attDispensasi->id, [
             'status' => 'tepat_waktu',
             'type' => 'WFO',
             'check_in_time' => '07:25',
@@ -503,7 +503,7 @@ class SimahubAttendanceTest extends TestCase
         $pdfResponse->assertDontSee('WA: 081234567890');
 
         // 5. Admin hapus presensi
-        $deleteResponse = $this->delete('/admin/attendance/' . $att->id);
+        $deleteResponse = $this->delete('/admin/attendance/'.$att->id);
         $deleteResponse->assertRedirect();
         $this->assertDatabaseMissing('attendances', ['id' => $att->id]);
 
