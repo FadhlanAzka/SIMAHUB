@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\intern;
+namespace App\Http\Controllers\Intern;
 
 use App\Http\Controllers\Controller;
 use App\Models\Attendance;

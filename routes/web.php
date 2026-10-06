@@ -2,11 +2,11 @@
 
 use App\Http\Controllers\Admin\AttendanceController as AdminAttendanceController;
 use App\Http\Controllers\Admin\ExportController;
-use App\Http\Controllers\Admin\internController;
+use App\Http\Controllers\Admin\InternController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\intern\AttendanceController as internAttendanceController;
+use App\Http\Controllers\Intern\AttendanceController as InternAttendanceController;
 use App\Http\Controllers\Intern\ProfileController;
 use Database\Seeders\ProductionSeeder;
 use Illuminate\Http\Request;
@@ -33,9 +33,9 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middl
 
 // Area Peserta Magang (Role: intern)
 Route::middleware(['auth', 'role:intern'])->prefix('intern')->name('intern.')->group(function () {
-    Route::post('/attendance/check-in', [internAttendanceController::class, 'checkIn'])->name('attendance.checkin');
-    Route::post('/attendance/check-out', [internAttendanceController::class, 'checkOut'])->name('attendance.checkout');
-    Route::get('/history', [internAttendanceController::class, 'history'])->name('history');
+    Route::post('/attendance/check-in', [InternAttendanceController::class, 'checkIn'])->name('attendance.checkin');
+    Route::post('/attendance/check-out', [InternAttendanceController::class, 'checkOut'])->name('attendance.checkout');
+    Route::get('/history', [InternAttendanceController::class, 'history'])->name('history');
 
     // Profil Peserta Magang
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -46,8 +46,8 @@ Route::middleware(['auth', 'role:intern'])->prefix('intern')->name('intern.')->g
 Route::middleware(['auth', 'role:admin,pengawas,mentor'])->prefix('admin')->name('admin.')->group(function () {
 
     // Manajemen Peserta Magang
-    Route::resource('intern', internController::class);
-    Route::post('intern/{intern}/reset-password', [internController::class, 'resetPassword'])->name('intern.reset_password');
+    Route::resource('intern', InternController::class);
+    Route::post('intern/{intern}/reset-password', [InternController::class, 'resetPassword'])->name('intern.reset_password');
 
     // Monitoring & Rekap Absensi
     Route::get('/attendance', [AdminAttendanceController::class, 'index'])->name('attendance.index');

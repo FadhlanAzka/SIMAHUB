@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
-use App\Http\Controllers\intern\DashboardController as InternDashboard;
+use App\Http\Controllers\Intern\DashboardController as InternDashboard;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
