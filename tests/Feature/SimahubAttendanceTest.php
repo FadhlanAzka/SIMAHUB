@@ -7,6 +7,8 @@ use App\Models\OfficeSetting;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class SimahubAttendanceTest extends TestCase
@@ -563,5 +565,110 @@ class SimahubAttendanceTest extends TestCase
         $response->assertSee('07:30 WIB');
 
         $intern->delete();
+    }
+
+    public function test_manual_attendance_pdf_upload_and_mentor_placeholder()
+    {
+        Storage::fake('public');
+
+        $admin = User::create([
+            'username' => 'admin_test_pdf',
+            'name' => 'Admin Test PDF',
+            'role' => 'admin',
+            'password' => bcrypt('password'),
+        ]);
+
+        $intern = User::create([
+            'username' => 'peserta_test_pdf',
+            'name' => 'Peserta Test PDF',
+            'role' => 'intern',
+            'position' => 'Backend Developer',
+            'password' => bcrypt('password'),
+        ]);
+
+        $this->actingAs($admin);
+
+        // 1. Verifikasi placeholder Mentor: "Contoh: Akhmad" di create & edit view
+        $createView = $this->get('/admin/intern/create');
+        $createView->assertStatus(200);
+        $createView->assertSee('Contoh: Akhmad');
+
+        $editView = $this->get('/admin/intern/' . $intern->id . '/edit');
+        $editView->assertStatus(200);
+        $editView->assertSee('Contoh: Akhmad');
+
+        // 2. Upload file non-PDF ditolak
+        $invalidFile = UploadedFile::fake()->create('surat.docx', 500);
+        $resInvalid = $this->post('/admin/attendance', [
+            'user_id' => $intern->id,
+            'date' => '2026-10-06',
+            'status' => 'sakit',
+            'type' => 'WFO',
+            'notes' => 'Surat dokter format docx',
+            'attachment' => $invalidFile,
+        ]);
+        $resInvalid->assertSessionHasErrors(['attachment']);
+
+        // 3. Upload file PDF melebihi 1MB (1024KB) ditolak
+        $largePdf = UploadedFile::fake()->create('surat_besar.pdf', 1500, 'application/pdf');
+        $resLarge = $this->post('/admin/attendance', [
+            'user_id' => $intern->id,
+            'date' => '2026-10-06',
+            'status' => 'sakit',
+            'type' => 'WFO',
+            'notes' => 'Surat dokter terlalu besar',
+            'attachment' => $largePdf,
+        ]);
+        $resLarge->assertSessionHasErrors(['attachment']);
+
+        // 4. Upload file PDF valid (<= 1MB) diterima & tersimpan
+        $validPdf = UploadedFile::fake()->create('surat_dokter.pdf', 300, 'application/pdf');
+        $resValid = $this->post('/admin/attendance', [
+            'user_id' => $intern->id,
+            'date' => '2026-10-06',
+            'status' => 'sakit',
+            'type' => 'WFO',
+            'notes' => 'Surat dokter resmi dari puskesmas',
+            'attachment' => $validPdf,
+        ]);
+        $resValid->assertRedirect();
+        $resValid->assertSessionHas('success');
+
+        $attendance = Attendance::where('user_id', $intern->id)->where('date', '2026-10-06')->first();
+        $this->assertNotNull($attendance);
+        $this->assertNotNull($attendance->attachment);
+        Storage::disk('public')->assertExists($attendance->attachment);
+
+        // 5. Verifikasi tampilan web memuat link surat PDF
+        $attendanceIndex = $this->get('/admin/attendance');
+        $attendanceIndex->assertStatus(200);
+        $attendanceIndex->assertSee('Surat PDF');
+        $attendanceIndex->assertSee($attendance->attachment_url);
+
+        // 6. Admin edit attendance dan ganti surat PDF baru
+        $newPdf = UploadedFile::fake()->create('surat_dokter_baru.pdf', 250, 'application/pdf');
+        $oldPath = $attendance->attachment;
+
+        $resEdit = $this->put('/admin/attendance/' . $attendance->id, [
+            'status' => 'izin',
+            'type' => 'WFO',
+            'notes' => 'Surat izin diperbarui',
+            'attachment' => $newPdf,
+        ]);
+        $resEdit->assertRedirect();
+        $resEdit->assertSessionHas('success');
+
+        $attendance->refresh();
+        Storage::disk('public')->assertMissing($oldPath);
+        Storage::disk('public')->assertExists($attendance->attachment);
+
+        // 7. Hapus attendance membersihkan file lampiran
+        $currentPath = $attendance->attachment;
+        $resDelete = $this->delete('/admin/attendance/' . $attendance->id);
+        $resDelete->assertRedirect();
+        Storage::disk('public')->assertMissing($currentPath);
+
+        $intern->delete();
+        $admin->delete();
     }
 }

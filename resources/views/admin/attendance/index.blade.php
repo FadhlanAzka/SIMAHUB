@@ -152,9 +152,17 @@
                                         {{ $row->notes }}
                                     </div>
                                 @endif
+                                @if($row->attachment)
+                                    <div class="mt-1">
+                                        <a href="{{ $row->attachment_url }}" target="_blank" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-rose-50 border border-rose-200 text-rose-700 text-[10px] font-bold hover:bg-rose-100 transition-colors" title="Lihat Surat Lampiran (PDF)">
+                                            <i data-lucide="file-text" class="w-3 h-3 text-rose-600"></i>
+                                            <span>Surat PDF</span>
+                                        </a>
+                                    </div>
+                                @endif
                                 @if($row->check_in_distance !== null)
                                     <span class="font-mono text-[10px] text-slate-400 block mt-0.5">GPS: {{ $row->check_in_distance }}m</span>
-                                @elseif(!$row->notes)
+                                @elseif(!$row->notes && !$row->attachment)
                                     <span class="text-slate-300">-</span>
                                 @endif
                             </td>
@@ -170,6 +178,7 @@
                                             data-in="{{ $row->check_in_time ? substr($row->check_in_time, 0, 5) : '' }}"
                                             data-out="{{ $row->check_out_time ? substr($row->check_out_time, 0, 5) : '' }}"
                                             data-notes="{{ $row->notes ?? '' }}"
+                                            data-attachment="{{ $row->attachment ? $row->attachment_url : '' }}"
                                             onclick="openEditModalFromBtn(this)"
                                             title="Edit Presensi"
                                             class="p-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors cursor-pointer">
@@ -335,7 +344,7 @@
             </button>
         </div>
 
-        <form action="{{ route('admin.attendance.store') }}" method="POST" class="space-y-4 text-xs">
+        <form action="{{ route('admin.attendance.store') }}" method="POST" enctype="multipart/form-data" class="space-y-4 text-xs">
             @csrf
 
             <!-- Pilih Peserta Magang -->
@@ -389,10 +398,22 @@
                 </div>
             </div>
 
-            <!-- Catatan / Keterangan -->
+            <!-- Catatan -->
             <div>
-                <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Alasan / Catatan / Keterangan</label>
-                <textarea name="notes" rows="2" placeholder="Contoh: Surat sakit terlampir, izin keperluan kampus, atau lupa check-in pagi..." class="w-full py-2 px-3 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white text-slate-900"></textarea>
+                <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Catatan</label>
+                <textarea name="notes" rows="2" placeholder="Contoh: Keperluan urusan kampus, istirahat sakit, atau lupa check-in pagi..." class="w-full py-2 px-3 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white text-slate-900"></textarea>
+            </div>
+
+            <!-- Upload Surat (PDF maks. 1MB) -->
+            <div>
+                <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">
+                    Unggah Surat <span class="text-[10px] text-slate-400 font-normal normal-case ml-1">(Opsional: Surat Dokter / Izin - PDF maks. 1 MB)</span>
+                </label>
+                <input type="file" 
+                       name="attachment" 
+                       accept=".pdf,application/pdf" 
+                       class="block w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 bg-slate-50 border border-slate-300 rounded-xl cursor-pointer transition-all">
+                <p class="text-[10px] text-slate-400 mt-1">Format wajib PDF dengan ukuran maksimal 1 MB.</p>
             </div>
 
             <div class="pt-3 border-t border-slate-100 flex items-center justify-end gap-2.5">
@@ -426,7 +447,7 @@
             </button>
         </div>
 
-        <form id="editAttendanceForm" method="POST" class="space-y-4 text-xs">
+        <form id="editAttendanceForm" method="POST" enctype="multipart/form-data" class="space-y-4 text-xs">
             @csrf
             @method('PUT')
 
@@ -464,10 +485,32 @@
                 </div>
             </div>
 
-            <!-- Catatan / Keterangan -->
+            <!-- Catatan -->
             <div>
-                <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Alasan / Catatan / Keterangan</label>
+                <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Catatan</label>
                 <textarea name="notes" id="editNotes" rows="2" placeholder="Contoh: Lupa absen pulang, surat izin, dispensasi tugas dinas luar..." class="w-full py-2 px-3 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white text-slate-900"></textarea>
+            </div>
+
+            <!-- Upload Surat (PDF maks. 1MB) -->
+            <div>
+                <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">
+                    Unggah Surat <span class="text-[10px] text-slate-400 font-normal normal-case ml-1">(Opsional - PDF maks. 1 MB)</span>
+                </label>
+                <div id="editExistingAttachmentContainer" class="hidden mb-2 p-2.5 rounded-xl bg-blue-50/70 border border-blue-200/80 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="file-text" class="w-4 h-4 text-blue-600"></i>
+                        <span class="text-xs font-semibold text-blue-900">Surat PDF sudah terlampir</span>
+                    </div>
+                    <a id="editExistingAttachmentLink" href="#" target="_blank" class="text-xs font-bold text-blue-700 hover:underline inline-flex items-center gap-1">
+                        <span>Lihat File</span>
+                        <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                    </a>
+                </div>
+                <input type="file" 
+                       name="attachment" 
+                       accept=".pdf,application/pdf" 
+                       class="block w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 bg-slate-50 border border-slate-300 rounded-xl cursor-pointer transition-all">
+                <p class="text-[10px] text-slate-400 mt-1">Kosongkan jika tidak ingin mengubah surat. Format PDF maks. 1 MB.</p>
             </div>
 
             <div class="pt-3 border-t border-slate-100 flex items-center justify-end gap-2.5">
@@ -511,7 +554,8 @@
             type: btn.dataset.type,
             check_in_time: btn.dataset.in,
             check_out_time: btn.dataset.out,
-            notes: btn.dataset.notes
+            notes: btn.dataset.notes,
+            attachment: btn.dataset.attachment || ''
         };
         openEditModal(data);
     }
@@ -526,6 +570,15 @@
         document.getElementById('editCheckInTime').value = data.check_in_time || '';
         document.getElementById('editCheckOutTime').value = data.check_out_time || '';
         document.getElementById('editNotes').value = data.notes || '';
+
+        const attachContainer = document.getElementById('editExistingAttachmentContainer');
+        const attachLink = document.getElementById('editExistingAttachmentLink');
+        if (data.attachment) {
+            attachLink.href = data.attachment;
+            attachContainer.classList.remove('hidden');
+        } else {
+            attachContainer.classList.add('hidden');
+        }
 
         toggleTimeInputs('edit');
 

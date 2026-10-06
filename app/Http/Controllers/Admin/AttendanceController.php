@@ -7,6 +7,7 @@ use App\Models\Attendance;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class AttendanceController extends Controller
 {
@@ -152,6 +153,10 @@ class AttendanceController extends Controller
             'check_in_time' => 'nullable',
             'check_out_time' => 'nullable',
             'notes' => 'nullable|string|max:500',
+            'attachment' => 'nullable|file|mimes:pdf|max:1024',
+        ], [
+            'attachment.mimes' => 'File surat wajib berformat PDF.',
+            'attachment.max' => 'Ukuran file surat maksimal 1 MB.',
         ]);
 
         // Cek duplikasi presensi untuk user & tanggal tersebut
@@ -173,6 +178,11 @@ class AttendanceController extends Controller
             $notes = 'Dispensasi Lupa Absen oleh Admin';
         }
 
+        $attachmentPath = null;
+        if ($request->hasFile('attachment')) {
+            $attachmentPath = $request->file('attachment')->store('attachments/letters', 'public');
+        }
+
         Attendance::create([
             'user_id' => $validated['user_id'],
             'date' => $validated['date'],
@@ -181,6 +191,7 @@ class AttendanceController extends Controller
             'check_in_time' => !empty($validated['check_in_time']) ? Carbon::parse($validated['check_in_time'])->format('H:i:s') : null,
             'check_out_time' => !empty($validated['check_out_time']) ? Carbon::parse($validated['check_out_time'])->format('H:i:s') : null,
             'notes' => $notes,
+            'attachment' => $attachmentPath,
         ]);
 
         return redirect()->back()->with('success', 'Catatan presensi / perizinan berhasil ditambahkan.');
@@ -197,6 +208,10 @@ class AttendanceController extends Controller
             'check_in_time' => 'nullable',
             'check_out_time' => 'nullable',
             'notes' => 'nullable|string|max:500',
+            'attachment' => 'nullable|file|mimes:pdf|max:1024',
+        ], [
+            'attachment.mimes' => 'File surat wajib berformat PDF.',
+            'attachment.max' => 'Ukuran file surat maksimal 1 MB.',
         ]);
 
         $type = $validated['type'] ?? $attendance->type;
@@ -209,12 +224,21 @@ class AttendanceController extends Controller
             $notes = 'Dispensasi Lupa Absen oleh Admin';
         }
 
+        $attachmentPath = $attendance->attachment;
+        if ($request->hasFile('attachment')) {
+            if ($attendance->attachment && Storage::disk('public')->exists($attendance->attachment)) {
+                Storage::disk('public')->delete($attendance->attachment);
+            }
+            $attachmentPath = $request->file('attachment')->store('attachments/letters', 'public');
+        }
+
         $attendance->update([
             'status' => $validated['status'],
             'type' => $type,
             'check_in_time' => !empty($validated['check_in_time']) ? Carbon::parse($validated['check_in_time'])->format('H:i:s') : null,
             'check_out_time' => !empty($validated['check_out_time']) ? Carbon::parse($validated['check_out_time'])->format('H:i:s') : null,
             'notes' => $notes,
+            'attachment' => $attachmentPath,
         ]);
 
         return redirect()->back()->with('success', 'Data presensi berhasil diperbarui.');
@@ -225,6 +249,9 @@ class AttendanceController extends Controller
      */
     public function destroy(Attendance $attendance)
     {
+        if ($attendance->attachment && Storage::disk('public')->exists($attendance->attachment)) {
+            Storage::disk('public')->delete($attendance->attachment);
+        }
         $attendance->delete();
         return redirect()->back()->with('success', 'Catatan presensi berhasil dihapus.');
     }

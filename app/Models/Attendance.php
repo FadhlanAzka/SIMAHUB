@@ -25,6 +25,7 @@ class Attendance extends Model
         'check_out_long',
         'check_out_distance',
         'notes',
+        'attachment',
     ];
 
     protected $casts = [
@@ -169,5 +170,16 @@ class Attendance extends Model
         }
 
         return '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 font-semibold">WFO (Kantor)</span>';
+    }
+
+    /**
+     * URL file lampiran PDF surat sakit / izin
+     */
+    public function getAttachmentUrlAttribute(): ?string
+    {
+        if (!$this->attachment) {
+            return null;
+        }
+        return asset('storage/' . $this->attachment);
     }
 }

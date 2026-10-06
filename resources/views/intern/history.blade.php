@@ -113,6 +113,19 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 {!! $row->status_badge !!}
+                                @if($row->notes)
+                                    <span class="block text-[11px] text-slate-500 mt-1 max-w-[150px] truncate" title="{{ $row->notes }}">
+                                        {{ $row->notes }}
+                                    </span>
+                                @endif
+                                @if($row->attachment)
+                                    <div class="mt-1">
+                                        <a href="{{ $row->attachment_url }}" target="_blank" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-rose-50 border border-rose-200 text-rose-700 text-[10px] font-bold hover:bg-rose-100 transition-colors" title="Lihat Surat Lampiran (PDF)">
+                                            <i data-lucide="file-text" class="w-3 h-3 text-rose-600"></i>
+                                            <span>Surat PDF</span>
+                                        </a>
+                                    </div>
+                                @endif
                             </td>
                             <td class="px-6 py-4 font-mono font-medium text-slate-800 whitespace-nowrap">
                                 {{ $row->check_out_time ? substr($row->check_out_time, 0, 5) . ' WIB' : '-' }}

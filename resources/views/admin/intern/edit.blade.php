@@ -86,7 +86,7 @@
                     <select name="mentor_id" 
                             id="mentor_id" 
                             class="w-full text-xs font-medium py-2.5 px-3.5 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-slate-900 transition-all">
-                        <option value="">-- Pilih Mentor (Opsional) --</option>
+                        <option value="">Contoh: Akhmad</option>
                         @foreach($mentors as $mentor)
                             <option value="{{ $mentor->id }}" {{ old('mentor_id', $intern->mentor_id) == $mentor->id ? 'selected' : '' }}>
                                 {{ $mentor->name }}
