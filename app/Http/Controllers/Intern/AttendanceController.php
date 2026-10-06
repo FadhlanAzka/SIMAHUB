@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Auth;
 class AttendanceController extends Controller
 {
     /**
-     * Memproses Absen Masuk intern magang.
+     * Memproses Absen Masuk peserta magang.
      */
     public function checkIn(Request $request)
     {
@@ -114,7 +114,7 @@ class AttendanceController extends Controller
     }
 
     /**
-     * Memproses Absen Pulang intern magang.
+     * Memproses Absen Pulang peserta magang.
      */
     public function checkOut(Request $request)
     {
@@ -187,7 +187,7 @@ class AttendanceController extends Controller
     }
 
     /**
-     * Menampilkan riwayat absensi intern magang.
+     * Menampilkan riwayat absensi peserta magang.
      */
     public function history(Request $request)
     {

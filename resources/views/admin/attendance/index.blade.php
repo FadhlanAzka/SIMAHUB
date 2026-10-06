@@ -222,11 +222,11 @@
         
         <form action="{{ route('admin.attendance.index') }}" method="GET" class="p-6 space-y-4 overflow-y-auto" onsubmit="cleanEmptyInputs(this)">
             
-            <!-- intern Filter -->
+            <!-- Filter Peserta Magang -->
             <div>
-                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Pilih intern</label>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Pilih Peserta Magang</label>
                 <select name="user_id" class="w-full text-xs font-medium py-2.5 px-3.5 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-slate-900 transition-all">
-                    <option value="">Semua intern</option>
+                    <option value="">Semua Peserta Magang</option>
                     @foreach($allintern as $m)
                         <option value="{{ $m->id }}" {{ $selectedUserId == $m->id ? 'selected' : '' }}>
                             {{ $m->name }}

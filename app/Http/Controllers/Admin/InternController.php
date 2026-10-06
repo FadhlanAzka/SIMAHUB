@@ -69,7 +69,7 @@ class internController extends Controller
             'name.required' => 'Nama peserta magang wajib diisi.',
             'username.required' => 'Username wajib diisi.',
             'username.unique' => 'Username tersebut sudah terdaftar.',
-            'username.not_regex' => 'Username intern tidak boleh mengandung kata "admin" atau "mentor".',
+            'username.not_regex' => 'Username peserta magang tidak boleh mengandung kata "admin" atau "mentor".',
             'mentor_id.exists' => 'Mentor yang dipilih tidak valid.',
             'password.required' => 'Kata sandi wajib diisi (minimal 8 karakter).',
             'password.min' => 'Kata sandi minimal 8 karakter.',
@@ -113,7 +113,7 @@ class internController extends Controller
             'name.required' => 'Nama peserta magang wajib diisi.',
             'username.required' => 'Username wajib diisi.',
             'username.unique' => 'Username sudah digunakan.',
-            'username.not_regex' => 'Username intern tidak boleh mengandung kata "admin" atau "mentor".',
+            'username.not_regex' => 'Username peserta magang tidak boleh mengandung kata "admin" atau "mentor".',
             'mentor_id.exists' => 'Mentor yang dipilih tidak valid.',
         ]);
 

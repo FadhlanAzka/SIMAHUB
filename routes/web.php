@@ -28,13 +28,13 @@ Route::middleware('guest')->group(function () {
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
-// Area intern Magang (Role: intern)
+// Area Peserta Magang (Role: intern)
 Route::middleware(['auth', 'role:intern'])->prefix('intern')->name('intern.')->group(function () {
     Route::post('/attendance/check-in', [internAttendanceController::class, 'checkIn'])->name('attendance.checkin');
     Route::post('/attendance/check-out', [internAttendanceController::class, 'checkOut'])->name('attendance.checkout');
     Route::get('/history', [internAttendanceController::class, 'history'])->name('history');
     
-    // Profil intern
+    // Profil Peserta Magang
     Route::get('/profile', [\App\Http\Controllers\Intern\ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [\App\Http\Controllers\Intern\ProfileController::class, 'update'])->name('profile.update');
 });
@@ -42,7 +42,7 @@ Route::middleware(['auth', 'role:intern'])->prefix('intern')->name('intern.')->g
 // Area Administrator Instansi (Role: admin, pengawas, mentor)
 Route::middleware(['auth', 'role:admin,pengawas,mentor'])->prefix('admin')->name('admin.')->group(function () {
     
-    // Manajemen intern Magang
+    // Manajemen Peserta Magang
     Route::resource('intern', internController::class);
     Route::post('intern/{intern}/reset-password', [internController::class, 'resetPassword'])->name('intern.reset_password');
     
