@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 
-class internController extends Controller
+class InternController extends Controller
 {
     public function index(Request $request)
     {
