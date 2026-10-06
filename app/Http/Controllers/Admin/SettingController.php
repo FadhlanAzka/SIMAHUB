@@ -10,14 +10,19 @@ class SettingController extends Controller
 {
     public function index()
     {
-        if (auth()->user()->role !== 'admin') abort(403, 'Akses ditolak.');
+        if (auth()->user()->role !== 'admin') {
+            abort(403, 'Akses ditolak.');
+        }
         $office = OfficeSetting::getSetting();
+
         return view('admin.settings.index', compact('office'));
     }
 
     public function update(Request $request)
     {
-        if (auth()->user()->role !== 'admin') abort(403, 'Akses ditolak.');
+        if (auth()->user()->role !== 'admin') {
+            abort(403, 'Akses ditolak.');
+        }
         $validated = $request->validate([
             'office_name' => ['required', 'string', 'max:255'],
             'latitude' => ['required', 'numeric', 'between:-90,90'],

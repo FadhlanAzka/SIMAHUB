@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\intern;
+namespace App\Http\Controllers\Intern;
 
 use App\Http\Controllers\Controller;
 use App\Models\Attendance;
@@ -22,7 +22,7 @@ class AttendanceController extends Controller
         $today = $now->toDateString();
         $currentTime = $now->toTimeString(); // HH:MM:SS
         $dayOfWeek = $now->dayOfWeekIso; // 1 = Senin, 5 = Jumat, 6 = Sabtu, 7 = Minggu
-        
+
         $office = OfficeSetting::getSetting();
         $wfhDays = is_array($office->wfh_days) ? $office->wfh_days : (json_decode($office->wfh_days, true) ?? []);
         $isWfhDay = in_array($dayOfWeek, $wfhDays);
@@ -47,7 +47,7 @@ class AttendanceController extends Controller
             ->first();
 
         if ($attendance && $attendance->check_in_time) {
-            return back()->with('error', 'Anda sudah melakukan absen masuk hari ini pada pukul ' . substr($attendance->check_in_time, 0, 5) . ' WIB.');
+            return back()->with('error', 'Anda sudah melakukan absen masuk hari ini pada pukul '.substr($attendance->check_in_time, 0, 5).' WIB.');
         }
 
         $userLat = $request->latitude ? (float) $request->latitude : null;
@@ -109,7 +109,7 @@ class AttendanceController extends Controller
 
         return back()->with(
             'success',
-            "Berhasil melakukan Absen Masuk ({$statusLabel} - {$typeLabel}) pada pukul " . substr($currentTime, 0, 5) . " WIB."
+            "Berhasil melakukan Absen Masuk ({$statusLabel} - {$typeLabel}) pada pukul ".substr($currentTime, 0, 5).' WIB.'
         );
     }
 
@@ -139,12 +139,12 @@ class AttendanceController extends Controller
             ->where('date', $today)
             ->first();
 
-        if (!$attendance || !$attendance->check_in_time) {
+        if (! $attendance || ! $attendance->check_in_time) {
             return back()->with('error', 'Anda belum melakukan absen masuk hari ini. Silakan absen masuk terlebih dahulu.');
         }
 
         if ($attendance->check_out_time) {
-            return back()->with('error', 'Anda sudah melakukan absen pulang hari ini pada pukul ' . substr($attendance->check_out_time, 0, 5) . ' WIB.');
+            return back()->with('error', 'Anda sudah melakukan absen pulang hari ini pada pukul '.substr($attendance->check_out_time, 0, 5).' WIB.');
         }
 
         // 3. Validasi Waktu Pulang
@@ -158,7 +158,7 @@ class AttendanceController extends Controller
         if ($currentTime < $endLimit) {
             return back()->with(
                 'error',
-                "Belum waktunya pulang! Absen pulang hanya dapat dilakukan mulai pukul " . substr($endLimit, 0, 5) . " WIB (Waktu saat ini: " . substr($currentTime, 0, 5) . " WIB)."
+                'Belum waktunya pulang! Absen pulang hanya dapat dilakukan mulai pukul '.substr($endLimit, 0, 5).' WIB (Waktu saat ini: '.substr($currentTime, 0, 5).' WIB).'
             );
         }
 
@@ -182,7 +182,7 @@ class AttendanceController extends Controller
 
         return back()->with(
             'success',
-            "Berhasil melakukan Absen Pulang pada pukul " . substr($currentTime, 0, 5) . " WIB. Terima kasih atas kerja keras Anda hari ini!"
+            'Berhasil melakukan Absen Pulang pada pukul '.substr($currentTime, 0, 5).' WIB. Terima kasih atas kerja keras Anda hari ini!'
         );
     }
 
@@ -192,7 +192,7 @@ class AttendanceController extends Controller
     public function history(Request $request)
     {
         $user = Auth::user();
-        
+
         $selectedMonth = $request->get('month');
         $selectedDate = $request->get('date');
         $startDate = $request->get('start_date');
@@ -206,8 +206,8 @@ class AttendanceController extends Controller
         } elseif ($startDate && $endDate) {
             $query->whereBetween('date', [$startDate, $endDate]);
         } elseif ($selectedMonth) {
-            $monthStart = Carbon::parse($selectedMonth . '-01')->startOfMonth()->toDateString();
-            $monthEnd = Carbon::parse($selectedMonth . '-01')->endOfMonth()->toDateString();
+            $monthStart = Carbon::parse($selectedMonth.'-01')->startOfMonth()->toDateString();
+            $monthEnd = Carbon::parse($selectedMonth.'-01')->endOfMonth()->toDateString();
             $query->whereBetween('date', [$monthStart, $monthEnd]);
         }
 
@@ -224,7 +224,7 @@ class AttendanceController extends Controller
 
         $lateHours = (int) floor($totalLateMinutes / 60);
         $remLateMins = $totalLateMinutes % 60;
-        $accumulatedLateText = $totalLateMinutes > 0 ? "{$lateHours} jam {$remLateMins} Menit" : "0 Menit";
+        $accumulatedLateText = $totalLateMinutes > 0 ? "{$lateHours} jam {$remLateMins} Menit" : '0 Menit';
 
         foreach ($attendances as $att) {
             $att->user_total_late_text = $accumulatedLateText;

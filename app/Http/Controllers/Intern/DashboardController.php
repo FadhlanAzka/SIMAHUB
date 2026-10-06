@@ -1,12 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\intern;
+namespace App\Http\Controllers\Intern;
 
 use App\Http\Controllers\Controller;
 use App\Models\Attendance;
 use App\Models\OfficeSetting;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
@@ -24,7 +23,7 @@ class DashboardController extends Controller
 
         $isWeekend = ($dayOfWeek >= 6); // Sabtu (6) atau Minggu (7)
         $isWfhDay = in_array((int) $dayOfWeek, $wfhDays, true);
-        
+
         // Tipe kerja hari ini
         if ($isWeekend) {
             $workType = 'LIBUR';
@@ -75,7 +74,7 @@ class DashboardController extends Controller
         }
         $lateHours = (int) floor($totalLateMinutes / 60);
         $remLateMins = $totalLateMinutes % 60;
-        $accumulatedLateText = $totalLateMinutes > 0 ? "{$lateHours} jam {$remLateMins} Menit" : "0 Menit";
+        $accumulatedLateText = $totalLateMinutes > 0 ? "{$lateHours} jam {$remLateMins} Menit" : '0 Menit';
 
         $stats = [
             'total_hadir' => $monthlyAttendances->count(),

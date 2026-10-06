@@ -1,135 +1,52 @@
-# SIMAHUB Git Workflow Documentation
+# Standar Operasional Prosedur (SOP) Git Workflow - SIMAHUB
 
-This document outlines the standard Git workflow for the SIMAHUB project to ensure clean collaboration between developers.
+Dokumen ini mengatur alur kerja dan pengelolaan kolaborasi kode (*version control*) untuk proyek SIMAHUB menggunakan Git dan GitHub.
 
-## 🌿 Branching Strategy
-We use four main branches for this project:
-- **`main`**: The production-ready code. **Never push directly to main.**
-- **`staging`**: The pre-production testing environment. All dev branches merge here first to test if they work together.
-- **`dev/padlan`**: Padlan's personal development branch.
-- **`dev/akbar`**: Akbar's personal development branch.
+## 1. Struktur Branch (Cabang)
+*   **`main`**: Merupakan *branch production*. Berisi kode yang sudah final, stabil, dan siap atau sedang digunakan oleh pengguna (*live*).
+*   **`staging`**: Merupakan *branch* integrasi dan tahap pengujian (*pre-production*). Semua fitur baru dari para *developer* digabungkan ke sini untuk diuji bersama.
+*   **`dev/[nama-developer]`**: Merupakan *branch* kerja pribadi masing-masing *developer* (contoh: `dev/padlan`, `dev/akbar`). Segala bentuk *coding* harian wajib dilakukan di *branch* masing-masing.
 
-## 🔒 Branch Protection Rules & Permissions
+## 2. Aturan Pembatasan Akses (Access Restriction)
+1.  **Dilarang Push Langsung (No Direct Pushes):** Tidak ada *developer* (termasuk Admin) yang diizinkan untuk melakukan `git push` secara langsung ke *branch* `main` dan `staging`.
+2.  **Batas Ruang Kerja:** Setiap *developer* hanya diperbolehkan melakukan *push* ke *branch* pribadi mereka masing-masing.
+3.  **Metode Penggabungan (Merge):**
+    *   **Dari Dev ke Staging:** Wajib melalui **Pull Request (PR)** di GitHub. Kode akan digabungkan setelah lolos tinjauan (*code review*).
+    *   **Dari Staging ke Main:** Wajib melalui **Pull Request (PR)** dengan metode *Merge Commit* saat rilis. *Staging* dilarang melakukan aksi *push* sepihak ke `main`.
 
-To maintain code integrity, the following rules are enforced (via GitHub Settings):
+## 3. Alur Kerja Harian (Daily Workflow)
 
-1. **`dev/*` Branches**: 
-   - Cannot push directly to `main` or `staging`.
-   - Cannot push directly to another developer's `dev/*` branch.
-   - Can only push to their respective remote branch (e.g., `dev/padlan` pushes to `origin dev/padlan`).
-2. **`staging` Branch**:
-   - Cannot push directly to `main`.
-   - Can only receive code via **Pull Requests** from `dev/*` branches.
-3. **`main` Branch**:
-   - Cannot push anywhere.
-   - Can only receive code via **Pull Requests** from the `staging` branch. 
-   - Direct commits/pushes to `main` are completely blocked.
+### A. Memulai Fitur Baru / Bekerja Harian
+1. Pastikan Anda berada di *branch* Anda (misal: `dev/padlan`):
+   ```bash
+   git checkout dev/padlan
+   ```
+2. Selalu tarik kode terbaru dari `staging` agar fondasi kode Anda up-to-date:
+   ```bash
+   git pull origin staging
+   ```
+3. Lakukan *coding*, lalu *commit* perubahan Anda:
+   ```bash
+   git add .
+   git commit -m "feat: deskripsi fitur yang dibuat"
+   ```
+4. *Push* ke *branch* Anda di server:
+   ```bash
+   git push origin dev/padlan
+   ```
 
----
+### B. Menggabungkan Kode ke Staging (Uji Coba)
+1. Buka repositori SIMAHUB di GitHub.
+2. Buat **Pull Request** baru.
+   * **Base:** `staging`
+   * **Compare:** `dev/padlan`
+3. Minta anggota tim lain untuk meninjau (*review*).
+4. Jika disetujui (Approved), klik **Merge Pull Request**.
 
-## 👨‍💻 1. Daily Development (Push & Pull)
-
-When you start working for the day on your feature, follow these steps. (Assuming you are on `dev/padlan`):
-
-### Ensure you are on your branch
-```bash
-git checkout dev/padlan
-```
-
-### Pull the latest changes
-If you are working across multiple computers, make sure your local branch is up to date:
-```bash
-git pull origin dev/padlan
-```
-
-### Write your code, then Add and Commit
-After you finish a feature or fix a bug:
-```bash
-# Add all changed files
-git add .
-
-# Write a descriptive commit message
-git commit -m "Add new student dashboard layout"
-```
-
-### Push to GitHub
-```bash
-git push origin dev/padlan
-```
-
----
-
-## 🔄 2. Syncing with Other Developers (Merging Staging into Dev)
-
-If Akbar has added a new feature to `staging` and you need his code in your branch (`dev/padlan`) to continue your work:
-
-```bash
-# 1. Make sure your local staging branch is up to date
-git checkout staging
-git pull origin staging
-
-# 2. Go back to your dev branch
-git checkout dev/padlan
-
-# 3. Merge staging into your branch
-git merge staging
-
-# (Resolve any merge conflicts if they appear, then commit and push)
-git push origin dev/padlan
-```
-
----
-
-## 🚀 3. Submitting Your Work (Merging Dev to Staging)
-
-When your feature on `dev/padlan` is complete and tested locally, it's time to merge it into `staging` so it can be combined with Akbar's work.
-
-### Method A: Pull Request (Recommended)
-1. Go to the SIMAHUB repository on GitHub.
-2. Click **"Compare & pull request"** next to your `dev/padlan` branch.
-3. Set the base branch to **`staging`**.
-4. Review the changes and click **"Create pull request"**.
-5. Once reviewed, click **"Merge pull request"**.
-
-### Method B: Terminal Merge
-If you prefer doing it manually in the terminal:
-```bash
-# 1. Switch to staging and pull the latest code
-git checkout staging
-git pull origin staging
-
-# 2. Merge your dev branch into staging
-git merge dev/padlan
-
-# 3. Push the updated staging to GitHub
-git push origin staging
-
-# 4. Switch back to your dev branch to continue working on new things
-git checkout dev/padlan
-```
-
----
-
-## 🏆 4. Deploying to Production (Merging Staging to Main)
-
-Once everything in `staging` has been tested and confirmed to work perfectly without bugs, it gets merged into `main`.
-
-**This should strictly be done via a GitHub Pull Request:**
-1. Open a Pull Request from `staging` into `main`.
-2. Have another developer review it.
-3. Merge it.
-4. **Never** write new code directly on the `main` branch.
-
-git checkout dev/padlan
-git pull origin staging -> make sure there is no local code update first
-
-# ...writes code...
-git add .
-git commit -m "Padlan finished the API endpoints"
-git push origin dev/padlan
-
-git checkout staging
-git pull origin staging
-
-# Merge Padlan's local branch AND Akbar's remote branch simultaneously
-git merge dev/padlan origin/dev/akbar
+### C. Rilis ke Production (Main)
+*Syarat: Kode di staging sudah stabil dan teruji tanpa bug.*
+1. Buka repositori SIMAHUB di GitHub.
+2. Buat **Pull Request** baru.
+   * **Base:** `main`
+   * **Compare:** `staging`
+3. Klik **Merge Pull Request** (Pilih opsi *Create a merge commit* agar riwayat rilis tercatat rapi).

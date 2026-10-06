@@ -46,7 +46,7 @@ class Attendance extends Model
             return ucfirst($this->status);
         }
 
-        if (!$this->check_in_time || !$this->check_out_time) {
+        if (! $this->check_in_time || ! $this->check_out_time) {
             return '-';
         }
 
@@ -67,11 +67,11 @@ class Attendance extends Model
      */
     public function getLateMinutesAttribute(): int
     {
-        if ($this->status !== 'terlambat' || !$this->check_in_time || !$this->date) {
+        if ($this->status !== 'terlambat' || ! $this->check_in_time || ! $this->date) {
             return 0;
         }
 
-        $office = \App\Models\OfficeSetting::getSetting();
+        $office = OfficeSetting::getSetting();
         $dayOfWeek = Carbon::parse($this->date)->dayOfWeekIso;
 
         $workHours = is_string($office->work_hours) ? json_decode($office->work_hours, true) : $office->work_hours;
@@ -112,6 +112,7 @@ class Attendance extends Model
             return 'Tepat Waktu';
         } elseif ($this->status === 'terlambat') {
             $duration = $this->late_duration_text ?: '0 jam 0 Menit';
+
             return "TELAT\n({$duration})";
         } elseif ($this->status === 'izin') {
             return 'Izin';
@@ -135,9 +136,10 @@ class Attendance extends Model
             return '<div class="inline-flex flex-col items-center"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">Tepat Waktu</span></div>';
         } elseif ($this->status === 'terlambat') {
             $duration = $this->late_duration_text ?: '0 jam 0 Menit';
+
             return '<div class="inline-flex flex-col items-center justify-center leading-tight">
                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-black bg-rose-100 text-rose-800 tracking-wide">TELAT</span>
-                <span class="text-[10px] text-rose-600 font-bold mt-0.5">(' . $duration . ')</span>
+                <span class="text-[10px] text-rose-600 font-bold mt-0.5">('.$duration.')</span>
             </div>';
         } elseif ($this->status === 'izin') {
             return '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-800">Izin</span>';

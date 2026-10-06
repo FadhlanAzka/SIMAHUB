@@ -35,6 +35,7 @@ class GeolocationService
     public static function isWithinRadius(float $userLat, float $userLon, float $officeLat, float $officeLon, int $radiusMeters): bool
     {
         $distance = self::calculateDistance($userLat, $userLon, $officeLat, $officeLon);
+
         return $distance <= $radiusMeters;
     }
 }

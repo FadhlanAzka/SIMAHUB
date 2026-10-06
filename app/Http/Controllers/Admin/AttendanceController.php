@@ -23,7 +23,7 @@ class AttendanceController extends Controller
         $selectedType = $request->get('type');
 
         $query = Attendance::with('user');
-        
+
         if (auth()->user()->role === 'mentor') {
             $query->whereHas('user', function ($q) {
                 $q->where('mentor_id', auth()->id());
@@ -35,8 +35,8 @@ class AttendanceController extends Controller
         } elseif ($startDate && $endDate) {
             $query->whereBetween('date', [$startDate, $endDate]);
         } elseif ($selectedMonth) {
-            $monthStart = Carbon::parse($selectedMonth . '-01')->startOfMonth()->toDateString();
-            $monthEnd = Carbon::parse($selectedMonth . '-01')->endOfMonth()->toDateString();
+            $monthStart = Carbon::parse($selectedMonth.'-01')->startOfMonth()->toDateString();
+            $monthEnd = Carbon::parse($selectedMonth.'-01')->endOfMonth()->toDateString();
             $query->whereBetween('date', [$monthStart, $monthEnd]);
         }
 
@@ -70,7 +70,7 @@ class AttendanceController extends Controller
         $totalLateMinutes = 0;
         foreach ($matchingAttendances as $att) {
             $uid = $att->user_id;
-            if (!isset($userLateTotals[$uid])) {
+            if (! isset($userLateTotals[$uid])) {
                 $userLateTotals[$uid] = 0;
             }
             $userLateTotals[$uid] += $att->late_minutes;
@@ -100,6 +100,7 @@ class AttendanceController extends Controller
         // Pasangkan total durasi terlambat per peserta ke setiap baris data
         $attendances->getCollection()->transform(function ($att) use ($userLateTotalsText) {
             $att->user_total_late_text = $userLateTotalsText[$att->user_id] ?? '0 Menit';
+
             return $att;
         });
 
@@ -119,11 +120,11 @@ class AttendanceController extends Controller
         ];
 
         $internQuery = User::where('role', 'intern')->orderBy('name', 'asc');
-        
+
         if (auth()->user()->role === 'mentor') {
             $internQuery->where('mentor_id', auth()->id());
         }
-        
+
         $allintern = $internQuery->get();
 
         return view('admin.attendance.index', compact(
@@ -165,7 +166,7 @@ class AttendanceController extends Controller
             ->first();
 
         if ($existing) {
-            return redirect()->back()->with('error', 'Catatan presensi untuk peserta tersebut pada tanggal ' . Carbon::parse($validated['date'])->translatedFormat('d F Y') . ' sudah ada. Silakan gunakan tombol edit pada baris tabel.');
+            return redirect()->back()->with('error', 'Catatan presensi untuk peserta tersebut pada tanggal '.Carbon::parse($validated['date'])->translatedFormat('d F Y').' sudah ada. Silakan gunakan tombol edit pada baris tabel.');
         }
 
         $type = $validated['type'] ?? 'WFO';
@@ -188,8 +189,8 @@ class AttendanceController extends Controller
             'date' => $validated['date'],
             'status' => $validated['status'],
             'type' => $type,
-            'check_in_time' => !empty($validated['check_in_time']) ? Carbon::parse($validated['check_in_time'])->format('H:i:s') : null,
-            'check_out_time' => !empty($validated['check_out_time']) ? Carbon::parse($validated['check_out_time'])->format('H:i:s') : null,
+            'check_in_time' => ! empty($validated['check_in_time']) ? Carbon::parse($validated['check_in_time'])->format('H:i:s') : null,
+            'check_out_time' => ! empty($validated['check_out_time']) ? Carbon::parse($validated['check_out_time'])->format('H:i:s') : null,
             'notes' => $notes,
             'attachment' => $attachmentPath,
         ]);
@@ -235,8 +236,8 @@ class AttendanceController extends Controller
         $attendance->update([
             'status' => $validated['status'],
             'type' => $type,
-            'check_in_time' => !empty($validated['check_in_time']) ? Carbon::parse($validated['check_in_time'])->format('H:i:s') : null,
-            'check_out_time' => !empty($validated['check_out_time']) ? Carbon::parse($validated['check_out_time'])->format('H:i:s') : null,
+            'check_in_time' => ! empty($validated['check_in_time']) ? Carbon::parse($validated['check_in_time'])->format('H:i:s') : null,
+            'check_out_time' => ! empty($validated['check_out_time']) ? Carbon::parse($validated['check_out_time'])->format('H:i:s') : null,
             'notes' => $notes,
             'attachment' => $attachmentPath,
         ]);
@@ -253,6 +254,7 @@ class AttendanceController extends Controller
             Storage::disk('public')->delete($attendance->attachment);
         }
         $attendance->delete();
+
         return redirect()->back()->with('success', 'Catatan presensi berhasil dihapus.');
     }
 }

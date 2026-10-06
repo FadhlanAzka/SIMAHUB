@@ -123,4 +123,9 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    'deploy_token' => env('DEPLOY_TOKEN', null),
+
+    // Password akun admin awal untuk ProductionSeeder (dipakai sekali saat seed pertama)
+    'seed_admin_password' => env('SEED_ADMIN_PASSWORD', null),
+
 ];

@@ -7,7 +7,6 @@ use App\Models\Attendance;
 use App\Models\OfficeSetting;
 use App\Models\User;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
