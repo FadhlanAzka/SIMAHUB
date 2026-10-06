@@ -1,0 +1,111 @@
+name: Deploy to Production
+
+on:
+  workflow_dispatch:
+    inputs:
+      seed:
+        description: 'Jalankan ProductionSeeder (centang HANYA saat deploy pertama)'
+        type: boolean
+        default: false
+
+jobs:
+  deploy:
+    name: Deploy to cPanel
+    runs-on: ubuntu-latest
+    environment: production
+    
+    # Keamanan tambahan: hanya izinkan deploy dari branch main
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite3, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick, fileinfo
+          coverage: none
+
+      - name: Install Composer dependencies
+        # Pastikan tidak menginstall dev dependencies dan mengoptimasi classmap
+        run: composer install --prefer-dist --no-interaction --no-dev --optimize-autoloader
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install NPM dependencies
+        run: npm ci
+
+      - name: Build frontend assets
+        # Kirim ASSET_URL ke proses build agar file font/gambar terbaca dengan benar di subfolder
+        run: npm run build
+        env:
+          ASSET_URL: ${{ secrets.ASSET_URL }}
+
+      - name: Deploy Application Files (App)
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME_APP }}
+          password: ${{ secrets.FTP_PASSWORD_APP }}
+          protocol: ftps
+          exclude: |
+            **/.git/**
+            .github/**
+            .gitattributes
+            **/node_modules/**
+            tests/**
+            .env
+            .env.*
+            README.md
+            GIT_WORKFLOW.md
+            DEPLOYMENT.md
+            phpunit.xml
+            serve.bat
+            storage/logs/*.log
+            storage/framework/sessions/*
+            storage/framework/views/*.php
+            storage/framework/cache/data/**
+            public/**
+            !storage/framework/sessions/.gitignore
+
+      - name: Deploy Public Files (Public HTML)
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME_PUBLIC }}
+          password: ${{ secrets.FTP_PASSWORD_PUBLIC }}
+          protocol: ftps
+          local-dir: ./public/
+          exclude: |
+            **/.git/**
+            index.php
+            storage
+            !build/**
+
+      - name: Execute Post-Deploy Commands
+        # Panggil endpoint yang telah dibuat di Laravel
+        run: |
+          SEED_HEADER=""
+          if [ "${{ inputs.seed }}" = "true" ]; then
+            SEED_HEADER="X-Deploy-Seed: 1"
+            echo "ProductionSeeder akan dijalankan."
+          fi
+
+          HTTP_STATUS=$(curl -s -o deploy_output.json -w "%{http_code}" -X POST ${{ secrets.ASSET_URL }}/_deploy \
+            -H "X-Deploy-Token: ${{ secrets.DEPLOY_TOKEN }}" \
+            ${SEED_HEADER:+-H "$SEED_HEADER"})
+          
+          echo "Response HTTP Code: $HTTP_STATUS"
+          cat deploy_output.json
+          
+          if [ "$HTTP_STATUS" -ne 200 ]; then
+            echo -e "\nError: Deploy endpoint returned status $HTTP_STATUS"
+            exit 1
+          fi
+          
+          echo -e "\nDeploy endpoint executed successfully."
