@@ -118,3 +118,25 @@ Buat Environment baru dengan nama `production`. Tambahkan *Environment Secrets*:
 - Upload pertama akan **lama** (bisa 10–30+ menit) karena seluruh folder `vendor/` dikirim lewat FTP. Deploy berikutnya hanya mengirim file yang berubah.
 - Jika step FTP gagal dengan error sertifikat TLS, kemungkinan `FTP_SERVER` tidak cocok dengan sertifikat server. Coba gunakan hostname server cPanel (lihat di cPanel → *FTP Accounts* → *Configure FTP Client*).
 - Setelah sukses, buka `https://domain.go.id/simahub/up` → harus tampil halaman "Application up".
+
+## 5. Alur Update Kode (Setelah Aplikasi Live)
+
+Jika di kemudian hari ada perubahan/update kode (setelah aplikasi ini live), alurnya sangat mudah dan tidak perlu mengulangi *setup* server lagi.
+
+Berikut adalah urutan kerjanya jika ada update:
+
+1. **Coding Seperti Biasa**: Anda coding di branch `dev/padlan` atau `dev/akbar` lalu *push*. Ini akan otomatis menjalankan CI (pengecekan error & style) di GitHub untuk branch Anda.
+2. **Merge ke Staging & Main**: Jika sudah aman, Anda *merge* perubahan ke `staging` lalu *merge* lagi ke `main` secara lokal, kemudian *push* branch `main` tersebut. GitHub akan menjalankan CI lagi khusus untuk branch `main`.
+3. **Deploy Manual (Klik Tombol)**:
+   - Buka halaman repositori di GitHub.
+   - Pergi ke tab **Actions**.
+   - Pilih workflow **Deploy to Production** di panel kiri.
+   - Klik tombol **Run workflow**. (Pastikan Anda memilih branch `main`).
+   - **Bedanya dengan deploy pertama**: Saat update kode biasa, **JANGAN centang opsi `seed`**. Biarkan kosong.
+
+**Apa yang terjadi di balik layar saat Anda klik deploy?**
+- GitHub Action akan nge-build ulang frontend (NPM build) untuk memastikan CSS/JS terbaru.
+- **Hanya upload file yang berubah**: Action FTP yang kita gunakan cukup pintar. Ia tidak meng-upload seluruh project dari awal (yang bisa makan waktu 30 menit), melainkan hanya meng-upload file-file yang Anda ubah saja.
+- **Migrasi Database Otomatis**: Setelah file selesai diupload, GitHub Action akan otomatis menembak endpoint `/_deploy` milik Anda. Endpoint ini akan otomatis menjalankan perintah `php artisan migrate --force` (untuk mengupdate tabel jika ada tabel/kolom baru) dan membersihkan cache aplikasi (`optimize:clear`).
+
+**Intinya:** Untuk *update* kode, Anda hanya perlu memastikan kodenya masuk ke branch `main`, lalu masuk ke tab Actions dan klik **Run workflow**. Server cPanel akan otomatis diperbarui dalam 1-2 menit.
