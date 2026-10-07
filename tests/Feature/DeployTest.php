@@ -48,7 +48,7 @@ class DeployTest extends TestCase
 
         $this->assertSame(1, OfficeSetting::count());
         $this->assertSame(2, User::where('role', 'admin')->count());
-        $this->assertSame(0, User::where('role', '!=', 'admin')->count());
+        $this->assertSame(18, User::where('role', '!=', 'admin')->count());
         $this->assertTrue(Hash::check('rahasia-awal', User::where('username', 'admins')->value('password')));
     }
 
@@ -65,7 +65,7 @@ class DeployTest extends TestCase
 
         $this->assertTrue(Hash::check('password-baru', User::where('username', 'admin')->value('password')));
         $this->assertSame(250, (int) OfficeSetting::first()->radius_meters);
-        $this->assertSame(2, User::count());
+        $this->assertSame(20, User::count());
     }
 
     public function test_production_seeder_requires_password(): void

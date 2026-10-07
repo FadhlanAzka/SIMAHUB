@@ -16,16 +16,21 @@ class ProductionSeeder extends Seeder
             $this->call(OfficeSettingSeeder::class);
         }
 
-        User::updateOrCreate(
+        $seedPassword = config('app.seed_admin_password');
+        if (empty($seedPassword)) {
+            throw new \RuntimeException('SEED_ADMIN_PASSWORD is not set in environment.');
+        }
+
+        User::firstOrCreate(
             ['username' => 'admin'],
             [
                 'name' => 'Ita Nurvita, S.E.',
                 'role' => 'admin',
-                'password' => Hash::make('password'),
+                'password' => Hash::make($seedPassword),
             ]
         );
 
-        User::updateOrCreate(
+        User::firstOrCreate(
             ['username' => 'mentor1'],
             [
                 'name' => 'Akhmad Susanto, S.E.',
@@ -34,7 +39,7 @@ class ProductionSeeder extends Seeder
             ]
         );
 
-        User::updateOrCreate(
+        User::firstOrCreate(
             ['username' => 'mentor2'],
             [
                 'name' => 'Lailatul Munawaroh, S.Pd, M.Pd.',
@@ -43,7 +48,7 @@ class ProductionSeeder extends Seeder
             ]
         );
 
-        User::updateOrCreate(
+        User::firstOrCreate(
             ['username' => 'mentor3'],
             [
                 'name' => 'Evi Fuji Fauziyah, M.Hum.',
@@ -71,7 +76,7 @@ class ProductionSeeder extends Seeder
         ];
 
         foreach ($interns as $intern) {
-            User::updateOrCreate(
+            User::firstOrCreate(
                 ['username' => $intern['username']],
                 [
                     'name' => $intern['name'],
@@ -84,12 +89,12 @@ class ProductionSeeder extends Seeder
             );
         }
 
-        User::updateOrCreate(
+        User::firstOrCreate(
             ['username' => 'admins'],
             [
                 'name' => 'Super Admin',
                 'role' => 'admin',
-                'password' => Hash::make('password'), // Saya set "password" ya, biar sama
+                'password' => Hash::make($seedPassword),
             ]
         );
     }
