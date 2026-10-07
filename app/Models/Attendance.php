@@ -182,6 +182,6 @@ class Attendance extends Model
         if (!$this->attachment) {
             return null;
         }
-        return asset('storage/' . $this->attachment);
+        return route('attendance.attachment', $this->id);
     }
 }

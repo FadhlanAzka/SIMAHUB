@@ -401,17 +401,19 @@
             <!-- Catatan -->
             <div>
                 <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Catatan</label>
-                <textarea name="notes" rows="2" placeholder="Contoh: Keperluan urusan kampus, istirahat sakit, atau lupa check-in pagi..." class="w-full py-2 px-3 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white text-slate-900"></textarea>
+                <textarea name="notes" id="createNotes" rows="2" placeholder="Contoh: Keperluan urusan kampus, istirahat sakit, atau lupa check-in pagi..." class="w-full py-2 px-3 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white text-slate-900 transition-all"></textarea>
             </div>
 
             <!-- Upload Surat (PDF maks. 1MB) -->
             <div>
                 <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">
-                    Unggah Surat <span class="text-[10px] text-slate-400 font-normal normal-case ml-1">(Opsional: Surat Dokter / Izin - PDF maks. 1 MB)</span>
+                    Unggah Surat <span id="createAttachmentLabelReq" class="text-rose-500 hidden">*</span> <span class="text-[10px] text-slate-400 font-normal normal-case ml-1">(Surat Dokter / Izin - PDF maks. 1 MB)</span>
                 </label>
                 <input type="file" 
                        name="attachment" 
+                       id="createAttachment"
                        accept=".pdf,application/pdf" 
+                       onchange="checkFileSize(this, 1)"
                        class="block w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 bg-slate-50 border border-slate-300 rounded-xl cursor-pointer transition-all">
                 <p class="text-[10px] text-slate-400 mt-1">Format wajib PDF dengan ukuran maksimal 1 MB.</p>
             </div>
@@ -488,13 +490,13 @@
             <!-- Catatan -->
             <div>
                 <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Catatan</label>
-                <textarea name="notes" id="editNotes" rows="2" placeholder="Contoh: Lupa absen pulang, surat izin, dispensasi tugas dinas luar..." class="w-full py-2 px-3 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white text-slate-900"></textarea>
+                <textarea name="notes" id="editNotes" rows="2" placeholder="Contoh: Lupa absen pulang, surat izin, dispensasi tugas dinas luar..." class="w-full py-2 px-3 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white text-slate-900 transition-all"></textarea>
             </div>
 
             <!-- Upload Surat (PDF maks. 1MB) -->
             <div>
                 <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">
-                    Unggah Surat <span class="text-[10px] text-slate-400 font-normal normal-case ml-1">(Opsional - PDF maks. 1 MB)</span>
+                    Unggah Surat <span id="editAttachmentLabelReq" class="text-rose-500 hidden">*</span> <span class="text-[10px] text-slate-400 font-normal normal-case ml-1">(Surat Dokter / Izin - PDF maks. 1 MB)</span>
                 </label>
                 <div id="editExistingAttachmentContainer" class="hidden mb-2 p-2.5 rounded-xl bg-blue-50/70 border border-blue-200/80 flex items-center justify-between">
                     <div class="flex items-center gap-2">
@@ -508,7 +510,9 @@
                 </div>
                 <input type="file" 
                        name="attachment" 
+                       id="editAttachment"
                        accept=".pdf,application/pdf" 
+                       onchange="checkFileSize(this, 1)"
                        class="block w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 bg-slate-50 border border-slate-300 rounded-xl cursor-pointer transition-all">
                 <p class="text-[10px] text-slate-400 mt-1">Kosongkan jika tidak ingin mengubah surat. Format PDF maks. 1 MB.</p>
             </div>
@@ -538,6 +542,7 @@
 
     function openCreateModal() {
         document.getElementById('createAttendanceModal').classList.remove('hidden');
+        toggleTimeInputs('create');
         lucide.createIcons();
     }
 
@@ -594,13 +599,50 @@
         const status = document.getElementById(type === 'create' ? 'createStatusSelect' : 'editStatusSelect').value;
         const timeSection = document.getElementById(type === 'create' ? 'createTimeSection' : 'editTimeSection');
         const typeSelect = document.getElementById(type === 'create' ? 'createTypeSelect' : 'editTypeSelect');
+        const notesInput = document.getElementById(type === 'create' ? 'createNotes' : 'editNotes');
+        const attachInput = document.getElementById(type === 'create' ? 'createAttachment' : 'editAttachment');
+        const attachReq = document.getElementById(type === 'create' ? 'createAttachmentLabelReq' : 'editAttachmentLabelReq');
 
+        // Jam Masuk & Pulang
         if (['izin', 'sakit', 'alpa'].includes(status)) {
             timeSection.style.opacity = '0.5';
             typeSelect.disabled = true;
         } else {
             timeSection.style.opacity = '1';
             typeSelect.disabled = false;
+        }
+
+        // Catatan
+        if (['tepat_waktu', 'alpa'].includes(status)) {
+            notesInput.disabled = true;
+            notesInput.classList.add('bg-slate-100', 'text-slate-400', 'opacity-60', 'cursor-not-allowed');
+            notesInput.classList.remove('bg-slate-50', 'text-slate-900');
+            notesInput.value = '';
+        } else {
+            notesInput.disabled = false;
+            notesInput.classList.remove('bg-slate-100', 'text-slate-400', 'opacity-60', 'cursor-not-allowed');
+            notesInput.classList.add('bg-slate-50', 'text-slate-900');
+        }
+
+        // Unggah Surat
+        if (['izin', 'sakit'].includes(status)) {
+            attachInput.disabled = false;
+            attachInput.classList.remove('opacity-50', 'cursor-not-allowed');
+            
+            if (status === 'sakit') {
+                const hasExisting = type === 'edit' && !document.getElementById('editExistingAttachmentContainer').classList.contains('hidden');
+                attachInput.required = !hasExisting;
+                attachReq.classList.remove('hidden');
+            } else {
+                attachInput.required = false;
+                attachReq.classList.add('hidden');
+            }
+        } else {
+            attachInput.disabled = true;
+            attachInput.required = false;
+            attachReq.classList.add('hidden');
+            attachInput.classList.add('opacity-50', 'cursor-not-allowed');
+            attachInput.value = '';
         }
     }
 
@@ -611,5 +653,15 @@
             closeEditModal();
         }
     });
+
+    function checkFileSize(input, maxMb) {
+        if (input.files && input.files[0]) {
+            const fileSizeMb = input.files[0].size / (1024 * 1024);
+            if (fileSizeMb > maxMb) {
+                alert(`Peringatan: Ukuran file (${fileSizeMb.toFixed(2)} MB) terlalu besar!\nBatas maksimal adalah ${maxMb} MB. Silakan kompres file PDF Anda terlebih dahulu.`);
+                input.value = ''; // Hapus file dari input
+            }
+        }
+    }
 </script>
 @endsection

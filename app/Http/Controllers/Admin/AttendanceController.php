@@ -181,7 +181,7 @@ class AttendanceController extends Controller
 
         $attachmentPath = null;
         if ($request->hasFile('attachment')) {
-            $attachmentPath = $request->file('attachment')->store('attachments/letters', 'public');
+            $attachmentPath = $request->file('attachment')->store('attachments/letters', 'local');
         }
 
         Attendance::create([
@@ -227,10 +227,10 @@ class AttendanceController extends Controller
 
         $attachmentPath = $attendance->attachment;
         if ($request->hasFile('attachment')) {
-            if ($attendance->attachment && Storage::disk('public')->exists($attendance->attachment)) {
-                Storage::disk('public')->delete($attendance->attachment);
+            if ($attendance->attachment && Storage::disk('local')->exists($attendance->attachment)) {
+                Storage::disk('local')->delete($attendance->attachment);
             }
-            $attachmentPath = $request->file('attachment')->store('attachments/letters', 'public');
+            $attachmentPath = $request->file('attachment')->store('attachments/letters', 'local');
         }
 
         $attendance->update([
@@ -250,11 +250,29 @@ class AttendanceController extends Controller
      */
     public function destroy(Attendance $attendance)
     {
-        if ($attendance->attachment && Storage::disk('public')->exists($attendance->attachment)) {
-            Storage::disk('public')->delete($attendance->attachment);
+        if ($attendance->attachment && Storage::disk('local')->exists($attendance->attachment)) {
+            Storage::disk('local')->delete($attendance->attachment);
         }
         $attendance->delete();
 
         return redirect()->back()->with('success', 'Catatan presensi berhasil dihapus.');
+    }
+
+    /**
+     * Tampilkan lampiran surat secara aman
+     */
+    public function showAttachment(Attendance $attendance)
+    {
+        if (!$attendance->attachment || !Storage::disk('local')->exists($attendance->attachment)) {
+            abort(404, 'File surat tidak ditemukan.');
+        }
+
+        // Pastikan hanya admin, pengawas, mentor, atau pemilik (peserta) yang bisa melihat
+        $user = auth()->user();
+        if ($user->role === 'intern' && $user->id !== $attendance->user_id) {
+            abort(403, 'Akses ditolak.');
+        }
+
+        return response()->file(Storage::disk('local')->path($attendance->attachment));
     }
 }

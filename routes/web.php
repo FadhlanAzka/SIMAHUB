@@ -31,6 +31,11 @@ Route::middleware('guest')->group(function () {
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
+// Akses Lampiran Presensi (Bisa diakses Admin & Peserta yang bersangkutan)
+Route::get('/attendance/{attendance}/attachment', [AdminAttendanceController::class, 'showAttachment'])
+    ->middleware('auth')
+    ->name('attendance.attachment');
+
 // Area Peserta Magang (Role: intern)
 Route::middleware(['auth', 'role:intern'])->prefix('intern')->name('intern.')->group(function () {
     Route::post('/attendance/check-in', [InternAttendanceController::class, 'checkIn'])->name('attendance.checkin');
