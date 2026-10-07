@@ -78,10 +78,12 @@ Aplikasi akan dibagi menjadi dua bagian:
    $app->handleRequest(Request::capture());
    ```
 
-6. **(Opsional) Buat Symlink Storage lewat Cron Job:**
-   > Saat ini SIMAHUB **belum memakai** disk `public` (tidak ada upload file yang ditampilkan ke publik), jadi langkah ini boleh dilewati. Lakukan hanya jika nanti ada fitur upload foto/dokumen yang perlu diakses lewat URL.
+6. **Buat Symlink Storage lewat Cron Job (PENTING UNTUK LOGO):**
+   > Saat ini SIMAHUB menggunakan disk `public` **hanya untuk menampilkan gambar logo statis** (contoh: `Logo_Login.png` dan `Logo_NavBar.png`).
 
-   Karena aplikasi dan folder publik dipisah, perintah `php artisan storage:link` standar akan salah sasaran. Gunakan perintah `ln` bawaan Linux lewat menu **Cron Jobs** di cPanel:
+   Karena aplikasi dan folder publik dipisah, perintah `php artisan storage:link` standar akan salah sasaran. Anda memiliki 2 pilihan untuk menampilkan logo:
+   **Pilihan A (Tanpa Symlink):** Buat folder manual `storage/logos` di dalam `public_html/simahub/`, lalu *upload* logo Anda ke sana lewat FTP/File Manager cPanel.
+   **Pilihan B (Dengan Symlink via Cron Job):** Gunakan perintah `ln` bawaan Linux lewat menu **Cron Jobs** di cPanel:
    - Tambahkan Cron Job baru, set waktunya ke *Once Per Minute* (bintang semua).
    - Command: `ln -sfn /home/[user]/simahub_app/storage/app/public /home/[user]/public_html/simahub/storage`
      *(flag `-sfn` membuat perintah aman walau sempat berjalan lebih dari sekali)*

@@ -263,7 +263,7 @@ class AttendanceController extends Controller
      */
     public function showAttachment(Attendance $attendance)
     {
-        if (!$attendance->attachment || !Storage::disk('local')->exists($attendance->attachment)) {
+        if (! $attendance->attachment || ! Storage::disk('local')->exists($attendance->attachment)) {
             abort(404, 'File surat tidak ditemukan.');
         }
 

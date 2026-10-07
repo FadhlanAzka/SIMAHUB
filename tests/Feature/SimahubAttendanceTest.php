@@ -569,7 +569,7 @@ class SimahubAttendanceTest extends TestCase
 
     public function test_manual_attendance_pdf_upload_and_mentor_placeholder()
     {
-        Storage::fake('public');
+        Storage::fake('local');
 
         $admin = User::create([
             'username' => 'admin_test_pdf',
@@ -593,7 +593,7 @@ class SimahubAttendanceTest extends TestCase
         $createView->assertStatus(200);
         $createView->assertSee('Contoh: Akhmad');
 
-        $editView = $this->get('/admin/intern/' . $intern->id . '/edit');
+        $editView = $this->get('/admin/intern/'.$intern->id.'/edit');
         $editView->assertStatus(200);
         $editView->assertSee('Contoh: Akhmad');
 
@@ -637,7 +637,7 @@ class SimahubAttendanceTest extends TestCase
         $attendance = Attendance::where('user_id', $intern->id)->where('date', '2026-10-06')->first();
         $this->assertNotNull($attendance);
         $this->assertNotNull($attendance->attachment);
-        Storage::disk('public')->assertExists($attendance->attachment);
+        Storage::disk('local')->assertExists($attendance->attachment);
 
         // 5. Verifikasi tampilan web memuat link surat PDF
         $attendanceIndex = $this->get('/admin/attendance');
@@ -649,7 +649,7 @@ class SimahubAttendanceTest extends TestCase
         $newPdf = UploadedFile::fake()->create('surat_dokter_baru.pdf', 250, 'application/pdf');
         $oldPath = $attendance->attachment;
 
-        $resEdit = $this->put('/admin/attendance/' . $attendance->id, [
+        $resEdit = $this->put('/admin/attendance/'.$attendance->id, [
             'status' => 'izin',
             'type' => 'WFO',
             'notes' => 'Surat izin diperbarui',
@@ -659,14 +659,14 @@ class SimahubAttendanceTest extends TestCase
         $resEdit->assertSessionHas('success');
 
         $attendance->refresh();
-        Storage::disk('public')->assertMissing($oldPath);
-        Storage::disk('public')->assertExists($attendance->attachment);
+        Storage::disk('local')->assertMissing($oldPath);
+        Storage::disk('local')->assertExists($attendance->attachment);
 
         // 7. Hapus attendance membersihkan file lampiran
         $currentPath = $attendance->attachment;
-        $resDelete = $this->delete('/admin/attendance/' . $attendance->id);
+        $resDelete = $this->delete('/admin/attendance/'.$attendance->id);
         $resDelete->assertRedirect();
-        Storage::disk('public')->assertMissing($currentPath);
+        Storage::disk('local')->assertMissing($currentPath);
 
         $intern->delete();
         $admin->delete();

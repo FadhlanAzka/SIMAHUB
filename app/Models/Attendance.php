@@ -179,9 +179,10 @@ class Attendance extends Model
      */
     public function getAttachmentUrlAttribute(): ?string
     {
-        if (!$this->attachment) {
+        if (! $this->attachment) {
             return null;
         }
+
         return route('attendance.attachment', $this->id);
     }
 }
