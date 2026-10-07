@@ -98,9 +98,12 @@ Route::post('/_deploy', function (Request $request) {
             $seedOutput = Artisan::output();
         }
 
-        // Optimize / clear cache
-        Artisan::call('optimize');
-        $optimizeOutput = Artisan::output();
+        // Cache config, event, view (tetapi hindari route:cache via HTTP request karena bisa corrupt cache method)
+        Artisan::call('config:cache');
+        Artisan::call('event:cache');
+        Artisan::call('view:cache');
+        Artisan::call('route:clear');
+        $optimizeOutput = 'Config, event, view cached. Route cache cleared.';
     } catch (Throwable $e) {
         return response()->json([
             'status' => 'error',
