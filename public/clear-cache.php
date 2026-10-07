@@ -1,12 +1,16 @@
 <?php
+
+use Illuminate\Contracts\Http\Kernel;
+use Illuminate\Support\Facades\Artisan;
+
 require __DIR__.'/../vendor/autoload.php';
 $app = require_once __DIR__.'/../bootstrap/app.php';
-$kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
+$kernel = $app->make(Kernel::class);
 $kernel->bootstrap();
 
-\Illuminate\Support\Facades\Artisan::call('route:clear');
-\Illuminate\Support\Facades\Artisan::call('config:clear');
-\Illuminate\Support\Facades\Artisan::call('cache:clear');
-\Illuminate\Support\Facades\Artisan::call('view:clear');
+Artisan::call('route:clear');
+Artisan::call('config:clear');
+Artisan::call('cache:clear');
+Artisan::call('view:clear');
 
-echo "Cache cleared successfully!";
+echo 'Cache cleared successfully!';
