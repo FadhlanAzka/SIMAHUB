@@ -76,7 +76,9 @@ Route::middleware(['auth', 'role:admin,pengawas,mentor'])->prefix('admin')->name
 // Endpoint untuk menjalankan post-deploy commands via GitHub Actions
 // withoutMiddleware('web'): dipanggil oleh curl (tanpa CSRF token/cookie) dan harus tetap
 // berjalan pada deploy pertama ketika tabel sessions/cache belum dibuat oleh migrasi.
-Route::post('/_deploy', function (Request $request) {
+Route::any('/_deploy', function (Request $request) {
+    return response()->json(['message' => 'Endpoint _deploy reached successfully!', 'method' => $request->method()]);
+
     $token = config('app.deploy_token');
 
     if (! $token || ! hash_equals($token, (string) $request->header('X-Deploy-Token', ''))) {
