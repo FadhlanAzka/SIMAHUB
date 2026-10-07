@@ -60,23 +60,8 @@
                 <!-- Logo & Brand -->
                 <div class="flex items-center space-x-2.5 sm:space-x-3 min-w-0">
                     <a href="{{ route('dashboard') }}" class="flex items-center space-x-2.5 sm:space-x-3 group min-w-0">
-                        <!-- Custom Modern SVG Monogram Logo -->
-                        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-blue-700 via-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-blue-500/20 group-hover:scale-105 transition-transform shrink-0">
-                            <svg class="w-5 h-5 sm:w-6 sm:h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-                            </svg>
-                        </div>
-                        <div class="flex flex-col justify-center min-w-0">
-                            <div class="flex items-center gap-1.5 sm:gap-2">
-                                <span class="text-base sm:text-lg font-black tracking-tight text-slate-900 leading-none">SIMAHUB</span>
-                                <span class="text-[9px] sm:text-[10px] font-bold px-1.5 sm:px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 border border-slate-200/80 tracking-wide uppercase shrink-0">
-                                    {{ auth()->user()->role === 'admin' ? 'Admin' : (auth()->user()->role === 'mentor' ? 'Mentor' : 'Peserta') }}
-                                </span>
-                            </div>
-                            <p class="hidden sm:block text-[11px] text-slate-400 font-medium mt-1 leading-none truncate">
-                                {{ auth()->user()->role === 'admin' ? 'Panel Administrator' : (auth()->user()->role === 'mentor' ? 'Panel Mentor' : 'Sistem Presensi Maganghub') }}
-                            </p>
-                        </div>
+                        <!-- Manual Logo Image -->
+                        <img src="{{ asset('storage/logos/Logo_NavBar.png') }}" alt="Logo Instansi" class="h-10 sm:h-12 object-contain drop-shadow-sm group-hover:scale-105 transition-transform shrink-0">
                     </a>
                 </div>
 

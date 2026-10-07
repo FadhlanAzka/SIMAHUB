@@ -87,10 +87,11 @@
                     </label>
                     <select name="mentor_id" 
                             id="mentor_id" 
-                            class="w-full text-xs font-medium py-2.5 px-3.5 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-slate-900 transition-all">
-                        <option value="">Contoh: Akhmad</option>
+                            onchange="this.classList.toggle('text-slate-400', this.value === ''); this.classList.toggle('text-slate-900', this.value !== '');"
+                            class="w-full text-xs font-medium py-2.5 px-3.5 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white {{ old('mentor_id') ? 'text-slate-900' : 'text-slate-400' }} transition-all">
+                        <option value="" class="text-slate-400">Contoh: Akhmad</option>
                         @foreach($mentors as $mentor)
-                            <option value="{{ $mentor->id }}" {{ old('mentor_id') == $mentor->id ? 'selected' : '' }}>
+                            <option value="{{ $mentor->id }}" class="text-slate-900" {{ old('mentor_id') == $mentor->id ? 'selected' : '' }}>
                                 {{ $mentor->name }}
                             </option>
                         @endforeach

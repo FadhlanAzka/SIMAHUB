@@ -6,14 +6,13 @@
 <div class="sm:mx-auto sm:w-full sm:max-w-md">
     
     <!-- Modern Brand Identity & Sleek Monogram Logo -->
-    <div class="text-center">
-        <div class="inline-flex w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-700 via-blue-600 to-indigo-600 items-center justify-center text-white shadow-xl shadow-blue-500/25 mb-4 ring-4 ring-blue-100/60 transform hover:scale-105 transition-transform duration-300">
-            <svg class="w-8 h-8 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-            </svg>
-        </div>
-        <h1 class="text-2xl font-black tracking-tight text-slate-900">SIMAHUB</h1>
-        <p class="text-xs text-slate-500 mt-1 font-semibold tracking-wide uppercase">Sistem Informasi Absensi MagangHub</p>
+    <div class="text-center mb-8">
+        <!-- Manual Logo Image -->
+        <img src="{{ asset('storage/logos/Logo_Login.png') }}" alt="Logo Instansi" class="inline-block h-28 sm:h-32 mb-6 drop-shadow-md transform hover:scale-105 transition-all duration-300 object-contain">
+        
+        <h1 class="text-2xl sm:text-3xl font-black tracking-tight text-slate-900">Balai Bahasa Provinsi Jawa Barat</h1>
+        <p class="text-xs sm:text-sm text-slate-500 mt-2 font-bold tracking-widest uppercase">SIMAHUB</p>
+        <!-- <p class="text-xs text-slate-500 mt-1 font-semibold tracking-wide uppercase">Sistem Informasi Absensi MagangHub</p> -->
     </div>
 
     <!-- Login Card -->
