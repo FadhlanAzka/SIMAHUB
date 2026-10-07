@@ -96,7 +96,9 @@ jobs:
             echo "ProductionSeeder akan dijalankan."
           fi
 
-          HTTP_STATUS=$(curl -s -o deploy_output.json -w "%{http_code}" -X POST ${{ secrets.ASSET_URL }}/_deploy \
+          # --data wajib: server hosting menolak (404) POST tanpa header Content-Length
+          HTTP_STATUS=$(curl -s -o deploy_output.json -w "%{http_code}" -X POST "${{ secrets.ASSET_URL }}/_deploy" \
+            --data "source=github-actions" \
             -H "X-Deploy-Token: ${{ secrets.DEPLOY_TOKEN }}" \
             ${SEED_HEADER:+-H "$SEED_HEADER"})
           
