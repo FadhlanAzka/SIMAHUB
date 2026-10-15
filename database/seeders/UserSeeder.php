@@ -19,7 +19,7 @@ class UserSeeder extends Seeder
             [
                 'name' => 'Ita Nurvita, S.E.',
                 'role' => 'admin',
-                'password' => Hash::make('password'),
+                'password' => Hash::make('balai1999'),
             ]
         );
 

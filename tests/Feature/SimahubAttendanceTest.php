@@ -671,4 +671,83 @@ class SimahubAttendanceTest extends TestCase
         $intern->delete();
         $admin->delete();
     }
+
+    public function test_work_duration_lunch_break_deduction()
+    {
+        $user = User::create([
+            'username' => 'intern_test_duration',
+            'name' => 'Peserta Durasi',
+            'role' => 'intern',
+            'position' => 'Web Developer',
+            'password' => bcrypt('password'),
+        ]);
+
+        // 1. Pulang sebelum istirahat (jam 11:00) -> tidak dipotong istirahat 1 jam
+        $att11 = Attendance::create([
+            'user_id' => $user->id,
+            'date' => '2026-09-01',
+            'status' => 'tepat_waktu',
+            'type' => 'WFO',
+            'check_in_time' => '07:30:00',
+            'check_out_time' => '11:00:00',
+        ]);
+        $this->assertEquals('3 jam 30 mnt', $att11->duration);
+
+        // 2. Pulang tepat jam 12:00 -> tidak dipotong istirahat 1 jam
+        $att12 = Attendance::create([
+            'user_id' => $user->id,
+            'date' => '2026-09-02',
+            'status' => 'tepat_waktu',
+            'type' => 'WFO',
+            'check_in_time' => '07:30:00',
+            'check_out_time' => '12:00:00',
+        ]);
+        $this->assertEquals('4 jam 30 mnt', $att12->duration);
+
+        // 3. Pulang saat rentang istirahat (jam 12:30) -> tidak dipotong istirahat
+        $att1230 = Attendance::create([
+            'user_id' => $user->id,
+            'date' => '2026-09-03',
+            'status' => 'tepat_waktu',
+            'type' => 'WFO',
+            'check_in_time' => '07:30:00',
+            'check_out_time' => '12:30:00',
+        ]);
+        $this->assertEquals('5 jam 0 mnt', $att1230->duration);
+
+        // 4. Pulang tepat jam 13:00 -> dipotong istirahat 1 jam
+        $att13 = Attendance::create([
+            'user_id' => $user->id,
+            'date' => '2026-09-04',
+            'status' => 'tepat_waktu',
+            'type' => 'WFO',
+            'check_in_time' => '07:30:00',
+            'check_out_time' => '13:00:00',
+        ]);
+        $this->assertEquals('4 jam 30 mnt', $att13->duration);
+
+        // 5. Pulang normal jam 16:00 (Senin - Kamis) -> dipotong istirahat 1 jam
+        $att16 = Attendance::create([
+            'user_id' => $user->id,
+            'date' => '2026-09-07',
+            'status' => 'tepat_waktu',
+            'type' => 'WFO',
+            'check_in_time' => '07:30:00',
+            'check_out_time' => '16:00:00',
+        ]);
+        $this->assertEquals('7 jam 30 mnt', $att16->duration);
+
+        // 6. Pulang normal hari Jumat jam 16:30 -> dipotong istirahat 1 jam
+        $att1630 = Attendance::create([
+            'user_id' => $user->id,
+            'date' => '2026-09-11',
+            'status' => 'tepat_waktu',
+            'type' => 'WFO',
+            'check_in_time' => '07:30:00',
+            'check_out_time' => '16:30:00',
+        ]);
+        $this->assertEquals('8 jam 0 mnt', $att1630->duration);
+
+        $user->delete();
+    }
 }

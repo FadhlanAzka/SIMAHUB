@@ -171,6 +171,7 @@
                                     <!-- Edit Button -->
                                     <button type="button" 
                                             data-id="{{ $row->id }}"
+                                            data-action="{{ route('admin.attendance.update', $row->id) }}"
                                             data-user="{{ $row->user ? $row->user->name : '-' }}"
                                             data-date="{{ $row->date->format('d/m/Y') }}"
                                             data-status="{{ $row->status }}"
@@ -553,6 +554,7 @@
     function openEditModalFromBtn(btn) {
         const data = {
             id: btn.dataset.id,
+            action: btn.dataset.action,
             user_name: btn.dataset.user,
             date_formatted: btn.dataset.date,
             status: btn.dataset.status,
@@ -567,7 +569,7 @@
 
     function openEditModal(data) {
         const form = document.getElementById('editAttendanceForm');
-        form.action = `/admin/attendance/${data.id}`;
+        form.action = data.action || `{{ url('admin/attendance') }}/${data.id}`;
 
         document.getElementById('editParticipantInfo').textContent = `${data.user_name} • Tanggal ${data.date_formatted}`;
         document.getElementById('editStatusSelect').value = data.status || 'tepat_waktu';

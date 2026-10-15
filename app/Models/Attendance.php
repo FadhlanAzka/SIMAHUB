@@ -53,11 +53,24 @@ class Attendance extends Model
         $in = Carbon::parse($this->check_in_time);
         $out = Carbon::parse($this->check_out_time);
 
-        // Bulatkan ke bawah dan kurangi 1 jam (istirahat)
-        $hours = (int) floor($in->diffInHours($out));
-        $hours = max(0, $hours - 1); // Pastikan tidak kurang dari 0
+        if ($out->lt($in)) {
+            return '0 jam 0 mnt';
+        }
 
-        $minutes = $in->diffInMinutes($out) % 60;
+        $totalMinutes = (int) $in->diffInMinutes($out);
+
+        // Jika jam pulang di atas jam 12.00-13.00 (>= 13:00) dan check-in sebelum jam 13:00,
+        // dipotong waktu istirahat 1 jam (60 menit).
+        // Jika pulang jam 12:00 ke bawah atau di rentang istirahat, durasi kerja tidak dipotong.
+        $inTimeStr = $in->format('H:i');
+        $outTimeStr = $out->format('H:i');
+
+        if ($outTimeStr >= '13:00' && $inTimeStr < '13:00') {
+            $totalMinutes = max(0, $totalMinutes - 60);
+        }
+
+        $hours = (int) floor($totalMinutes / 60);
+        $minutes = $totalMinutes % 60;
 
         return "{$hours} jam {$minutes} mnt";
     }
