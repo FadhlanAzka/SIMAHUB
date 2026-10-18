@@ -80,10 +80,8 @@
         
         <!-- Official Institutional Header (KOP INSTANSI) -->
         <div class="border-b-4 border-double border-slate-900 pb-4 mb-6 text-center">
-            <div class="flex items-center justify-center gap-3.5 mb-1.5">
-                <div class="w-12 h-12 rounded-xl bg-blue-700 text-white flex items-center justify-center font-bold text-xl shrink-0">
-                    <i data-lucide="building-2" class="w-7 h-7"></i>
-                </div>
+            <div class="flex items-center justify-center gap-4 mb-1.5">
+                <img src="{{ asset('storage/logos/Logo_Login.png') }}" alt="Logo Instansi" class="h-16 w-auto object-contain shrink-0">
                 <div class="text-left">
                     <h1 class="text-lg font-black tracking-wider text-slate-900 uppercase leading-snug">
                         {{ $office->office_name }}
@@ -229,9 +227,11 @@
             </div>
             <div class="text-center min-w-[220px]">
                 <p class="font-medium text-slate-600">Mengetahui,</p>
-                <p class="font-bold text-slate-900">Pembimbing / Admin Instansi</p>
+                <p class="font-bold text-slate-900">
+                    {{ auth()->check() ? (auth()->user()->role === 'admin' ? 'Administrator' : (auth()->user()->role === 'mentor' ? 'Mentor' : (auth()->user()->role === 'pengawas' ? 'Pengawas' : ucfirst(auth()->user()->role)))) : 'Administrator' }}
+                </p>
                 <div class="h-20"></div>
-                <p class="font-extrabold underline text-slate-900 uppercase">ADMINISTRATOR</p>
+                <p class="font-extrabold underline text-slate-900 uppercase">{{ auth()->check() ? auth()->user()->name : 'ADMINISTRATOR' }}</p>
                 <p class="text-[11px] text-slate-500">{{ $office->office_name }}</p>
             </div>
         </div>

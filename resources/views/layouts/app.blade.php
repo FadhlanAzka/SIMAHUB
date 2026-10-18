@@ -117,8 +117,8 @@
                 <!-- User Profile & Logout -->
                 <div class="flex items-center space-x-3 shrink-0">
                     <div class="hidden sm:block text-right">
-                        <div class="text-xs font-bold text-slate-900 leading-tight max-w-[140px] md:max-w-[180px] truncate">{{ auth()->user()->name }}</div>
-                        <div class="text-[11px] text-blue-600 font-semibold max-w-[140px] md:max-w-[180px] truncate">
+                        <div class="text-xs font-bold text-slate-900 leading-tight max-w-[160px] sm:max-w-xs md:max-w-sm truncate" title="{{ auth()->user()->name }}">{{ auth()->user()->name }}</div>
+                        <div class="text-[11px] text-blue-600 font-semibold max-w-[200px] sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl truncate" title="{{ auth()->user()->role === 'admin' ? 'Administrator' : (auth()->user()->role === 'mentor' ? 'Mentor' : (auth()->user()->position ?: 'Peserta Magang')) }}">
                             {{ auth()->user()->role === 'admin' ? 'Administrator' : (auth()->user()->role === 'mentor' ? 'Mentor' : (auth()->user()->position ?: 'Peserta Magang')) }}
                         </div>
                     </div>

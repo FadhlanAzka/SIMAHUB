@@ -15,9 +15,9 @@
         <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
             <div>
                 <div class="flex flex-wrap items-center gap-2 mb-3">
-                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 text-blue-100 text-xs font-bold backdrop-blur-md border border-white/10">
-                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                        <span>Posisi: {{ $user->position ?: 'Peserta Magang' }}</span>
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 text-blue-100 text-xs font-bold backdrop-blur-md border border-white/10 max-w-full">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
+                        <span class="truncate">Posisi: {{ $user->position ?: 'Peserta Magang' }}</span>
                     </div>
                     <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 text-blue-100 text-xs font-bold backdrop-blur-md border border-white/10">
                         <i data-lucide="user-check" class="w-3.5 h-3.5"></i>

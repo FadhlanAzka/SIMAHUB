@@ -23,4 +23,5 @@ Homestead.json
 Homestead.yaml
 Thumbs.db
 serve.bat
-/database/seeders/AttendanceSeeder.php
+database/backups
+initialize.txt
